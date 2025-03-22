@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(180deg, #28a745 0%, #1e7e34 100%); /* Зелёный градиент */
+            background: linear-gradient(180deg, #00cc00 0%, #006600 100%); /* Зелёный градиент */
             color: #fff;
             height: 100vh;
             display: flex;
@@ -33,7 +33,7 @@
         .header .beta {
             font-size: 12px;
             background: #fff;
-            color: #28a745;
+            color: #00cc00;
             padding: 2px 8px;
             border-radius: 10px;
         }
@@ -95,10 +95,10 @@
             background: #fff;
             border-radius: 50%;
         }
-        .history, .profile {
+        .history, .profile, #depositScreen, #networkScreen, #qrScreen {
             display: none;
         }
-        .history h3, .profile h3 {
+        .history h3, .profile h3, #depositScreen h3, #networkScreen h3, #qrScreen h3 {
             font-size: 16px;
             margin-bottom: 10px;
         }
@@ -118,7 +118,7 @@
         .history-item .left .icon {
             width: 30px;
             height: 30px;
-            background: #28a745;
+            background: #00cc00;
             border-radius: 50%;
             margin-right: 10px;
         }
@@ -134,6 +134,70 @@
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
+        }
+        #depositScreen, #networkScreen, #qrScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            color: #000;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #depositScreen .network-option, #networkScreen .network-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        #depositScreen .network-option img, #networkScreen .network-option img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        #qrScreen .qr-code {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+        }
+        #qrScreen .address {
+            font-size: 14px;
+            word-break: break-all;
+            text-align: center;
+            margin: 10px 0;
+        }
+        #qrScreen .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        #qrScreen .fee {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        #qrScreen .copy-btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
         }
         #qrScanner {
             display: none;
@@ -164,7 +228,7 @@
         }
         #qrScanner #result {
             position: absolute;
-            bottom: 20px;
+            bottom: 80px;
             left: 20px;
             color: #fff;
             font-size: 14px;
@@ -173,36 +237,29 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            background: #28a745;
+            background: #00cc00;
             color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 10px;
             cursor: pointer;
         }
-        #qrScanner #flashlightBtn {
+        #qrScanner #flashlightBtn, #qrScanner #uploadBtn {
             position: absolute;
-            bottom: 80px;
-            right: 20px;
+            bottom: 20px;
+            left: 20px;
             background: #fff;
             color: #000;
             border: none;
             padding: 10px;
             border-radius: 10px;
             cursor: pointer;
+            margin-right: 10px;
         }
-        #qrScanner #galleryBtn {
-            position: absolute;
-            bottom: 140px;
-            right: 20px;
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
+        #qrScanner #flashlightBtn img, #qrScanner #uploadBtn img {
+            width: 20px;
         }
-        #qrScanner #galleryInput {
+        #qrScanner #uploadInput {
             display: none;
         }
         .navbar {
@@ -225,7 +282,7 @@
             cursor: pointer;
         }
         .navbar button.active {
-            color: #28a745;
+            color: #00cc00;
         }
         .navbar button img {
             width: 20px;
@@ -249,7 +306,7 @@
                 <p id="balanceUsdt">0.0 USDT</p>
             </div>
             <div class="buttons">
-                <button onclick="deposit()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
+                <button onclick="showDepositScreen()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
                 <button onclick="showQrScanner()"><img src="https://img.icons8.com/ios-filled/50/qr-code.png" alt="Оплатить">Оплатить</button>
             </div>
             <div class="promo">
@@ -273,24 +330,111 @@
                 <p><strong>Баланс:</strong> <span id="profileBalance"></span> USDT</p>
             </div>
         </div>
+        <div id="depositScreen">
+            <h3>Пополнить</h3>
+            <p>Как вы хотите пополнить криптовалюту на CryptoTap</p>
+            <div class="network-option" onclick="showNetworkScreen()">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/tron.png" alt="TRC20">
+                    <div>
+                        <p>Внешний кошелёк</p>
+                        <p style="font-size: 12px; color: #666;">Перевод с другого кошелька</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+            <div class="network-option">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/credit-card.png" alt="Card">
+                    <div>
+                        <p>Банковская карта</p>
+                        <p style="font-size: 12px; color: #666;">Покупка криптовалюты по карте</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+            <div class="network-option">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/flash.png" alt="Express">
+                    <div>
+                        <p>Экспресс-покупка</p>
+                        <p style="font-size: 12px; color: #666;">Покупка у продавца в 3 шага</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+            <div class="network-option">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/users.png" alt="P2P">
+                    <div>
+                        <p>P2P рынок</p>
+                        <p style="font-size: 12px; color: #666;">Купить без посредников</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+        </div>
+        <div id="networkScreen">
+            <h3>Выберите криптовалюту</h3>
+            <div class="network-option" onclick="selectNetwork('TRC20')">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/tron.png" alt="TRC20">
+                    <div>
+                        <p>USDT</p>
+                        <p style="font-size: 12px; color: #666;">0.0 USDT</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+            <div class="network-option" onclick="selectNetwork('TON')">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/ton.png" alt="TON">
+                    <div>
+                        <p>TON</p>
+                        <p style="font-size: 12px; color: #666;">0.0 TON</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+            <div class="network-option" onclick="selectNetwork('BEP-20')">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/binance.png" alt="BEP-20">
+                    <div>
+                        <p>BEP-20</p>
+                        <p style="font-size: 12px; color: #666;">0.0 BEP-20</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+        </div>
+        <div id="qrScreen">
+            <h3>Пополнение USDT</h3>
+            <img id="qrCode" class="qr-code" src="" alt="QR Code">
+            <p id="usdtAddress" class="address"></p>
+            <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
+            <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
+            <p class="fee">Фиксированная комиссия: 2.75 USDT</p>
+            <button class="copy-btn" onclick="copyAddress()">Копировать адрес</button>
+        </div>
+        <div id="qrScanner">
+            <video id="video" autoplay playsinline></video>
+            <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
+            <p id="result"></p>
+            <button id="flashlightBtn" onclick="toggleFlashlight()"><img src="https://img.icons8.com/ios-filled/50/flashlight.png" alt="Фонарик"></button>
+            <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()"><img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Загрузить"></button>
+            <input type="file" id="uploadInput" accept="image/*" onchange="uploadQrCode(event)">
+            <button id="confirmBtn" onclick="processPayment()">Подтвердить</button>
+        </div>
     </div>
     <div class="navbar">
         <button id="homeBtn" class="active" onclick="showMain()"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Главная">Главная</button>
         <button id="historyBtn" onclick="showHistory()"><img src="https://img.icons8.com/ios-filled/50/clock.png" alt="История">История</button>
         <button id="profileBtn" onclick="showProfile()"><img src="https://img.icons8.com/ios-filled/50/user.png" alt="Профиль">Профиль</button>
     </div>
-    <div id="qrScanner">
-        <video id="video" autoplay playsinline></video>
-        <p id="warning">Мы можем распознавать QR-код только с платёжных терминалов</p>
-        <p id="result"></p>
-        <button id="confirmBtn" onclick="processPayment()">Подтвердить</button>
-        <button id="flashlightBtn" onclick="toggleFlashlight()">Фонарик</button>
-        <button id="galleryBtn" onclick="document.getElementById('galleryInput').click()">Из галереи</button>
-        <input type="file" id="galleryInput" accept="image/*" onchange="loadQrFromGallery(event)">
-    </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -335,6 +479,9 @@
         const mainContent = document.querySelector(".main-content");
         const historyContent = document.querySelector(".history");
         const profileContent = document.querySelector(".profile");
+        const depositScreen = document.getElementById("depositScreen");
+        const networkScreen = document.getElementById("networkScreen");
+        const qrScreen = document.getElementById("qrScreen");
         const homeBtn = document.getElementById("homeBtn");
         const historyBtn = document.getElementById("historyBtn");
         const profileBtn = document.getElementById("profileBtn");
@@ -352,6 +499,10 @@
             mainContent.style.display = "block";
             historyContent.style.display = "none";
             profileContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
             homeBtn.classList.add("active");
             historyBtn.classList.remove("active");
             profileBtn.classList.remove("active");
@@ -362,6 +513,10 @@
             mainContent.style.display = "none";
             historyContent.style.display = "block";
             profileContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.add("active");
             profileBtn.classList.remove("active");
@@ -372,6 +527,10 @@
             mainContent.style.display = "none";
             historyContent.style.display = "none";
             profileContent.style.display = "block";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.remove("active");
             profileBtn.classList.add("active");
@@ -379,11 +538,106 @@
             fetchProfileBalance();
         }
 
+        function showDepositScreen() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            profileContent.style.display = "none";
+            depositScreen.style.display = "block";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
+        }
+
+        function showNetworkScreen() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            profileContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "block";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
+        }
+
+        async function selectNetwork(network) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/balance/${currentUserId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+                const usdtAddress = await fetchUsdtAddress();
+                if (usdtAddress) {
+                    document.getElementById("usdtAddress").innerText = usdtAddress;
+                    // Генерируем QR-код
+                    const qrCodeCanvas = document.createElement("canvas");
+                    QRCode.toCanvas(qrCodeCanvas, usdtAddress, { width: 200 }, (error) => {
+                        if (error) {
+                            console.error("Ошибка генерации QR-кода:", error);
+                            return;
+                        }
+                        const qrCodeImg = document.getElementById("qrCode");
+                        qrCodeImg.src = qrCodeCanvas.toDataURL("image/png");
+                    });
+                    mainContent.style.display = "none";
+                    historyContent.style.display = "none";
+                    profileContent.style.display = "none";
+                    depositScreen.style.display = "none";
+                    networkScreen.style.display = "none";
+                    qrScreen.style.display = "block";
+                    qrScanner.style.display = "none";
+                } else {
+                    alert("Не удалось получить адрес USDT. Попробуй снова.");
+                }
+            } catch (e) {
+                console.error("Ошибка при выборе сети:", e);
+                alert("Ошибка при выборе сети. Попробуй снова.");
+            }
+        }
+
+        async function fetchUsdtAddress() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/usdt_address/${currentUserId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+                return data.usdt_address;
+            } catch (e) {
+                console.error("Ошибка получения адреса USDT:", e);
+                return null;
+            }
+        }
+
+        function copyAddress() {
+            const address = document.getElementById("usdtAddress").innerText;
+            navigator.clipboard.writeText(address).then(() => {
+                alert("Адрес скопирован!");
+            }).catch(err => {
+                console.error("Ошибка копирования адреса:", err);
+                alert("Не удалось скопировать адрес.");
+            });
+        }
+
         async function showQrScanner() {
             console.log("Открываем сканер QR-кодов...");
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            profileContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
             qrScanner.style.display = "block";
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                console.log("Камера успешно запущена");
                 video.srcObject = stream;
                 video.play();
                 scanQR();
@@ -401,52 +655,38 @@
                 await track.applyConstraints({
                     advanced: [{ torch: flashlightOn }]
                 });
-                document.getElementById("flashlightBtn").innerText = flashlightOn ? "Выкл. фонарик" : "Фонарик";
+                console.log("Фонарик:", flashlightOn ? "включён" : "выключён");
             } catch (err) {
-                console.error("Ошибка включения/выключения фонарика:", err);
-                result.innerText = "Фонарик не поддерживается на этом устройстве";
+                console.error("Ошибка управления фонариком:", err);
+                alert("Фонарик не поддерживается на этом устройстве.");
             }
         }
 
-        function loadQrFromGallery(event) {
+        async function uploadQrCode(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0, img.width, img.height);
-                    const imageData = ctx.getImageData(0, 0, img.width, img.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: "attemptBoth"
-                    });
-                    if (code) {
-                        qrData = code.data;
-                        result.innerText = `QR отсканирован: ${qrData}`;
-                        console.log("QR-код успешно отсканирован из галереи:", qrData);
-                    } else {
-                        result.innerText = "Не удалось распознать QR-код из изображения";
-                        console.log("QR-код не найден в изображении");
-                    }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function deposit() {
-            tg.sendData(JSON.stringify({ action: "deposit" }));
-            setTimeout(() => {
-                fetchBalance();
-                if (historyContent.style.display === "block") {
-                    fetchHistory();
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "attemptBoth"
+                });
+                if (code) {
+                    qrData = code.data;
+                    result.innerText = `QR отсканирован: ${qrData}`;
+                    console.log("QR-код успешно отсканирован из изображения:", qrData);
+                } else {
+                    result.innerText = "Не удалось распознать QR-код из изображения.";
+                    console.log("QR-код не найден в изображении");
                 }
-            }, 2000);
+            };
         }
 
         function scanQR() {
@@ -606,12 +846,12 @@
                         <div class="left">
                             <div class="icon"></div>
                             <div>
-                                <p>${tx.status === "Пополнение" ? "Пополнение" : "Оплата"}</p>
+                                <p>${tx.status === "Пополнение" ? "Пополнение" : tx.status === "В обработке" ? "В обработке" : "Оплата"}</p>
                                 <p style="color: #666;">${tx.date}</p>
                             </div>
                         </div>
                         <div class="right">
-                            <p class="amount">${tx.status === "Пополнение" ? "+" : "-"}${tx.amount_usdt.toFixed(3)} USDT</p>
+                            <p class="amount">${tx.status === "Пополнение" ? "+" : tx.status === "В обработке" ? "" : "-"}${tx.amount_usdt.toFixed(3)} USDT</p>
                             <p style="color: #666;">${tx.status}</p>
                         </div>
                     </div>
