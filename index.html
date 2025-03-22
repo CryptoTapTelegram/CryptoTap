@@ -240,8 +240,14 @@
         tg.ready();
         tg.expand();
 
-        const userId = tg.initDataUnsafe.user.id;
-        const apiBaseUrl = "http://192.168.185.245:5000";  // Замени на IP твоего сервера
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+        if (!userId) {
+            console.error("Не удалось получить userId из Telegram");
+        } else {
+            console.log("User ID:", userId);
+        }
+
+        const apiBaseUrl = "http://192.168.185.245:5000";  // Обновлено на твой IP
 
         const qrScanner = document.getElementById("qrScanner");
         const video = document.getElementById("video");
@@ -269,14 +275,18 @@
         }
 
         function showQrScanner() {
+            console.log("Открываем сканер QR-кодов...");
             qrScanner.style.display = "block";
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(stream => {
+                    console.log("Камера успешно запущена");
                     video.srcObject = stream;
+                    video.play();
                     scanQR();
                 })
                 .catch(err => {
-                    result.innerText = "Ошибка камеры: " + err;
+                    result.innerText = "Ошибка камеры: " + err.message;
+                    console.error("Ошибка доступа к камере:", err);
                 });
         }
 
@@ -285,21 +295,29 @@
         }
 
         function scanQR() {
+            console.log("Начинаем сканирование QR-кода...");
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
 
             function tick() {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert"
+                    });
                     if (code) {
                         qrData = code.data;
                         result.innerText = `QR отсканирован: ${qrData}`;
+                        console.log("QR-код успешно отсканирован:", qrData);
                         return;
+                    } else {
+                        console.log("QR-код не найден в текущем кадре");
                     }
+                } else {
+                    console.log("Видео ещё не готово, ждём...");
                 }
                 requestAnimationFrame(tick);
             }
@@ -309,40 +327,52 @@
         async function processPayment() {
             if (!qrData) {
                 result.innerText = "Сначала отсканируй QR, брат!";
+                console.error("QR-код не отсканирован");
                 return;
             }
 
-            const qrParams = new URLSearchParams(qrData.split("?")[1]);
-            const amountRub = parseFloat(qrParams.get("amount")) || 0;
-            if (!amountRub) {
-                result.innerText = "В QR нет суммы, брат!";
-                return;
+            try {
+                const qrParams = new URLSearchParams(qrData.split("?")[1]);
+                const amountRub = parseFloat(qrParams.get("amount")) || 0;
+                if (!amountRub) {
+                    result.innerText = "В QR нет суммы, брат!";
+                    console.error("В QR нет суммы");
+                    return;
+                }
+
+                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                const data = await response.json();
+                const usdtRate = data.tether.rub;
+                const amountUsdt = amountRub / usdtRate;
+                const commission = amountUsdt * 0.05;
+                const totalUsdt = amountUsdt + commission;
+
+                const paymentData = {
+                    amountRub: amountRub,
+                    amountUsdt: amountUsdt,
+                    commission: commission,
+                    totalUsdt: totalUsdt,
+                    qrData: qrData
+                };
+
+                tg.sendData(JSON.stringify(paymentData));
+                qrScanner.style.display = "none";
+                fetchBalance();
+            } catch (e) {
+                console.error("Ошибка при обработке оплаты:", e);
+                result.innerText = "Ошибка при оплате, брат!";
             }
-
-            const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
-            const data = await response.json();
-            const usdtRate = data.tether.rub;
-            const amountUsdt = amountRub / usdtRate;
-            const commission = amountUsdt * 0.05;
-            const totalUsdt = amountUsdt + commission;
-
-            const paymentData = {
-                amountRub: amountRub,
-                amountUsdt: amountUsdt,
-                commission: commission,
-                totalUsdt: totalUsdt,
-                qrData: qrData
-            };
-
-            tg.sendData(JSON.stringify(paymentData));
-            qrScanner.style.display = "none";
-            fetchBalance();
         }
 
         async function fetchBalance() {
             try {
+                console.log("Запрос баланса для userId:", userId);
                 const response = await fetch(`${apiBaseUrl}/balance/${userId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status}`);
+                }
                 const data = await response.json();
+                console.log("Получен баланс:", data);
                 const balanceUsdt = data.balance_usdt;
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
@@ -357,8 +387,13 @@
 
         async function fetchHistory() {
             try {
+                console.log("Запрос истории для userId:", userId);
                 const response = await fetch(`${apiBaseUrl}/history/${userId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status}`);
+                }
                 const transactions = await response.json();
+                console.log("Получена история:", transactions);
                 historyList.innerHTML = transactions.map(tx => `
                     <div class="history-item">
                         <div class="left">
