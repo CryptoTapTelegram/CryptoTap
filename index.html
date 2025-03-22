@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryptoTap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(180deg, #00cc00 0%, #006600 100%); /* Зелёный градиент */
+            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Градиент на основе иконки */
             color: #fff;
             height: 100vh;
             display: flex;
@@ -27,57 +28,81 @@
             margin-bottom: 20px;
         }
         .header h1 {
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: 700;
             margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
         }
         .header .beta {
             font-size: 12px;
-            background: #fff;
-            color: #00cc00;
-            padding: 2px 8px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
         }
         .balance {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .balance h2 {
-            font-size: 32px;
+            font-size: 36px;
+            font-weight: 700;
             margin: 0;
+            color: #fff;
         }
         .balance p {
-            font-size: 14px;
-            color: #ccc;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
             margin: 5px 0 0;
         }
         .buttons {
             display: flex;
-            justify-content: space-around;
+            justify-content: center; /* Теперь только одна кнопка, центрируем */
             margin-bottom: 20px;
         }
         .buttons button {
             background: #fff;
-            color: #000;
+            color: #003087; /* Тёмно-синий цвет текста для контраста */
             border: none;
-            border-radius: 10px;
-            padding: 10px;
-            width: 70px;
+            border-radius: 12px;
+            padding: 12px;
+            width: 90px;
             text-align: center;
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background 0.3s;
+        }
+        .buttons button:hover {
+            transform: translateY(-2px);
+            background: #e6f0ff; /* Светло-голубой при наведении */
         }
         .buttons button img {
-            width: 20px;
+            width: 24px;
             margin-bottom: 5px;
         }
         .promo {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
             padding: 15px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .promo:hover {
+            background: rgba(255, 255, 255, 0.25);
         }
         .promo .text {
             flex: 1;
@@ -85,9 +110,15 @@
         .promo .text span {
             background: #ffd700;
             color: #000;
-            padding: 2px 5px;
+            padding: 3px 6px;
             border-radius: 5px;
             font-size: 12px;
+            font-weight: 500;
+        }
+        .promo .text p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
         }
         .promo .logo {
             width: 50px;
@@ -95,21 +126,24 @@
             background: #fff;
             border-radius: 50%;
         }
-        .history, .profile, #depositScreen, #networkScreen, #qrScreen {
+        .history, #depositScreen, #networkScreen, #qrScreen, #referralScreen {
             display: none;
         }
-        .history h3, .profile h3, #depositScreen h3, #networkScreen h3, #qrScreen h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
+        .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #referralScreen h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
         }
         .history-item {
             display: flex;
             justify-content: space-between;
             background: #fff;
             color: #000;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .history-item .left {
             display: flex;
@@ -118,7 +152,7 @@
         .history-item .left .icon {
             width: 30px;
             height: 30px;
-            background: #00cc00;
+            background: #00C4FF; /* Светло-голубой для иконки */
             border-radius: 50%;
             margin-right: 10px;
         }
@@ -127,13 +161,47 @@
         }
         .history-item .right .amount {
             color: #28a745;
+            font-weight: 500;
         }
-        .profile .info {
+        #referralScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: #fff;
             color: #000;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #referralScreen .info {
+            background: #f8f9fa;
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        #referralScreen .info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        #referralScreen .copy-btn {
+            background: #00C4FF; /* Светло-голубой для кнопки */
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s;
+        }
+        #referralScreen .copy-btn:hover {
+            background: #003087; /* Тёмно-синий при наведении */
         }
         #depositScreen, #networkScreen, #qrScreen {
             position: fixed;
@@ -152,10 +220,11 @@
             justify-content: space-between;
             align-items: center;
             background: #f0f0f0;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             margin-bottom: 10px;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
         #depositScreen .network-option img, #networkScreen .network-option img {
             width: 30px;
@@ -167,12 +236,15 @@
             margin: 20px auto;
             width: 200px;
             height: 200px;
+            border: 5px solid #f0f0f0;
+            border-radius: 10px;
         }
         #qrScreen .address {
             font-size: 14px;
             word-break: break-all;
             text-align: center;
             margin: 10px 0;
+            color: #333;
         }
         #qrScreen .warning {
             background: #fff3cd;
@@ -188,16 +260,23 @@
             border-radius: 10px;
             margin: 10px 0;
             font-size: 12px;
+            color: #333;
         }
         #qrScreen .copy-btn {
-            background: #007bff;
+            background: #00C4FF; /* Светло-голубой для кнопки */
             color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 12px;
             cursor: pointer;
             display: block;
             margin: 10px auto;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s;
+        }
+        #qrScreen .copy-btn:hover {
+            background: #003087; /* Тёмно-синий при наведении */
         }
         #qrScanner {
             display: none;
@@ -237,12 +316,17 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            background: #00cc00;
+            background: #00C4FF; /* Светло-голубой для кнопки */
             color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 12px;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s;
+        }
+        #qrScanner #confirmBtn:hover {
+            background: #003087; /* Тёмно-синий при наведении */
         }
         #qrScanner #flashlightBtn, #qrScanner #uploadBtn {
             position: absolute;
@@ -255,6 +339,7 @@
             border-radius: 10px;
             cursor: pointer;
             margin-right: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         #qrScanner #flashlightBtn img, #qrScanner #uploadBtn img {
             width: 20px;
@@ -263,30 +348,64 @@
             display: none;
         }
         .navbar {
+            position: relative;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             background: #fff;
-            padding: 10px 0;
+            padding: 12px 20px;
             position: sticky;
             bottom: 0;
             border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
         }
         .navbar button {
-            background: none;
+            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Такой же градиент, как у QR-кнопки */
             border: none;
-            color: #666;
-            font-size: 12px;
+            border-radius: 50%;
+            padding: 10px;
+            width: 50px;
+            height: 50px;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
         }
-        .navbar button.active {
-            color: #00cc00;
+        .navbar button:hover {
+            transform: scale(1.1);
         }
         .navbar button img {
+            width: 24px;
+        }
+        .navbar .pay-btn {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Градиент кнопки */
+            border-radius: 50%;
+            padding: 15px;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .navbar .pay-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 20px;
-            margin-bottom: 5px;
+            height: 20px;
+            background: #003087; /* Тёмно-синий цвет для выреза */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        .navbar .pay-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+        .navbar .pay-btn img {
+            width: 30px;
         }
         .main-content {
             display: block;
@@ -307,9 +426,8 @@
             </div>
             <div class="buttons">
                 <button onclick="showDepositScreen()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
-                <button onclick="showQrScanner()"><img src="https://img.icons8.com/ios-filled/50/qr-code.png" alt="Оплатить">Оплатить</button>
             </div>
-            <div class="promo">
+            <div class="promo" onclick="showReferralScreen()">
                 <div class="text">
                     <span>Предложение</span>
                     <p>Пригласи своих друзей к закр. бета-тестированию</p>
@@ -323,12 +441,14 @@
                 <!-- Транзакции будут добавляться динамически -->
             </div>
         </div>
-        <div class="profile">
-            <h3>Профиль</h3>
+        <div id="referralScreen">
+            <h3>Реферальная система</h3>
             <div class="info">
-                <p><strong>Имя:</strong> <span id="profileName"></span></p>
-                <p><strong>Баланс:</strong> <span id="profileBalance"></span> USDT</p>
+                <p><strong>Ваша реферальная ссылка:</strong> <span id="referralLink"></span></p>
+                <p><strong>Приглашено друзей:</strong> <span id="invitedCount">0</span></p>
+                <p><strong>Заработано:</strong> <span id="earnedAmount">0.0 USDT</span></p>
             </div>
+            <button class="copy-btn" onclick="copyReferralLink()">Копировать ссылку</button>
         </div>
         <div id="depositScreen">
             <h3>Пополнить</h3>
@@ -378,9 +498,9 @@
         </div>
     </div>
     <div class="navbar">
-        <button id="homeBtn" class="active" onclick="showMain()"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Главная">Главная</button>
-        <button id="historyBtn" onclick="showHistory()"><img src="https://img.icons8.com/ios-filled/50/clock.png" alt="История">История</button>
-        <button id="profileBtn" onclick="showProfile()"><img src="https://img.icons8.com/ios-filled/50/user.png" alt="Профиль">Профиль</button>
+        <button id="homeBtn" class="active" onclick="showMain()"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Главная"></button>
+        <button id="payBtn" class="pay-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="Оплатить"></button>
+        <button id="historyBtn" onclick="showHistory()"><img src="https://img.icons8.com/ios-filled/50/clock.png" alt="История"></button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -429,13 +549,12 @@
         const result = document.getElementById("result");
         const mainContent = document.querySelector(".main-content");
         const historyContent = document.querySelector(".history");
-        const profileContent = document.querySelector(".profile");
+        const referralScreen = document.getElementById("referralScreen");
         const depositScreen = document.getElementById("depositScreen");
         const networkScreen = document.getElementById("networkScreen");
         const qrScreen = document.getElementById("qrScreen");
         const homeBtn = document.getElementById("homeBtn");
         const historyBtn = document.getElementById("historyBtn");
-        const profileBtn = document.getElementById("profileBtn");
         const historyList = document.getElementById("historyList");
         let qrData = null;
         let stream = null;
@@ -443,7 +562,7 @@
 
         // Проверяем start_param для определения начальной страницы
         if (startParam && startParam.startsWith("profile_")) {
-            showProfile();
+            showMain(); // Профиль убрали, открываем главную
         }
 
         async function fetchTransactionFee() {
@@ -456,7 +575,7 @@
                 const trx_to_usdt = data["tron"]["usdt"];
                 const network_fee_trx = 20; // Средняя комиссия за транзакцию TRC20
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
-                const our_fee = 0.4; // Наша комиссия
+                const our_fee = 1.2; // Наша комиссия (увеличили с 0.4 до 1.2)
                 const total_fee = network_fee_usdt + our_fee;
                 document.getElementById("feeText").innerText = `Фиксированная комиссия: ${total_fee.toFixed(2)} USDT (сеть: ${network_fee_usdt.toFixed(2)} USDT, наша: ${our_fee} USDT)`;
             } catch (e) {
@@ -468,50 +587,63 @@
         function showMain() {
             mainContent.style.display = "block";
             historyContent.style.display = "none";
-            profileContent.style.display = "none";
+            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             homeBtn.classList.add("active");
             historyBtn.classList.remove("active");
-            profileBtn.classList.remove("active");
             fetchBalance();
         }
 
         function showHistory() {
             mainContent.style.display = "none";
             historyContent.style.display = "block";
-            profileContent.style.display = "none";
+            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.add("active");
-            profileBtn.classList.remove("active");
             fetchHistory();
         }
 
-        function showProfile() {
+        function showReferralScreen() {
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            profileContent.style.display = "block";
+            referralScreen.style.display = "block";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.remove("active");
-            profileBtn.classList.add("active");
-            document.getElementById("profileName").innerText = profileUserName;
-            fetchProfileBalance();
+
+            // Генерируем реферальную ссылку
+            const referralLink = `https://t.me/CryptoTapBot?start=ref_${currentUserId}`;
+            document.getElementById("referralLink").innerText = referralLink;
+
+            // Для примера: пока данные о приглашённых и заработке статические
+            document.getElementById("invitedCount").innerText = "5"; // Замени на реальные данные
+            document.getElementById("earnedAmount").innerText = "10.0 USDT"; // Замени на реальные данные
+        }
+
+        function copyReferralLink() {
+            const referralLink = document.getElementById("referralLink").innerText;
+            navigator.clipboard.writeText(referralLink).then(() => {
+                alert("Реферальная ссылка скопирована!");
+            }).catch(err => {
+                console.error("Ошибка копирования ссылки:", err);
+                alert("Не удалось скопировать ссылку.");
+            });
         }
 
         function showDepositScreen() {
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            profileContent.style.display = "none";
+            referralScreen.style.display = "none";
             depositScreen.style.display = "block";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
@@ -521,7 +653,7 @@
         function showNetworkScreen() {
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            profileContent.style.display = "none";
+            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "block";
             qrScreen.style.display = "none";
@@ -556,7 +688,7 @@
                     await fetchTransactionFee();
                     mainContent.style.display = "none";
                     historyContent.style.display = "none";
-                    profileContent.style.display = "none";
+                    referralScreen.style.display = "none";
                     depositScreen.style.display = "none";
                     networkScreen.style.display = "none";
                     qrScreen.style.display = "block";
@@ -602,7 +734,7 @@
             console.log("Открываем сканер QR-кодов...");
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            profileContent.style.display = "none";
+            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
@@ -716,7 +848,7 @@
                 const trx_to_usdt = commissionData["tron"]["usdt"];
                 const network_fee_trx = 20; // Средняя комиссия за транзакцию TRC20
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
-                const our_fee = 0.4; // Наша комиссия
+                const our_fee = 1.2; // Наша комиссия (увеличили с 0.4 до 1.2)
                 const commission = network_fee_usdt + our_fee;
                 const totalUsdt = amountUsdt + commission;
 
@@ -793,38 +925,13 @@
                 const balanceUsdt = data.balance_usdt || 0;
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
-                const usdtRate = rateData.tether.rub || 0;
+                const usdtRate = (rateData.tether.rub || 0) - 0.5; // Вычитаем 0.5 рубля за 1 USDT
                 const balanceRub = balanceUsdt * usdtRate;
                 console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
                 document.getElementById("balanceRub").innerText = `${balanceRub.toFixed(2)} ₽`;
                 document.getElementById("balanceUsdt").innerText = `${balanceUsdt.toFixed(2)} USDT`;
             } catch (e) {
                 console.error("Ошибка получения баланса:", e);
-            }
-        }
-
-        async function fetchProfileBalance() {
-            if (!profileUserId) {
-                console.error("Не могу запросить баланс профиля: profileUserId не определён");
-                return;
-            }
-            try {
-                console.log("Запрос баланса для профиля userId:", profileUserId);
-                console.log("URL запроса:", `${apiBaseUrl}/balance/${profileUserId}`);
-                const response = await fetch(`${apiBaseUrl}/balance/${profileUserId}`, {
-                    headers: {
-                        "ngrok-skip-browser-warning": "true"
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                console.log("Получен баланс для профиля:", data);
-                const balanceUsdt = data.balance_usdt || 0;
-                document.getElementById("profileBalance").innerText = balanceUsdt.toFixed(2);
-            } catch (e) {
-                console.error("Ошибка получения баланса для профиля:", e);
             }
         }
 
@@ -875,9 +982,6 @@
             }
             if (historyContent.style.display === "block") {
                 fetchHistory();
-            }
-            if (profileContent.style.display === "block") {
-                fetchProfileBalance();
             }
         }, 5000);
 
