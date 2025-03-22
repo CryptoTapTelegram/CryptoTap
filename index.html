@@ -257,7 +257,7 @@
 
         const currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
         const currentUserName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно";
-        let profileUserId = currentUserId;  // По умолчанию показываем профиль текущего пользователя
+        let profileUserId = currentUserId;
         let profileUserName = currentUserName;
 
         // Проверяем start_param для определения userId профиля
@@ -274,7 +274,7 @@
             console.log("Profile User ID:", profileUserId);
         }
 
-        const apiBaseUrl = "http://192.168.185.245:5000";
+        const apiBaseUrl = "http://10.134.64.119:5000";
 
         const qrScanner = document.getElementById("qrScanner");
         const video = document.getElementById("video");
@@ -434,11 +434,12 @@
                 }
                 const data = await response.json();
                 console.log("Получен баланс:", data);
-                const balanceUsdt = data.balance_usdt;
+                const balanceUsdt = data.balance_usdt || 0;
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
-                const usdtRate = rateData.tether.rub;
+                const usdtRate = rateData.tether.rub || 0;
                 const balanceRub = balanceUsdt * usdtRate;
+                console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
                 document.getElementById("balanceRub").innerText = `${balanceRub.toFixed(2)} ₽`;
                 document.getElementById("balanceUsdt").innerText = `${balanceUsdt.toFixed(2)} USDT`;
             } catch (e) {
@@ -455,7 +456,7 @@
                 }
                 const data = await response.json();
                 console.log("Получен баланс для профиля:", data);
-                const balanceUsdt = data.balance_usdt;
+                const balanceUsdt = data.balance_usdt || 0;
                 document.getElementById("profileBalance").innerText = balanceUsdt.toFixed(2);
             } catch (e) {
                 console.error("Ошибка получения баланса для профиля:", e);
@@ -471,7 +472,7 @@
                 }
                 const transactions = await response.json();
                 console.log("Получена история:", transactions);
-                historyList.innerHTML = transactions.map(tx => `
+                historyList.innerHTML = transactions.length > 0 ? transactions.map(tx => `
                     <div class="history-item">
                         <div class="left">
                             <div class="icon"></div>
@@ -485,9 +486,10 @@
                             <p style="color: #666;">${tx.status}</p>
                         </div>
                     </div>
-                `).join("");
+                `).join("") : "<p>История транзакций пуста</p>";
             } catch (e) {
                 console.error("Ошибка получения истории:", e);
+                historyList.innerText = "Ошибка загрузки истории";
             }
         }
 
