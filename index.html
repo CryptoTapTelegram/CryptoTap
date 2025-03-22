@@ -164,17 +164,21 @@
         .history, #depositScreen, #networkScreen, #qrScreen, #referralScreen {
             display: none;
         }
+        .history {
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Такой же фон, как на главной */
+            color: #fff; /* Белый текст */
+        }
         .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #referralScreen h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 15px;
-            color: #333;
+            color: #fff; /* Белый текст */
         }
         .history-item {
             display: flex;
             justify-content: space-between;
-            background: #fff;
-            color: #000;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 10px;
@@ -204,14 +208,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #fff;
-            color: #000;
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Такой же фон, как на главной */
+            color: #fff; /* Белый текст */
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
         }
         #referralScreen .info {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 15px;
@@ -220,7 +224,7 @@
         #referralScreen .info p {
             margin: 5px 0;
             font-size: 14px;
-            color: #333;
+            color: #fff;
         }
         #referralScreen .copy-btn {
             background: #00C4FF; /* Светло-голубой для кнопки */
@@ -924,7 +928,19 @@
                     transactionId: transactionId
                 };
 
-                tg.sendData(JSON.stringify(paymentData));
+                // Отправляем данные на сервер через AJAX
+                const paymentResponse = await fetch(`${apiBaseUrl}/pay/${currentUserId}`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true"
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const paymentResult = await paymentResponse.json();
+                result.innerText = paymentResult.message;
+
                 qrScanner.style.display = "none";
                 setTimeout(() => {
                     fetchBalance();
