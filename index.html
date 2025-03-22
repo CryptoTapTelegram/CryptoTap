@@ -440,7 +440,11 @@
             try {
                 console.log("Запрос баланса для userId:", currentUserId);
                 console.log("URL запроса:", `${apiBaseUrl}/balance/${currentUserId}`);
-                const response = await fetch(`${apiBaseUrl}/balance/${currentUserId}`);
+                const response = await fetch(`${apiBaseUrl}/balance/${currentUserId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
@@ -467,7 +471,11 @@
             try {
                 console.log("Запрос баланса для профиля userId:", profileUserId);
                 console.log("URL запроса:", `${apiBaseUrl}/balance/${profileUserId}`);
-                const response = await fetch(`${apiBaseUrl}/balance/${profileUserId}`);
+                const response = await fetch(`${apiBaseUrl}/balance/${profileUserId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
@@ -489,7 +497,11 @@
             try {
                 console.log("Запрос истории для userId:", currentUserId);
                 console.log("URL запроса:", `${apiBaseUrl}/history/${currentUserId}`);
-                const response = await fetch(`${apiBaseUrl}/history/${currentUserId}`);
+                const response = await fetch(`${apiBaseUrl}/history/${currentUserId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
