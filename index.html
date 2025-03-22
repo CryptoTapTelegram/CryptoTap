@@ -232,7 +232,6 @@
         <div class="profile">
             <h3>Профиль</h3>
             <div class="info">
-                <p><strong>ID:</strong> <span id="profileId"></span></p>
                 <p><strong>Имя:</strong> <span id="profileName"></span></p>
                 <p><strong>Баланс:</strong> <span id="profileBalance"></span> USDT</p>
             </div>
@@ -265,7 +264,6 @@
         const startParam = tg.initDataUnsafe.start_param;
         if (startParam && startParam.startsWith("profile_")) {
             profileUserId = parseInt(startParam.split("_")[1]);
-            // Если profileUserId отличается от текущего пользователя, имя нужно будет получить через API
             profileUserName = profileUserId === currentUserId ? currentUserName : "Пользователь " + profileUserId;
         }
 
@@ -290,7 +288,7 @@
         const historyList = document.getElementById("historyList");
         let qrData = null;
 
-        // Проверяем, открыт ли Web App через Menu Button
+        // Проверяем start_param для определения начальной страницы
         if (startParam && startParam.startsWith("profile_")) {
             showProfile();
         }
@@ -302,6 +300,7 @@
             homeBtn.classList.add("active");
             historyBtn.classList.remove("active");
             profileBtn.classList.remove("active");
+            fetchBalance();
         }
 
         function showHistory() {
@@ -321,7 +320,6 @@
             homeBtn.classList.remove("active");
             historyBtn.classList.remove("active");
             profileBtn.classList.add("active");
-            document.getElementById("profileId").innerText = profileUserId || "Неизвестно";
             document.getElementById("profileName").innerText = profileUserName;
             fetchProfileBalance();
         }
@@ -344,7 +342,12 @@
 
         function deposit() {
             tg.sendData(JSON.stringify({ action: "deposit" }));
-            setTimeout(fetchBalance, 2000);
+            setTimeout(() => {
+                fetchBalance();
+                if (historyContent.style.display === "block") {
+                    fetchHistory();
+                }
+            }, 2000);
         }
 
         function scanQR() {
@@ -410,7 +413,12 @@
 
                 tg.sendData(JSON.stringify(paymentData));
                 qrScanner.style.display = "none";
-                setTimeout(fetchBalance, 2000);
+                setTimeout(() => {
+                    fetchBalance();
+                    if (historyContent.style.display === "block") {
+                        fetchHistory();
+                    }
+                }, 2000);
             } catch (e) {
                 console.error("Ошибка при обработке оплаты:", e);
                 result.innerText = "Ошибка при оплате, брат!";
@@ -482,6 +490,19 @@
                 console.error("Ошибка получения истории:", e);
             }
         }
+
+        // Автоматическое обновление баланса и истории каждые 5 секунд
+        setInterval(() => {
+            if (mainContent.style.display === "block") {
+                fetchBalance();
+            }
+            if (historyContent.style.display === "block") {
+                fetchHistory();
+            }
+            if (profileContent.style.display === "block") {
+                fetchProfileBalance();
+            }
+        }, 5000);
 
         fetchBalance();
         tg.MainButton.setText("Закрыть").show().onClick(() => tg.close());
