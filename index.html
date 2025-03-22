@@ -290,39 +290,41 @@
                 });
         }
 
-        function deposit() {
-            tg.sendData(JSON.stringify({ action: "deposit" }));
-        }
+       function deposit() {
+    tg.sendData(JSON.stringify({ action: "deposit" }));
+    // Обновляем баланс после пополнения
+    setTimeout(fetchBalance, 2000);  // Даём боту 2 секунды на обработку
+}
 
         function scanQR() {
-            console.log("Начинаем сканирование QR-кода...");
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+    console.log("Начинаем сканирование QR-кода...");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-            function tick() {
-                if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: "dontInvert"
-                    });
-                    if (code) {
-                        qrData = code.data;
-                        result.innerText = `QR отсканирован: ${qrData}`;
-                        console.log("QR-код успешно отсканирован:", qrData);
-                        return;
-                    } else {
-                        console.log("QR-код не найден в текущем кадре");
-                    }
-                } else {
-                    console.log("Видео ещё не готово, ждём...");
-                }
-                requestAnimationFrame(tick);
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "attemptBoth"  // Пробуем инверсию цветов
+            });
+            if (code) {
+                qrData = code.data;
+                result.innerText = `QR отсканирован: ${qrData}`;
+                console.log("QR-код успешно отсканирован:", qrData);
+                return;
+            } else {
+                console.log("QR-код не найден в текущем кадре");
             }
-            tick();
+        } else {
+            console.log("Видео ещё не готово, ждём...");
         }
+        requestAnimationFrame(tick);
+    }
+    tick();
+}
 
         async function processPayment() {
             if (!qrData) {
