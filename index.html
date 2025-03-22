@@ -10,11 +10,12 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Градиент на основе иконки */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент из дизайна */
             color: #fff;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
         .container {
             padding: 20px;
@@ -46,48 +47,82 @@
         .balance {
             text-align: center;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .balance::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 25px;
+            background: #ffd700; /* Золотой "чип" карты */
+            border-radius: 5px;
         }
         .balance h2 {
             font-size: 36px;
             font-weight: 700;
-            margin: 0;
+            margin: 10px 0;
             color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .balance p {
             font-size: 16px;
             color: rgba(255, 255, 255, 0.8);
             margin: 5px 0 0;
         }
-        .buttons {
-            display: flex;
-            justify-content: center; /* Теперь только одна кнопка, центрируем */
+        .accounts {
             margin-bottom: 20px;
         }
-        .buttons button {
-            background: #fff;
-            color: #003087; /* Тёмно-синий цвет текста для контраста */
-            border: none;
+        .accounts h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
             border-radius: 12px;
-            padding: 12px;
-            width: 90px;
-            text-align: center;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .account-item .left {
+            display: flex;
+            align-items: center;
+        }
+        .account-item .left img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        .account-item .left div p {
+            margin: 0;
+            font-size: 14px;
+            color: #fff;
+        }
+        .account-item .right {
+            text-align: right;
+        }
+        .account-item .right .amount {
             font-size: 14px;
             font-weight: 500;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, background 0.3s;
+            color: #fff;
         }
-        .buttons button:hover {
-            transform: translateY(-2px);
-            background: #e6f0ff; /* Светло-голубой при наведении */
-        }
-        .buttons button img {
-            width: 24px;
-            margin-bottom: 5px;
+        .account-item .right .coming-soon {
+            font-size: 12px;
+            color: #ffd700; /* Жёлтый для надписи "скоро" */
+            font-style: italic;
         }
         .promo {
             background: rgba(255, 255, 255, 0.15);
@@ -348,20 +383,22 @@
             display: none;
         }
         .navbar {
-            position: relative;
+            position: fixed; /* Фиксируем панель навигации */
+            bottom: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
             background: #fff;
             padding: 12px 20px;
-            position: sticky;
-            bottom: 0;
             border-top: 1px solid #ddd;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* Чтобы панель была поверх контента */
         }
         .navbar button {
-            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Такой же градиент, как у QR-кнопки */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент фона */
             border: none;
-            border-radius: 50%;
+            border-radius: 8px; /* Квадратная форма с небольшим скруглением */
             padding: 10px;
             width: 50px;
             height: 50px;
@@ -377,13 +414,14 @@
         }
         .navbar button img {
             width: 24px;
+            filter: brightness(0) invert(1); /* Белые иконки */
         }
         .navbar .pay-btn {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #00C4FF 0%, #003087 100%); /* Градиент кнопки */
-            border-radius: 50%;
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент фона */
+            border-radius: 8px; /* Квадратная форма */
             padding: 15px;
             width: 60px;
             height: 60px;
@@ -398,7 +436,7 @@
             transform: translateX(-50%);
             width: 20px;
             height: 20px;
-            background: #003087; /* Тёмно-синий цвет для выреза */
+            background: #1A1A3D; /* Тёмный цвет градиента для выреза */
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
         .navbar .pay-btn:hover {
@@ -406,6 +444,7 @@
         }
         .navbar .pay-btn img {
             width: 30px;
+            filter: brightness(0) invert(1); /* Белая иконка */
         }
         .main-content {
             display: block;
@@ -420,12 +459,34 @@
                 <span class="beta">beta</span>
             </div>
             <div class="balance">
-                <h2 id="balanceRub">0.0 ₽</h2>
-                <p>Общий баланс</p>
-                <p id="balanceUsdt">0.0 USDT</p>
+                <h2><span id="balanceRub">0.0</span> ₽</h2>
+                <p>CryptoTap</p>
             </div>
-            <div class="buttons">
-                <button onclick="showDepositScreen()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
+            <div class="accounts">
+                <h3>Ваши счета</h3>
+                <div class="account-item">
+                    <div class="left">
+                        <img src="https://img.icons8.com/color/48/tether--v1.png" alt="Tether">
+                        <div>
+                            <p>Tether (USDT)</p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <p class="amount" id="usdtBalance">0.0 USDT</p>
+                        <p class="change">+0.00%</p>
+                    </div>
+                </div>
+                <div class="account-item">
+                    <div class="left">
+                        <img src="https://img.icons8.com/color/48/ton.png" alt="TON">
+                        <div>
+                            <p>The Open Network (TON)</p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <p class="coming-soon">Скоро</p>
+                    </div>
+                </div>
             </div>
             <div class="promo" onclick="showReferralScreen()">
                 <div class="text">
@@ -468,8 +529,7 @@
             <h3>Выберите криптовалюту</h3>
             <div class="network-option" onclick="selectNetwork('TRC20')">
                 <div style="display: flex; align-items: center;">
-                    <!-- Замени URL на реальный после загрузки иконки -->
-                    <img src="https://placeholder-url-for-usdt-icon.png" alt="USDT">
+                    <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
                     <div>
                         <p>USDT</p>
                         <p style="font-size: 12px; color: #666;">0.0 USDT</p>
@@ -536,7 +596,7 @@
         if (!currentUserId) {
             console.error("Не удалось получить userId из Telegram. Убедись, что Web App открывается через Telegram.");
             document.getElementById("balanceRub").innerText = "Ошибка: userId не определён";
-            document.getElementById("balanceUsdt").innerText = "Ошибка: userId не определён";
+            document.getElementById("usdtBalance").innerText = "Ошибка: userId не определён";
         } else {
             console.log("Current User ID:", currentUserId);
             console.log("Profile User ID:", profileUserId);
@@ -906,7 +966,7 @@
             if (!currentUserId) {
                 console.error("Не могу запросить баланс: userId не определён");
                 document.getElementById("balanceRub").innerText = "Ошибка: userId не определён";
-                document.getElementById("balanceUsdt").innerText = "Ошибка: userId не определён";
+                document.getElementById("usdtBalance").innerText = "Ошибка: userId не определён";
                 return;
             }
             try {
@@ -928,8 +988,8 @@
                 const usdtRate = (rateData.tether.rub || 0) - 0.5; // Вычитаем 0.5 рубля за 1 USDT
                 const balanceRub = balanceUsdt * usdtRate;
                 console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
-                document.getElementById("balanceRub").innerText = `${balanceRub.toFixed(2)} ₽`;
-                document.getElementById("balanceUsdt").innerText = `${balanceUsdt.toFixed(2)} USDT`;
+                document.getElementById("balanceRub").innerText = balanceRub.toFixed(2);
+                document.getElementById("usdtBalance").innerText = balanceUsdt.toFixed(2);
             } catch (e) {
                 console.error("Ошибка получения баланса:", e);
             }
