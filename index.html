@@ -95,10 +95,10 @@
             background: #fff;
             border-radius: 50%;
         }
-        .history {
+        .history, .profile {
             display: none;
         }
-        .history h3 {
+        .history h3, .profile h3 {
             font-size: 16px;
             margin-bottom: 10px;
         }
@@ -127,6 +127,13 @@
         }
         .history-item .right .amount {
             color: #28a745;
+        }
+        .profile .info {
+            background: #fff;
+            color: #000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
         #qrScanner {
             display: none;
@@ -222,10 +229,19 @@
                 <!-- Транзакции будут добавляться динамически -->
             </div>
         </div>
+        <div class="profile">
+            <h3>Профиль</h3>
+            <div class="info">
+                <p><strong>ID:</strong> <span id="profileId"></span></p>
+                <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                <p><strong>Баланс:</strong> <span id="profileBalance"></span> USDT</p>
+            </div>
+        </div>
     </div>
     <div class="navbar">
         <button id="homeBtn" class="active" onclick="showMain()"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Главная">Главная</button>
         <button id="historyBtn" onclick="showHistory()"><img src="https://img.icons8.com/ios-filled/50/clock.png" alt="История">История</button>
+        <button id="profileBtn" onclick="showProfile()"><img src="https://img.icons8.com/ios-filled/50/user.png" alt="Профиль">Профиль</button>
     </div>
     <div id="qrScanner">
         <video id="video" autoplay playsinline></video>
@@ -240,38 +256,74 @@
         tg.ready();
         tg.expand();
 
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-        if (!userId) {
-            console.error("Не удалось получить userId из Telegram");
-        } else {
-            console.log("User ID:", userId);
+        const currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+        const currentUserName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно";
+        let profileUserId = currentUserId;  // По умолчанию показываем профиль текущего пользователя
+        let profileUserName = currentUserName;
+
+        // Проверяем start_param для определения userId профиля
+        const startParam = tg.initDataUnsafe.start_param;
+        if (startParam && startParam.startsWith("profile_")) {
+            profileUserId = parseInt(startParam.split("_")[1]);
+            // Если profileUserId отличается от текущего пользователя, имя нужно будет получить через API
+            profileUserName = profileUserId === currentUserId ? currentUserName : "Пользователь " + profileUserId;
         }
 
-        const apiBaseUrl = "http://192.168.185.245:5000";  // Обновлено на твой IP
+        if (!currentUserId) {
+            console.error("Не удалось получить userId из Telegram");
+        } else {
+            console.log("Current User ID:", currentUserId);
+            console.log("Profile User ID:", profileUserId);
+        }
+
+        const apiBaseUrl = "http://192.168.185.245:5000";
 
         const qrScanner = document.getElementById("qrScanner");
         const video = document.getElementById("video");
         const result = document.getElementById("result");
         const mainContent = document.querySelector(".main-content");
         const historyContent = document.querySelector(".history");
+        const profileContent = document.querySelector(".profile");
         const homeBtn = document.getElementById("homeBtn");
         const historyBtn = document.getElementById("historyBtn");
+        const profileBtn = document.getElementById("profileBtn");
         const historyList = document.getElementById("historyList");
         let qrData = null;
+
+        // Проверяем, открыт ли Web App через Menu Button
+        if (startParam && startParam.startsWith("profile_")) {
+            showProfile();
+        }
 
         function showMain() {
             mainContent.style.display = "block";
             historyContent.style.display = "none";
+            profileContent.style.display = "none";
             homeBtn.classList.add("active");
             historyBtn.classList.remove("active");
+            profileBtn.classList.remove("active");
         }
 
         function showHistory() {
             mainContent.style.display = "none";
             historyContent.style.display = "block";
+            profileContent.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.add("active");
+            profileBtn.classList.remove("active");
             fetchHistory();
+        }
+
+        function showProfile() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            profileContent.style.display = "block";
+            homeBtn.classList.remove("active");
+            historyBtn.classList.remove("active");
+            profileBtn.classList.add("active");
+            document.getElementById("profileId").innerText = profileUserId || "Неизвестно";
+            document.getElementById("profileName").innerText = profileUserName;
+            fetchProfileBalance();
         }
 
         function showQrScanner() {
@@ -290,41 +342,40 @@
                 });
         }
 
-       function deposit() {
-    tg.sendData(JSON.stringify({ action: "deposit" }));
-    // Обновляем баланс после пополнения
-    setTimeout(fetchBalance, 2000);  // Даём боту 2 секунды на обработку
-}
+        function deposit() {
+            tg.sendData(JSON.stringify({ action: "deposit" }));
+            setTimeout(fetchBalance, 2000);
+        }
 
         function scanQR() {
-    console.log("Начинаем сканирование QR-кода...");
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+            console.log("Начинаем сканирование QR-кода...");
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
 
-    function tick() {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: "attemptBoth"  // Пробуем инверсию цветов
-            });
-            if (code) {
-                qrData = code.data;
-                result.innerText = `QR отсканирован: ${qrData}`;
-                console.log("QR-код успешно отсканирован:", qrData);
-                return;
-            } else {
-                console.log("QR-код не найден в текущем кадре");
+            function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "attemptBoth"
+                    });
+                    if (code) {
+                        qrData = code.data;
+                        result.innerText = `QR отсканирован: ${qrData}`;
+                        console.log("QR-код успешно отсканирован:", qrData);
+                        return;
+                    } else {
+                        console.log("QR-код не найден в текущем кадре");
+                    }
+                } else {
+                    console.log("Видео ещё не готово, ждём...");
+                }
+                requestAnimationFrame(tick);
             }
-        } else {
-            console.log("Видео ещё не готово, ждём...");
+            tick();
         }
-        requestAnimationFrame(tick);
-    }
-    tick();
-}
 
         async function processPayment() {
             if (!qrData) {
@@ -359,7 +410,7 @@
 
                 tg.sendData(JSON.stringify(paymentData));
                 qrScanner.style.display = "none";
-                fetchBalance();
+                setTimeout(fetchBalance, 2000);
             } catch (e) {
                 console.error("Ошибка при обработке оплаты:", e);
                 result.innerText = "Ошибка при оплате, брат!";
@@ -368,8 +419,8 @@
 
         async function fetchBalance() {
             try {
-                console.log("Запрос баланса для userId:", userId);
-                const response = await fetch(`${apiBaseUrl}/balance/${userId}`);
+                console.log("Запрос баланса для userId:", currentUserId);
+                const response = await fetch(`${apiBaseUrl}/balance/${currentUserId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP ошибка: ${response.status}`);
                 }
@@ -387,10 +438,26 @@
             }
         }
 
+        async function fetchProfileBalance() {
+            try {
+                console.log("Запрос баланса для профиля userId:", profileUserId);
+                const response = await fetch(`${apiBaseUrl}/balance/${profileUserId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Получен баланс для профиля:", data);
+                const balanceUsdt = data.balance_usdt;
+                document.getElementById("profileBalance").innerText = balanceUsdt.toFixed(2);
+            } catch (e) {
+                console.error("Ошибка получения баланса для профиля:", e);
+            }
+        }
+
         async function fetchHistory() {
             try {
-                console.log("Запрос истории для userId:", userId);
-                const response = await fetch(`${apiBaseUrl}/history/${userId}`);
+                console.log("Запрос истории для userId:", currentUserId);
+                const response = await fetch(`${apiBaseUrl}/history/${currentUserId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP ошибка: ${response.status}`);
                 }
