@@ -255,6 +255,9 @@
         tg.ready();
         tg.expand();
 
+        console.log("Инициализация Telegram Web App...");
+        console.log("tg.initDataUnsafe:", tg.initDataUnsafe);
+
         const currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
         const currentUserName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно";
         let profileUserId = currentUserId;
@@ -268,13 +271,15 @@
         }
 
         if (!currentUserId) {
-            console.error("Не удалось получить userId из Telegram");
+            console.error("Не удалось получить userId из Telegram. Убедись, что Web App открывается через Telegram.");
+            document.getElementById("balanceRub").innerText = "Ошибка: userId не определён";
+            document.getElementById("balanceUsdt").innerText = "Ошибка: userId не определён";
         } else {
             console.log("Current User ID:", currentUserId);
             console.log("Profile User ID:", profileUserId);
         }
 
-        const apiBaseUrl = "http://10.134.64.119:5000";
+        const apiBaseUrl = "https://3738-212-111-88-251.ngrok-free.app";
 
         const qrScanner = document.getElementById("qrScanner");
         const video = document.getElementById("video");
@@ -426,11 +431,18 @@
         }
 
         async function fetchBalance() {
+            if (!currentUserId) {
+                console.error("Не могу запросить баланс: userId не определён");
+                document.getElementById("balanceRub").innerText = "Ошибка: userId не определён";
+                document.getElementById("balanceUsdt").innerText = "Ошибка: userId не определён";
+                return;
+            }
             try {
                 console.log("Запрос баланса для userId:", currentUserId);
+                console.log("URL запроса:", `${apiBaseUrl}/balance/${currentUserId}`);
                 const response = await fetch(`${apiBaseUrl}/balance/${currentUserId}`);
                 if (!response.ok) {
-                    throw new Error(`HTTP ошибка: ${response.status}`);
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
                 console.log("Получен баланс:", data);
@@ -448,11 +460,16 @@
         }
 
         async function fetchProfileBalance() {
+            if (!profileUserId) {
+                console.error("Не могу запросить баланс профиля: profileUserId не определён");
+                return;
+            }
             try {
                 console.log("Запрос баланса для профиля userId:", profileUserId);
+                console.log("URL запроса:", `${apiBaseUrl}/balance/${profileUserId}`);
                 const response = await fetch(`${apiBaseUrl}/balance/${profileUserId}`);
                 if (!response.ok) {
-                    throw new Error(`HTTP ошибка: ${response.status}`);
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
                 console.log("Получен баланс для профиля:", data);
@@ -464,11 +481,17 @@
         }
 
         async function fetchHistory() {
+            if (!currentUserId) {
+                console.error("Не могу запросить историю: userId не определён");
+                historyList.innerText = "Ошибка: userId не определён";
+                return;
+            }
             try {
                 console.log("Запрос истории для userId:", currentUserId);
+                console.log("URL запроса:", `${apiBaseUrl}/history/${currentUserId}`);
                 const response = await fetch(`${apiBaseUrl}/history/${currentUserId}`);
                 if (!response.ok) {
-                    throw new Error(`HTTP ошибка: ${response.status}`);
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const transactions = await response.json();
                 console.log("Получена история:", transactions);
