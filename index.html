@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(180deg, #28a745 0%, #1e7e34 100%); /* Зелёный градиент */
             color: #fff;
             height: 100vh;
             display: flex;
@@ -33,7 +33,7 @@
         .header .beta {
             font-size: 12px;
             background: #fff;
-            color: #007bff;
+            color: #28a745;
             padding: 2px 8px;
             border-radius: 10px;
         }
@@ -118,7 +118,7 @@
         .history-item .left .icon {
             width: 30px;
             height: 30px;
-            background: #007bff;
+            background: #28a745;
             border-radius: 50%;
             margin-right: 10px;
         }
@@ -150,6 +150,18 @@
             height: 100%;
             object-fit: cover;
         }
+        #qrScanner #warning {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
         #qrScanner #result {
             position: absolute;
             bottom: 20px;
@@ -161,12 +173,37 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            background: #007bff;
+            background: #28a745;
             color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 10px;
             cursor: pointer;
+        }
+        #qrScanner #flashlightBtn {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #qrScanner #galleryBtn {
+            position: absolute;
+            bottom: 140px;
+            right: 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #qrScanner #galleryInput {
+            display: none;
         }
         .navbar {
             display: flex;
@@ -188,7 +225,7 @@
             cursor: pointer;
         }
         .navbar button.active {
-            color: #007bff;
+            color: #28a745;
         }
         .navbar button img {
             width: 20px;
@@ -244,8 +281,12 @@
     </div>
     <div id="qrScanner">
         <video id="video" autoplay playsinline></video>
+        <p id="warning">Мы можем распознавать QR-код только с платёжных терминалов</p>
         <p id="result"></p>
         <button id="confirmBtn" onclick="processPayment()">Подтвердить</button>
+        <button id="flashlightBtn" onclick="toggleFlashlight()">Фонарик</button>
+        <button id="galleryBtn" onclick="document.getElementById('galleryInput').click()">Из галереи</button>
+        <input type="file" id="galleryInput" accept="image/*" onchange="loadQrFromGallery(event)">
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -256,10 +297,13 @@
         tg.expand();
 
         console.log("Инициализация Telegram Web App...");
+        console.log("tg.initData:", tg.initData);
         console.log("tg.initDataUnsafe:", tg.initDataUnsafe);
+        console.log("tg.platform:", tg.platform);
+        console.log("tg.version:", tg.version);
 
-        const currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-        const currentUserName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно";
+        let currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+        let currentUserName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно";
         let profileUserId = currentUserId;
         let profileUserName = currentUserName;
 
@@ -268,6 +312,10 @@
         if (startParam && startParam.startsWith("profile_")) {
             profileUserId = parseInt(startParam.split("_")[1]);
             profileUserName = profileUserId === currentUserId ? currentUserName : "Пользователь " + profileUserId;
+            if (!currentUserId) {
+                currentUserId = profileUserId;
+                console.log("Использую userId из start_param:", currentUserId);
+            }
         }
 
         if (!currentUserId) {
@@ -292,6 +340,8 @@
         const profileBtn = document.getElementById("profileBtn");
         const historyList = document.getElementById("historyList");
         let qrData = null;
+        let stream = null;
+        let flashlightOn = false;
 
         // Проверяем start_param для определения начальной страницы
         if (startParam && startParam.startsWith("profile_")) {
@@ -329,20 +379,64 @@
             fetchProfileBalance();
         }
 
-        function showQrScanner() {
+        async function showQrScanner() {
             console.log("Открываем сканер QR-кодов...");
             qrScanner.style.display = "block";
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(stream => {
-                    console.log("Камера успешно запущена");
-                    video.srcObject = stream;
-                    video.play();
-                    scanQR();
-                })
-                .catch(err => {
-                    result.innerText = "Ошибка камеры: " + err.message;
-                    console.error("Ошибка доступа к камере:", err);
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.play();
+                scanQR();
+            } catch (err) {
+                result.innerText = "Ошибка камеры: " + err.message;
+                console.error("Ошибка доступа к камере:", err);
+            }
+        }
+
+        async function toggleFlashlight() {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            flashlightOn = !flashlightOn;
+            try {
+                await track.applyConstraints({
+                    advanced: [{ torch: flashlightOn }]
                 });
+                document.getElementById("flashlightBtn").innerText = flashlightOn ? "Выкл. фонарик" : "Фонарик";
+            } catch (err) {
+                console.error("Ошибка включения/выключения фонарика:", err);
+                result.innerText = "Фонарик не поддерживается на этом устройстве";
+            }
+        }
+
+        function loadQrFromGallery(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "attemptBoth"
+                    });
+                    if (code) {
+                        qrData = code.data;
+                        result.innerText = `QR отсканирован: ${qrData}`;
+                        console.log("QR-код успешно отсканирован из галереи:", qrData);
+                    } else {
+                        result.innerText = "Не удалось распознать QR-код из изображения";
+                        console.log("QR-код не найден в изображении");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function deposit() {
