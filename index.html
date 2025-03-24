@@ -86,8 +86,6 @@
             z-index: 1000;
         }
         .buttons button {
-            background: #fff;
-            color: #003087;
             border: none;
             border-radius: 12px;
             padding: 12px;
@@ -102,11 +100,32 @@
         }
         .buttons button:hover {
             transform: translateY(-2px);
-            background: #e6f0ff;
         }
         .buttons button img {
             width: 24px;
             margin-bottom: 5px;
+        }
+        .buttons .deposit-btn {
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .buttons .deposit-btn img {
+            width: 30px;
+            margin: 0;
+        }
+        .buttons .qr-btn {
+            background: #00C4FF;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .buttons .qr-btn img {
+            width: 30px;
+            margin: 0;
         }
         .accounts {
             margin-bottom: 20px;
@@ -193,10 +212,7 @@
         }
         .history, #depositScreen, #networkScreen, #qrScreen, #referralScreen {
             display: none;
-        }
-        .history {
             background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
-            color: #fff;
         }
         .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #referralScreen h3 {
             font-size: 18px;
@@ -238,8 +254,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
-            color: #fff;
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
@@ -278,17 +292,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #fff;
-            color: #000;
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
+        }
+        #depositScreen .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #depositScreen .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
         }
         #depositScreen .network-option, #networkScreen .network-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f0f0f0;
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 10px;
@@ -300,36 +324,45 @@
             height: 30px;
             margin-right: 10px;
         }
+        #qrScreen .warning {
+            background: rgba(255, 75, 75, 0.2);
+            color: #ff4444;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
         #qrScreen .qr-code {
             display: block;
             margin: 20px auto;
             width: 200px;
             height: 200px;
-            border: 5px solid #f0f0f0;
+            border: 5px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
         #qrScreen .address {
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 600;
             word-break: break-all;
             text-align: center;
             margin: 10px 0;
-            color: #333;
+            color: #fff;
+            cursor: pointer;
         }
-        #qrScreen .warning {
-            background: #fff3cd;
-            color: #856404;
-            padding: 10px;
-            border-radius: 10px;
+        #qrScreen .exchange-rate {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
             margin: 10px 0;
-            font-size: 12px;
+            color: #fff;
         }
         #qrScreen .fee {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 10px;
             border-radius: 10px;
             margin: 10px 0;
             font-size: 12px;
-            color: #333;
+            color: #fff;
         }
         #qrScreen .copy-btn {
             background: #00C4FF;
@@ -509,9 +542,8 @@
                 <p>CryptoTap</p>
             </div>
             <div class="buttons">
-                <button onclick="showDepositScreen()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
-                <button onclick="depositUsdt()" style="background: #00C4FF; color: #fff; border: none; border-radius: 12px; padding: 12px; width: 90px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-left: 10px;"><img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT" style="width: 24px; margin-bottom: 5px;">USDT</button>
-                <button onclick="showQrScanner()" style="background: #00C4FF; color: #fff; border: none; border-radius: 50%; padding: 8px; width: 40px; height: 40px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-left: 10px;"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR" style="width: 24px;"></button>
+                <button class="deposit-btn" onclick="showDepositScreen()"><img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT"></button>
+                <button class="qr-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR"></button>
             </div>
             <div class="accounts">
                 <h3>Ваши счета</h3>
@@ -562,11 +594,14 @@
             <button class="copy-btn" onclick="copyReferralLink()">Копировать ссылку</button>
         </div>
         <div id="depositScreen">
+            <div class="logo">
+                <h1>CRYPTAP</h1>
+            </div>
             <h3>Пополнить</h3>
             <p>Как вы хотите пополнить криптовалюту на CryptoTap</p>
             <div class="network-option" onclick="showNetworkScreen()">
                 <div style="display: flex; align-items: center;">
-                    <img src="https://img.icons8.com/color/48/tron.png" alt="TRC20">
+                    <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
                     <div>
                         <p>Внешний кошелёк</p>
                         <p style="font-size: 12px; color: #666;">Перевод с другого кошелька</p>
@@ -590,12 +625,11 @@
         </div>
         <div id="qrScreen">
             <h3>Пополнение USDT</h3>
-            <img id="qrCode" class="qr-code" src="" alt="QR Code">
-            <p id="usdtAddress" class="address"></p>
-            <p id="tronLink"><strong>Tron-линк:</strong> <a id="tronLinkUrl" href="#" target="_blank">Оплатить через Tron</a></p>
-            <p id="exchangeRate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
             <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
             <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
+            <img id="qrCode" class="qr-code" src="" alt="QR Code">
+            <p id="usdtAddress" class="address" onclick="copyAddress()"></p>
+            <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
             <p class="fee" id="feeText">Фиксированная комиссия: загрузка...</p>
             <button class="copy-btn" onclick="copyAddress()">Копировать адрес</button>
         </div>
@@ -691,7 +725,7 @@
 
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
-                const usdtRate = rateData.tether.rub;
+                const usdtRate = (rateData.tether.rub || 0) - 0.5;
                 document.getElementById("usdtRate").innerText = usdtRate.toFixed(2);
             } catch (e) {
                 console.error("Ошибка получения комиссии:", e);
@@ -797,9 +831,6 @@
                         const qrCodeImg = document.getElementById("qrCode");
                         qrCodeImg.src = qrCodeCanvas.toDataURL("image/png");
                     });
-                    const tronLinkUrl = `https://www.tronlink.org/transfer?to=${usdtAddress}&token=USDT`;
-                    document.getElementById("tronLinkUrl").href = tronLinkUrl;
-                    document.getElementById("tronLinkUrl").innerText = `Оплатить через Tron`;
                     await fetchTransactionFee();
                     mainContent.style.display = "none";
                     historyContent.style.display = "none";
@@ -843,10 +874,6 @@
                 console.error("Ошибка копирования адреса:", err);
                 alert("Не удалось скопировать адрес.");
             });
-        }
-
-        function depositUsdt() {
-            alert("Функция пополнения USDT в разработке. Используйте кнопку 'Пополнить' для депозита через TRC20.");
         }
 
         async function showQrScanner() {
@@ -913,7 +940,6 @@
                     qrData = code.data;
                     result.innerText = `QR отсканирован: ${qrData}`;
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
-                    // Автоматически запускаем процесс оплаты
                     processPayment();
                 } else {
                     result.innerText = "Не удалось распознать QR-код из изображения.";
@@ -940,7 +966,6 @@
                         qrData = code.data;
                         result.innerText = `QR отсканирован: ${qrData}`;
                         console.log("QR-код успешно отсканирован:", qrData);
-                        // Автоматически запускаем процесс оплаты
                         processPayment();
                         return;
                     } else {
@@ -970,7 +995,12 @@
                     return;
                 }
 
-                const transactionId = await saveTransaction(amountRub / 90.0, "Ожидает оплаты");
+                const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                const rateData = await rateResponse.json();
+                const usdtRate = (rateData.tether.rub || 0) - 0.5;
+                const amountUsdt = amountRub / usdtRate;
+
+                const transactionId = await saveTransaction(amountUsdt, "Ожидает оплаты");
 
                 const paymentData = {
                     amountRub: amountRub,
