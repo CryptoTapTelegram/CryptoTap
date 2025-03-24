@@ -260,15 +260,24 @@
         }
         #referralScreen .info {
             background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
+            padding: 20px;
             border-radius: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         #referralScreen .info p {
-            margin: 5px 0;
-            font-size: 14px;
+            margin: 10px 0;
+            font-size: 16px;
             color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #referralScreen .info p img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
         }
         #referralScreen .copy-btn {
             background: #00C4FF;
@@ -295,6 +304,7 @@
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
+            overflow-y: auto;
         }
         #depositScreen .logo {
             text-align: center;
@@ -411,8 +421,10 @@
             position: absolute;
             bottom: 80px;
             left: 20px;
+            right: 20px;
             color: #fff;
             font-size: 14px;
+            text-align: center;
         }
         #qrScanner #loader {
             display: none;
@@ -437,9 +449,10 @@
         }
         #qrScanner #flashlightBtn, #qrScanner #uploadBtn {
             position: absolute;
-            bottom: 20px;
-            background: #fff;
-            color: #000;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+            color: #fff;
             border: none;
             padding: 10px;
             border-radius: 10px;
@@ -449,16 +462,44 @@
             z-index: 1001;
         }
         #qrScanner #flashlightBtn {
-            left: 20px;
+            left: 50%;
+            transform: translateX(-120%);
         }
         #qrScanner #uploadBtn {
-            left: 70px;
+            left: 50%;
+            transform: translateX(20%);
         }
         #qrScanner #flashlightBtn img, #qrScanner #uploadBtn img {
             width: 20px;
         }
         #qrScanner #uploadInput {
             display: none;
+        }
+        #qrScanner .action-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 1001;
+        }
+        #qrScanner .action-buttons button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        #qrScanner .action-buttons .confirm-btn {
+            background: #00C4FF;
+            color: #fff;
+        }
+        #qrScanner .action-buttons .cancel-btn {
+            background: #ff4444;
+            color: #fff;
         }
         .navbar {
             position: fixed;
@@ -587,9 +628,9 @@
         <div id="referralScreen">
             <h3>Реферальная система</h3>
             <div class="info">
-                <p><strong>Ваша реферальная ссылка:</strong> <span id="referralLink"></span></p>
-                <p><strong>Приглашено друзей:</strong> <span id="invitedCount">0</span></p>
-                <p><strong>Заработано:</strong> <span id="earnedAmount">0.0 USDT</span></p>
+                <p><img src="https://media.tenor.com/1zY0ZqK5z5gAAAAi/referral.gif" alt="Referral Icon"> <strong>Ваша реферальная ссылка:</strong> <span id="referralLink"></span></p>
+                <p><img src="https://media.tenor.com/5z5z5z5z5z5AAAAi/friends.gif" alt="Friends Icon"> <strong>Приглашено друзей:</strong> <span id="invitedCount">0</span></p>
+                <p><img src="https://media.tenor.com/6z6z6z6z6z6AAAAi/money.gif" alt="Money Icon"> <strong>Заработано:</strong> <span id="earnedAmount">0.0 USDT</span></p>
             </div>
             <button class="copy-btn" onclick="copyReferralLink()">Копировать ссылку</button>
         </div>
@@ -641,6 +682,10 @@
             <button id="flashlightBtn" onclick="toggleFlashlight()"><img src="https://img.icons8.com/ios-filled/50/flashlight.png" alt="Фонарик"></button>
             <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()"><img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Загрузить"></button>
             <input type="file" id="uploadInput" accept="image/*" onchange="uploadQrCode(event)">
+            <div id="actionButtons" class="action-buttons" style="display: none;">
+                <button class="confirm-btn" onclick="confirmPayment()">Подтвердить оплату</button>
+                <button class="cancel-btn" onclick="cancelPayment()">Отмена</button>
+            </div>
         </div>
     </div>
     <div class="navbar">
@@ -701,9 +746,11 @@
         const homeBtn = document.getElementById("homeBtn");
         const historyBtn = document.getElementById("historyBtn");
         const historyList = document.getElementById("historyList");
+        const actionButtons = document.getElementById("actionButtons");
         let qrData = null;
         let stream = null;
         let flashlightOn = false;
+        let scanning = true;
 
         if (startParam && startParam.startsWith("profile_")) {
             showMain();
@@ -885,6 +932,10 @@
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "block";
+            actionButtons.style.display = "none";
+            result.innerText = "";
+            qrData = null;
+            scanning = true;
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 console.log("Камера успешно запущена");
@@ -938,9 +989,11 @@
                 });
                 if (code) {
                     qrData = code.data;
-                    result.innerText = `QR отсканирован: ${qrData}`;
+                    const qrParams = new URLSearchParams(qrData.split("?")[1]);
+                    const amountRub = parseFloat(qrParams.get("amount")) || 0;
+                    result.innerText = `QR отсканирован: Сумма: ${amountRub} RUB\nПодтвердите оплату.`;
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
-                    processPayment();
+                    actionButtons.style.display = "flex";
                 } else {
                     result.innerText = "Не удалось распознать QR-код из изображения.";
                     console.log("QR-код не найден в изображении");
@@ -949,11 +1002,13 @@
         }
 
         function scanQR() {
+            if (!scanning) return;
             console.log("Начинаем сканирование QR-кода...");
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
 
             function tick() {
+                if (!scanning) return;
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -964,11 +1019,15 @@
                     });
                     if (code) {
                         qrData = code.data;
-                        result.innerText = `QR отсканирован: ${qrData}`;
+                        const qrParams = new URLSearchParams(qrData.split("?")[1]);
+                        const amountRub = parseFloat(qrParams.get("amount")) || 0;
+                        result.innerText = `QR отсканирован: Сумма: ${amountRub} RUB\nПодтвердите оплату.`;
                         console.log("QR-код успешно отсканирован:", qrData);
-                        processPayment();
+                        scanning = false;
+                        actionButtons.style.display = "flex";
                         return;
                     } else {
+                        result.innerText = "Наведите камеру на QR-код.";
                         console.log("QR-код не найден в текущем кадре");
                     }
                 } else {
@@ -977,6 +1036,21 @@
                 requestAnimationFrame(tick);
             }
             tick();
+        }
+
+        function confirmPayment() {
+            if (qrData) {
+                actionButtons.style.display = "none";
+                processPayment();
+            }
+        }
+
+        function cancelPayment() {
+            qrData = null;
+            result.innerText = "";
+            actionButtons.style.display = "none";
+            scanning = true;
+            scanQR();
         }
 
         async function processPayment() {
