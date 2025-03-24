@@ -10,9 +10,9 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент из дизайна */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
             color: #fff;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
@@ -21,6 +21,7 @@
             padding: 20px;
             flex: 1;
             overflow-y: auto;
+            padding-bottom: 80px;
         }
         .header {
             display: flex;
@@ -61,7 +62,7 @@
             left: 10px;
             width: 40px;
             height: 25px;
-            background: #ffd700; /* Золотой "чип" карты */
+            background: #ffd700;
             border-radius: 5px;
         }
         .balance h2 {
@@ -77,6 +78,35 @@
             font-size: 16px;
             color: rgba(255, 255, 255, 0.8);
             margin: 5px 0 0;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            z-index: 1000;
+        }
+        .buttons button {
+            background: #fff;
+            color: #003087;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            width: 90px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background 0.3s;
+            margin: 0 5px;
+        }
+        .buttons button:hover {
+            transform: translateY(-2px);
+            background: #e6f0ff;
+        }
+        .buttons button img {
+            width: 24px;
+            margin-bottom: 5px;
         }
         .accounts {
             margin-bottom: 20px;
@@ -121,7 +151,7 @@
         }
         .account-item .right .coming-soon {
             font-size: 12px;
-            color: #ffd700; /* Жёлтый для надписи "скоро" */
+            color: #ffd700;
             font-style: italic;
         }
         .promo {
@@ -165,14 +195,14 @@
             display: none;
         }
         .history {
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Такой же фон, как на главной */
-            color: #fff; /* Белый текст */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
+            color: #fff;
         }
         .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #referralScreen h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 15px;
-            color: #fff; /* Белый текст */
+            color: #fff;
         }
         .history-item {
             display: flex;
@@ -191,7 +221,7 @@
         .history-item .left .icon {
             width: 30px;
             height: 30px;
-            background: #00C4FF; /* Светло-голубой для иконки */
+            background: #00C4FF;
             border-radius: 50%;
             margin-right: 10px;
         }
@@ -208,8 +238,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Такой же фон, как на главной */
-            color: #fff; /* Белый текст */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
+            color: #fff;
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
@@ -227,7 +257,7 @@
             color: #fff;
         }
         #referralScreen .copy-btn {
-            background: #00C4FF; /* Светло-голубой для кнопки */
+            background: #00C4FF;
             color: #fff;
             border: none;
             padding: 12px 20px;
@@ -240,7 +270,7 @@
             transition: background 0.3s;
         }
         #referralScreen .copy-btn:hover {
-            background: #003087; /* Тёмно-синий при наведении */
+            background: #003087;
         }
         #depositScreen, #networkScreen, #qrScreen {
             position: fixed;
@@ -302,7 +332,7 @@
             color: #333;
         }
         #qrScreen .copy-btn {
-            background: #00C4FF; /* Светло-голубой для кнопки */
+            background: #00C4FF;
             color: #fff;
             border: none;
             padding: 12px 20px;
@@ -315,7 +345,7 @@
             transition: background 0.3s;
         }
         #qrScreen .copy-btn:hover {
-            background: #003087; /* Тёмно-синий при наведении */
+            background: #003087;
         }
         #qrScanner {
             display: none;
@@ -351,34 +381,45 @@
             color: #fff;
             font-size: 14px;
         }
-        #qrScanner #confirmBtn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: #00C4FF; /* Светло-голубой для кнопки */
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            transition: background 0.3s;
+        #qrScanner #loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: #ffd700;
+            font-size: 16px;
         }
-        #qrScanner #confirmBtn:hover {
-            background: #003087; /* Тёмно-синий при наведении */
+        #qrScanner #loader::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffd700;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         #qrScanner #flashlightBtn, #qrScanner #uploadBtn {
             position: absolute;
             bottom: 20px;
-            left: 20px;
             background: #fff;
             color: #000;
             border: none;
             padding: 10px;
             border-radius: 10px;
             cursor: pointer;
-            margin-right: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            z-index: 1001;
+        }
+        #qrScanner #flashlightBtn {
+            left: 20px;
+        }
+        #qrScanner #uploadBtn {
+            left: 70px;
         }
         #qrScanner #flashlightBtn img, #qrScanner #uploadBtn img {
             width: 20px;
@@ -387,22 +428,22 @@
             display: none;
         }
         .navbar {
-            position: fixed; /* Фиксируем панель навигации */
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             display: flex;
             justify-content: space-between;
-            background: #fff;
+            background: linear-gradient(180deg, #3A1E71 0%, #0A0A2D 100%) !important;
             padding: 12px 20px;
             border-top: 1px solid #ddd;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000; /* Чтобы панель была поверх контента */
+            z-index: 1000;
         }
         .navbar button {
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент фона */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
             border: none;
-            border-radius: 8px; /* Квадратная форма с небольшим скруглением */
+            border-radius: 8px;
             padding: 10px;
             width: 50px;
             height: 50px;
@@ -418,14 +459,14 @@
         }
         .navbar button img {
             width: 24px;
-            filter: brightness(0) invert(1); /* Белые иконки */
+            filter: brightness(0) invert(1);
         }
         .navbar .pay-btn {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%); /* Градиент фона */
-            border-radius: 8px; /* Квадратная форма */
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
+            border-radius: 8px;
             padding: 15px;
             width: 60px;
             height: 60px;
@@ -440,7 +481,7 @@
             transform: translateX(-50%);
             width: 20px;
             height: 20px;
-            background: #1A1A3D; /* Тёмный цвет градиента для выреза */
+            background: #1A1A3D;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
         .navbar .pay-btn:hover {
@@ -448,10 +489,11 @@
         }
         .navbar .pay-btn img {
             width: 30px;
-            filter: brightness(0) invert(1); /* Белая иконка */
+            filter: brightness(0) invert(1);
         }
         .main-content {
             display: block;
+            min-height: calc(100vh - 80px);
         }
     </style>
 </head>
@@ -466,6 +508,11 @@
                 <h2><span id="balanceRub">0.0</span> ₽</h2>
                 <p>CryptoTap</p>
             </div>
+            <div class="buttons">
+                <button onclick="showDepositScreen()"><img src="https://img.icons8.com/ios-filled/50/plus.png" alt="Пополнить">Пополнить</button>
+                <button onclick="depositUsdt()" style="background: #00C4FF; color: #fff; border: none; border-radius: 12px; padding: 12px; width: 90px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-left: 10px;"><img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT" style="width: 24px; margin-bottom: 5px;">USDT</button>
+                <button onclick="showQrScanner()" style="background: #00C4FF; color: #fff; border: none; border-radius: 50%; padding: 8px; width: 40px; height: 40px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-left: 10px;"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR" style="width: 24px;"></button>
+            </div>
             <div class="accounts">
                 <h3>Ваши счета</h3>
                 <div class="account-item">
@@ -477,7 +524,6 @@
                     </div>
                     <div class="right">
                         <p class="amount" id="usdtBalance">0.0 USDT</p>
-                        <p class="change">+0.00%</p>
                     </div>
                 </div>
                 <div class="account-item">
@@ -546,6 +592,8 @@
             <h3>Пополнение USDT</h3>
             <img id="qrCode" class="qr-code" src="" alt="QR Code">
             <p id="usdtAddress" class="address"></p>
+            <p id="tronLink"><strong>Tron-линк:</strong> <a id="tronLinkUrl" href="#" target="_blank">Оплатить через Tron</a></p>
+            <p id="exchangeRate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
             <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
             <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
             <p class="fee" id="feeText">Фиксированная комиссия: загрузка...</p>
@@ -555,10 +603,10 @@
             <video id="video" autoplay playsinline></video>
             <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
             <p id="result"></p>
+            <div id="loader" class="loader">Ожидайте подтверждения...</div>
             <button id="flashlightBtn" onclick="toggleFlashlight()"><img src="https://img.icons8.com/ios-filled/50/flashlight.png" alt="Фонарик"></button>
             <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()"><img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Загрузить"></button>
             <input type="file" id="uploadInput" accept="image/*" onchange="uploadQrCode(event)">
-            <button id="confirmBtn" onclick="processPayment()">Подтвердить</button>
         </div>
     </div>
     <div class="navbar">
@@ -586,7 +634,6 @@
         let profileUserId = currentUserId;
         let profileUserName = currentUserName;
 
-        // Проверяем start_param для определения userId профиля
         const startParam = tg.initDataUnsafe.start_param;
         if (startParam && startParam.startsWith("profile_")) {
             profileUserId = parseInt(startParam.split("_")[1]);
@@ -624,9 +671,8 @@
         let stream = null;
         let flashlightOn = false;
 
-        // Проверяем start_param для определения начальной страницы
         if (startParam && startParam.startsWith("profile_")) {
-            showMain(); // Профиль убрали, открываем главную
+            showMain();
         }
 
         async function fetchTransactionFee() {
@@ -637,14 +683,20 @@
                 }
                 const data = await response.json();
                 const trx_to_usdt = data["tron"]["usdt"];
-                const network_fee_trx = 20; // Средняя комиссия за транзакцию TRC20
+                const network_fee_trx = 20;
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
-                const our_fee = 1.2; // Наша комиссия (увеличили с 0.4 до 1.2)
+                const our_fee = 1.2;
                 const total_fee = network_fee_usdt + our_fee;
                 document.getElementById("feeText").innerText = `Фиксированная комиссия: ${total_fee.toFixed(2)} USDT (сеть: ${network_fee_usdt.toFixed(2)} USDT, наша: ${our_fee} USDT)`;
+
+                const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                const rateData = await rateResponse.json();
+                const usdtRate = rateData.tether.rub;
+                document.getElementById("usdtRate").innerText = usdtRate.toFixed(2);
             } catch (e) {
                 console.error("Ошибка получения комиссии:", e);
                 document.getElementById("feeText").innerText = "Фиксированная комиссия: ошибка загрузки";
+                document.getElementById("usdtRate").innerText = "ошибка";
             }
         }
 
@@ -685,13 +737,11 @@
             homeBtn.classList.remove("active");
             historyBtn.classList.remove("active");
 
-            // Генерируем реферальную ссылку
             const referralLink = `https://t.me/CryptoTapBot?start=ref_${currentUserId}`;
             document.getElementById("referralLink").innerText = referralLink;
 
-            // Для примера: пока данные о приглашённых и заработке статические
-            document.getElementById("invitedCount").innerText = "5"; // Замени на реальные данные
-            document.getElementById("earnedAmount").innerText = "10.0 USDT"; // Замени на реальные данные
+            document.getElementById("invitedCount").innerText = "5";
+            document.getElementById("earnedAmount").innerText = "10.0 USDT";
         }
 
         function copyReferralLink() {
@@ -738,7 +788,6 @@
                 const usdtAddress = await fetchUsdtAddress();
                 if (usdtAddress) {
                     document.getElementById("usdtAddress").innerText = usdtAddress;
-                    // Генерируем QR-код
                     const qrCodeCanvas = document.createElement("canvas");
                     QRCode.toCanvas(qrCodeCanvas, usdtAddress, { width: 200 }, (error) => {
                         if (error) {
@@ -748,7 +797,9 @@
                         const qrCodeImg = document.getElementById("qrCode");
                         qrCodeImg.src = qrCodeCanvas.toDataURL("image/png");
                     });
-                    // Запрашиваем комиссию
+                    const tronLinkUrl = `https://www.tronlink.org/transfer?to=${usdtAddress}&token=USDT`;
+                    document.getElementById("tronLinkUrl").href = tronLinkUrl;
+                    document.getElementById("tronLinkUrl").innerText = `Оплатить через Tron`;
                     await fetchTransactionFee();
                     mainContent.style.display = "none";
                     historyContent.style.display = "none";
@@ -794,6 +845,10 @@
             });
         }
 
+        function depositUsdt() {
+            alert("Функция пополнения USDT в разработке. Используйте кнопку 'Пополнить' для депозита через TRC20.");
+        }
+
         async function showQrScanner() {
             console.log("Открываем сканер QR-кодов...");
             mainContent.style.display = "none";
@@ -816,7 +871,11 @@
         }
 
         async function toggleFlashlight() {
-            if (!stream) return;
+            console.log("Попытка включить/выключить фонарик...");
+            if (!stream) {
+                console.error("Stream не инициализирован");
+                return;
+            }
             const track = stream.getVideoTracks()[0];
             flashlightOn = !flashlightOn;
             try {
@@ -831,8 +890,12 @@
         }
 
         async function uploadQrCode(event) {
+            console.log("Попытка загрузить QR-код из галереи...");
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {
+                console.error("Файл не выбран");
+                return;
+            }
 
             const img = new Image();
             img.src = URL.createObjectURL(file);
@@ -850,6 +913,8 @@
                     qrData = code.data;
                     result.innerText = `QR отсканирован: ${qrData}`;
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
+                    // Автоматически запускаем процесс оплаты
+                    processPayment();
                 } else {
                     result.innerText = "Не удалось распознать QR-код из изображения.";
                     console.log("QR-код не найден в изображении");
@@ -875,6 +940,8 @@
                         qrData = code.data;
                         result.innerText = `QR отсканирован: ${qrData}`;
                         console.log("QR-код успешно отсканирован:", qrData);
+                        // Автоматически запускаем процесс оплаты
+                        processPayment();
                         return;
                     } else {
                         console.log("QR-код не найден в текущем кадре");
@@ -888,92 +955,117 @@
         }
 
         async function processPayment() {
-    if (!qrData) {
-        result.innerText = "Сначала отсканируй QR, брат!";
-        console.error("QR-код не отсканирован");
-        return;
-    }
+            if (!qrData) {
+                result.innerText = "Сначала отсканируй QR, брат!";
+                console.error("QR-код не отсканирован");
+                return;
+            }
 
-    try {
-        const qrParams = new URLSearchParams(qrData.split("?")[1]);
-        const amountRub = parseFloat(qrParams.get("amount")) || 0;
-        if (!amountRub) {
-            result.innerText = "В QR нет суммы, брат!";
-            console.error("В QR нет суммы");
-            return;
-        }
-
-        const transactionId = await saveTransaction(amountRub / 90.0, "Ожидает оплаты");
-
-        const paymentData = {
-            amountRub: amountRub,
-            qrData: qrData,
-            transactionId: transactionId
-        };
-
-        const paymentResponse = await fetch(`${apiBaseUrl}/pay/${currentUserId}`, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true"
-            },
-            body: JSON.stringify(paymentData)
-        });
-
-        const paymentResult = await paymentResponse.json();
-        result.innerText = paymentResult.message;
-
-        if (paymentResult.status === "pending") {
-            // Показываем анимацию ожидания
-            const loader = document.getElementById("loader");
-            loader.style.display = "block";
-            result.style.display = "block";
-            result.innerText = "Ожидайте подтверждения оплаты сотрудником...";
-
-            // Ждём подтверждения через Redis
-            const taskId = paymentResult.task_id;
-            let timeElapsed = 0;
-            const maxWaitTime = 60; // Максимальное время ожидания: 60 секунд
-
-            while (timeElapsed < maxWaitTime) {
-                const response = await fetch(`${apiBaseUrl}/check_payment_status/${taskId}`, {
-                    headers: {
-                        "ngrok-skip-browser-warning": "true"
-                    }
-                });
-                const statusResult = await response.json();
-
-                if (statusResult.status === "success") {
-                    loader.style.display = "none";
-                    result.innerText = "Ваш QR оплачен!";
-                    setTimeout(() => {
-                        qrScanner.style.display = "none";
-                        fetchBalance();
-                        if (historyContent.style.display === "block") {
-                            fetchHistory();
-                        }
-                    }, 2000);
-                    return;
-                } else if (statusResult.status === "error") {
-                    loader.style.display = "none";
-                    result.innerText = statusResult.message;
+            try {
+                const qrParams = new URLSearchParams(qrData.split("?")[1]);
+                const amountRub = parseFloat(qrParams.get("amount")) || 0;
+                if (!amountRub) {
+                    result.innerText = "В QR нет суммы, брат!";
+                    console.error("В QR нет суммы");
                     return;
                 }
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                timeElapsed++;
-            }
+                const transactionId = await saveTransaction(amountRub / 90.0, "Ожидает оплаты");
 
-            // Если время ожидания истекло
-            loader.style.display = "none";
-            result.innerText = "Время ожидания истекло. Попробуй снова.";
+                const paymentData = {
+                    amountRub: amountRub,
+                    qrData: qrData,
+                    transactionId: transactionId
+                };
+
+                const paymentResponse = await fetch(`${apiBaseUrl}/pay/${currentUserId}`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true"
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const paymentResult = await paymentResponse.json();
+                result.innerText = paymentResult.message;
+
+                if (paymentResult.status === "pending") {
+                    const loader = document.getElementById("loader");
+                    loader.style.display = "block";
+                    result.style.display = "block";
+                    result.innerText = "Ожидайте подтверждения оплаты сотрудником...";
+
+                    const cancelButton = document.createElement("button");
+                    cancelButton.innerText = "Отменить";
+                    cancelButton.style = "background: #ff4444; color: #fff; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; display: block; margin: 10px auto;";
+                    qrScanner.appendChild(cancelButton);
+
+                    let isCancelled = false;
+                    cancelButton.onclick = async () => {
+                        isCancelled = true;
+                        loader.style.display = "none";
+                        result.innerText = "Запрос на оплату отменён.";
+                        qrScanner.style.display = "none";
+                        await fetch(`${apiBaseUrl}/cancel_payment/${paymentResult.task_id}`, {
+                            method: 'POST',
+                            headers: {
+                                "ngrok-skip-browser-warning": "true"
+                            }
+                        });
+                        setTimeout(() => {
+                            fetchBalance();
+                            if (historyContent.style.display === "block") {
+                                fetchHistory();
+                            }
+                        }, 2000);
+                    };
+
+                    const taskId = paymentResult.task_id;
+                    let timeElapsed = 0;
+                    const maxWaitTime = 60;
+
+                    while (timeElapsed < maxWaitTime && !isCancelled) {
+                        const response = await fetch(`${apiBaseUrl}/check_payment_status/${taskId}`, {
+                            headers: {
+                                "ngrok-skip-browser-warning": "true"
+                            }
+                        });
+                        const statusResult = await response.json();
+
+                        if (statusResult.status === "success") {
+                            loader.style.display = "none";
+                            result.innerText = "Ваш QR оплачен!";
+                            setTimeout(() => {
+                                qrScanner.style.display = "none";
+                                fetchBalance();
+                                if (historyContent.style.display === "block") {
+                                    fetchHistory();
+                                }
+                            }, 2000);
+                            return;
+                        } else if (statusResult.status === "error") {
+                            loader.style.display = "none";
+                            result.innerText = statusResult.message;
+                            return;
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        timeElapsed++;
+                    }
+
+                    if (!isCancelled) {
+                        loader.style.display = "none";
+                        result.innerText = "Время ожидания истекло. Попробуй снова.";
+                    }
+                }
+
+            } catch (e) {
+                console.error("Ошибка при обработке оплаты:", e);
+                result.innerText = "Ошибка при оплате, брат!";
+            }
         }
 
-    } catch (e) {
-        console.error("Ошибка при обработке оплаты:", e);
-        result.innerText = "Ошибка при оплате, брат!";
-    }
-}
         async function saveTransaction(amount_usdt, status) {
             try {
                 const response = await fetch(`${apiBaseUrl}/save_transaction/${currentUserId}`, {
@@ -1021,7 +1113,7 @@
                 const balanceUsdt = data.balance_usdt || 0;
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
-                const usdtRate = (rateData.tether.rub || 0) - 0.5; // Вычитаем 0.5 рубля за 1 USDT
+                const usdtRate = (rateData.tether.rub || 0) - 0.5;
                 const balanceRub = balanceUsdt * usdtRate;
                 console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
                 document.getElementById("balanceRub").innerText = balanceRub.toFixed(2);
@@ -1071,7 +1163,6 @@
             }
         }
 
-        // Автоматическое обновление баланса и истории каждые 5 секунд
         setInterval(() => {
             if (mainContent.style.display === "block") {
                 fetchBalance();
