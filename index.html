@@ -23,11 +23,30 @@
             overflow-y: auto;
             padding-bottom: 80px;
         }
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
+            z-index: 1001;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .fixed-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            margin-top: 50px;
         }
         .header h1 {
             font-size: 24px;
@@ -85,6 +104,11 @@
             margin-bottom: 20px;
             z-index: 1000;
         }
+        .buttons .button-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .buttons button {
             border: none;
             border-radius: 12px;
@@ -117,8 +141,8 @@
             margin: 0;
         }
         .buttons .qr-btn {
-            background: #00C4FF;
-            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -126,6 +150,11 @@
         .buttons .qr-btn img {
             width: 30px;
             margin: 0;
+        }
+        .buttons .button-label {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #fff;
         }
         .accounts {
             margin-bottom: 20px;
@@ -390,6 +419,9 @@
         #qrScreen .copy-btn:hover {
             background: #003087;
         }
+        #qrScreen > * {
+            margin-bottom: 20px;
+        }
         #qrScanner {
             display: none;
             position: fixed;
@@ -460,6 +492,7 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             display: inline-block;
             z-index: 1001;
+            font-size: 20px;
         }
         #qrScanner #flashlightBtn {
             left: 50%;
@@ -468,9 +501,6 @@
         #qrScanner #uploadBtn {
             left: 50%;
             transform: translateX(20%);
-        }
-        #qrScanner #flashlightBtn img, #qrScanner #uploadBtn img {
-            width: 20px;
         }
         #qrScanner #uploadInput {
             display: none;
@@ -494,6 +524,7 @@
             font-size: 18px;
             margin-bottom: 20px;
             color: #fff;
+            line-height: 1.5;
         }
         #qrConfirmScreen .action-buttons {
             display: flex;
@@ -548,7 +579,6 @@
         }
         .navbar button img {
             width: 24px;
-            filter: brightness(0) invert(1);
         }
         .navbar .pay-btn {
             position: absolute;
@@ -578,7 +608,6 @@
         }
         .navbar .pay-btn img {
             width: 30px;
-            filter: brightness(0) invert(1);
         }
         .main-content {
             display: block;
@@ -589,20 +618,29 @@
 <body>
     <div class="container">
         <div class="main-content">
+            <div class="fixed-header">
+                <h1>CRYPTOTAP</h1>
+            </div>
             <div class="header">
                 <h1>cryptotap</h1>
                 <span class="beta">beta</span>
             </div>
             <div class="balance">
                 <h2><span id="balanceRub">0.0</span> ₽</h2>
-                <p>CryptoTap</p>
+                <p>CryptoTap CARD</p>
             </div>
             <div class="buttons">
-                <button class="deposit-btn" onclick="showDepositScreen()"><img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT"></button>
-                <button class="qr-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR"></button>
+                <div class="button-wrapper">
+                    <button class="deposit-btn" onclick="showDepositScreen()"><img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT"></button>
+                    <span class="button-label">Пополнить</span>
+                </div>
+                <div class="button-wrapper">
+                    <button class="qr-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR"></button>
+                    <span class="button-label">QR-код</span>
+                </div>
             </div>
             <div class="accounts">
-                <h3>Ваши счета</h3>
+                <h3>Ваши активы</h3>
                 <div class="account-item">
                     <div class="left">
                         <img src="https://img.icons8.com/color/48/tether--v1.png" alt="Tether">
@@ -694,7 +732,7 @@
             <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
             <p id="result"></p>
             <div id="loader" class="loader">Ожидайте подтверждения...</div>
-            <button id="flashlightBtn" onclick="toggleFlashlight()"><img src="https://img.icons8.com/ios-filled/50/flashlight.png" alt="Фонарик"></button>
+            <button id="flashlightBtn" onclick="toggleFlashlight()">🔦</button>
             <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()"><img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Загрузить"></button>
             <input type="file" id="uploadInput" accept="image/*" onchange="uploadQrCode(event)">
         </div>
@@ -708,9 +746,9 @@
         </div>
     </div>
     <div class="navbar">
-        <button id="homeBtn" class="active" onclick="showMain()"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Главная"></button>
-        <button id="payBtn" class="pay-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="Оплатить"></button>
-        <button id="historyBtn" onclick="showHistory()"><img src="https://img.icons8.com/ios-filled/50/clock.png" alt="История"></button>
+        <button id="homeBtn" class="active" onclick="showMain()"><img src="https://media.tenor.com/5z5z5z5z5z5AAAAi/home.gif" alt="🏠"></button>
+        <button id="payBtn" class="pay-btn" onclick="showQrScanner()"><img src="https://media.tenor.com/6z6z6z6z6z6AAAAi/camera.gif" alt="📷"></button>
+        <button id="historyBtn" onclick="showHistory()"><img src="https://media.tenor.com/7z7z7z7z7z7AAAAi/rocket.gif" alt="🚀"></button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -788,7 +826,7 @@
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
                 const our_fee = 1.2;
                 const total_fee = network_fee_usdt + our_fee;
-                document.getElementById("feeText").innerText = `Фиксированная комиссия: ${total_fee.toFixed(2)} USDT (сеть: ${network_fee_usdt.toFixed(2)} USDT, наша: ${our_fee} USDT)`;
+                document.getElementById("feeText").innerText = `Фиксированная комиссия: ${total_fee.toFixed(2)} USDT`;
 
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
                 const rateData = await rateResponse.json();
@@ -1015,9 +1053,14 @@
                 });
                 if (code) {
                     qrData = code.data;
-                    const qrParams = new URLSearchParams(qrData.split("?")[1]);
-                    const amountRub = parseFloat(qrParams.get("amount")) || 0;
-                    qrInfo.innerText = `Сумма: ${amountRub} RUB`;
+                    const qrFields = qrData.split("|").reduce((acc, field) => {
+                        const [key, value] = field.split("=");
+                        if (key && value) acc[key] = value;
+                        return acc;
+                    }, {});
+                    const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
+                    const name = qrFields["Name"] || "Не указано";
+                    qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB`;
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
                     qrScanner.style.display = "none";
                     qrConfirmScreen.style.display = "flex";
@@ -1046,9 +1089,14 @@
                     });
                     if (code) {
                         qrData = code.data;
-                        const qrParams = new URLSearchParams(qrData.split("?")[1]);
-                        const amountRub = parseFloat(qrParams.get("amount")) || 0;
-                        qrInfo.innerText = `Сумма: ${amountRub} RUB`;
+                        const qrFields = qrData.split("|").reduce((acc, field) => {
+                            const [key, value] = field.split("=");
+                            if (key && value) acc[key] = value;
+                            return acc;
+                        }, {});
+                        const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
+                        const name = qrFields["Name"] || "Не указано";
+                        qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB`;
                         console.log("QR-код успешно отсканирован:", qrData);
                         scanning = false;
                         qrScanner.style.display = "none";
@@ -1092,8 +1140,12 @@
             }
 
             try {
-                const qrParams = new URLSearchParams(qrData.split("?")[1]);
-                const amountRub = parseFloat(qrParams.get("amount")) || 0;
+                const qrFields = qrData.split("|").reduce((acc, field) => {
+                    const [key, value] = field.split("=");
+                    if (key && value) acc[key] = value;
+                    return acc;
+                }, {});
+                const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
                 if (!amountRub) {
                     result.innerText = "В QR нет суммы, брат!";
                     console.error("В QR нет суммы");
