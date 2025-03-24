@@ -888,72 +888,92 @@
         }
 
         async function processPayment() {
-            if (!qrData) {
-                result.innerText = "Сначала отсканируй QR, брат!";
-                console.error("QR-код не отсканирован");
-                return;
-            }
+    if (!qrData) {
+        result.innerText = "Сначала отсканируй QR, брат!";
+        console.error("QR-код не отсканирован");
+        return;
+    }
 
-            try {
-                const qrParams = new URLSearchParams(qrData.split("?")[1]);
-                const amountRub = parseFloat(qrParams.get("amount")) || 0;
-                if (!amountRub) {
-                    result.innerText = "В QR нет суммы, брат!";
-                    console.error("В QR нет суммы");
+    try {
+        const qrParams = new URLSearchParams(qrData.split("?")[1]);
+        const amountRub = parseFloat(qrParams.get("amount")) || 0;
+        if (!amountRub) {
+            result.innerText = "В QR нет суммы, брат!";
+            console.error("В QR нет суммы");
+            return;
+        }
+
+        const transactionId = await saveTransaction(amountRub / 90.0, "Ожидает оплаты");
+
+        const paymentData = {
+            amountRub: amountRub,
+            qrData: qrData,
+            transactionId: transactionId
+        };
+
+        const paymentResponse = await fetch(`${apiBaseUrl}/pay/${currentUserId}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true"
+            },
+            body: JSON.stringify(paymentData)
+        });
+
+        const paymentResult = await paymentResponse.json();
+        result.innerText = paymentResult.message;
+
+        if (paymentResult.status === "pending") {
+            // Показываем анимацию ожидания
+            const loader = document.getElementById("loader");
+            loader.style.display = "block";
+            result.style.display = "block";
+            result.innerText = "Ожидайте подтверждения оплаты сотрудником...";
+
+            // Ждём подтверждения через Redis
+            const taskId = paymentResult.task_id;
+            let timeElapsed = 0;
+            const maxWaitTime = 60; // Максимальное время ожидания: 60 секунд
+
+            while (timeElapsed < maxWaitTime) {
+                const response = await fetch(`${apiBaseUrl}/check_payment_status/${taskId}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true"
+                    }
+                });
+                const statusResult = await response.json();
+
+                if (statusResult.status === "success") {
+                    loader.style.display = "none";
+                    result.innerText = "Ваш QR оплачен!";
+                    setTimeout(() => {
+                        qrScanner.style.display = "none";
+                        fetchBalance();
+                        if (historyContent.style.display === "block") {
+                            fetchHistory();
+                        }
+                    }, 2000);
+                    return;
+                } else if (statusResult.status === "error") {
+                    loader.style.display = "none";
+                    result.innerText = statusResult.message;
                     return;
                 }
 
-                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
-                const data = await response.json();
-                const usdtRate = data.tether.rub;
-                const amountUsdt = amountRub / usdtRate;
-                const commissionResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usdt");
-                const commissionData = await commissionResponse.json();
-                const trx_to_usdt = commissionData["tron"]["usdt"];
-                const network_fee_trx = 20; // Средняя комиссия за транзакцию TRC20
-                const network_fee_usdt = network_fee_trx * trx_to_usdt;
-                const our_fee = 1.2; // Наша комиссия (увеличили с 0.4 до 1.2)
-                const commission = network_fee_usdt + our_fee;
-                const totalUsdt = amountUsdt + commission;
-
-                // Сохраняем транзакцию как "Ожидает оплаты"
-                const transactionId = await saveTransaction(amountUsdt, "Ожидает оплаты");
-
-                const paymentData = {
-                    amountRub: amountRub,
-                    amountUsdt: amountUsdt,
-                    commission: commission,
-                    totalUsdt: totalUsdt,
-                    qrData: qrData,
-                    transactionId: transactionId
-                };
-
-                // Отправляем данные на сервер через AJAX
-                const paymentResponse = await fetch(`${apiBaseUrl}/pay/${currentUserId}`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "ngrok-skip-browser-warning": "true"
-                    },
-                    body: JSON.stringify(paymentData)
-                });
-
-                const paymentResult = await paymentResponse.json();
-                result.innerText = paymentResult.message;
-
-                qrScanner.style.display = "none";
-                setTimeout(() => {
-                    fetchBalance();
-                    if (historyContent.style.display === "block") {
-                        fetchHistory();
-                    }
-                }, 2000);
-            } catch (e) {
-                console.error("Ошибка при обработке оплаты:", e);
-                result.innerText = "Ошибка при оплате, брат!";
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                timeElapsed++;
             }
+
+            // Если время ожидания истекло
+            loader.style.display = "none";
+            result.innerText = "Время ожидания истекло. Попробуй снова.";
         }
 
+    } catch (e) {
+        console.error("Ошибка при обработке оплаты:", e);
+        result.innerText = "Ошибка при оплате, брат!";
+    }
+}
         async function saveTransaction(amount_usdt, status) {
             try {
                 const response = await fetch(`${apiBaseUrl}/save_transaction/${currentUserId}`, {
