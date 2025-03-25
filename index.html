@@ -439,7 +439,7 @@
         }
         #qrScanner #warning {
             position: absolute;
-            top: 20px;
+            top: 70px;
             left: 20px;
             right: 20px;
             background: rgba(255, 255, 255, 0.8);
@@ -457,6 +457,7 @@
             color: #fff;
             font-size: 14px;
             text-align: center;
+            line-height: 1.5;
         }
         #qrScanner #loader {
             display: none;
@@ -493,6 +494,11 @@
             display: inline-block;
             z-index: 1001;
             font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         #qrScanner #flashlightBtn {
             left: 50%;
@@ -573,12 +579,10 @@
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s;
+            font-size: 24px;
         }
         .navbar button:hover {
             transform: scale(1.1);
-        }
-        .navbar button img {
-            width: 24px;
         }
         .navbar .pay-btn {
             position: absolute;
@@ -591,6 +595,7 @@
             height: 60px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s;
+            font-size: 30px;
         }
         .navbar .pay-btn::after {
             content: '';
@@ -605,9 +610,6 @@
         }
         .navbar .pay-btn:hover {
             transform: translateX(-50%) scale(1.1);
-        }
-        .navbar .pay-btn img {
-            width: 30px;
         }
         .main-content {
             display: block;
@@ -729,11 +731,11 @@
         </div>
         <div id="qrScanner">
             <video id="video" autoplay playsinline></video>
+            <button id="flashlightBtn" onclick="toggleFlashlight()">🔦</button>
+            <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()">📤</button>
             <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
             <p id="result"></p>
             <div id="loader" class="loader">Ожидайте подтверждения...</div>
-            <button id="flashlightBtn" onclick="toggleFlashlight()">🔦</button>
-            <button id="uploadBtn" onclick="document.getElementById('uploadInput').click()"><img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Загрузить"></button>
             <input type="file" id="uploadInput" accept="image/*" onchange="uploadQrCode(event)">
         </div>
         <div id="qrConfirmScreen">
@@ -746,9 +748,9 @@
         </div>
     </div>
     <div class="navbar">
-        <button id="homeBtn" class="active" onclick="showMain()"><img src="https://media.tenor.com/5z5z5z5z5z5AAAAi/home.gif" alt="🏠"></button>
-        <button id="payBtn" class="pay-btn" onclick="showQrScanner()"><img src="https://media.tenor.com/6z6z6z6z6z6AAAAi/camera.gif" alt="📷"></button>
-        <button id="historyBtn" onclick="showHistory()"><img src="https://media.tenor.com/7z7z7z7z7z7AAAAi/rocket.gif" alt="🚀"></button>
+        <button id="homeBtn" class="active" onclick="showMain()">🏠</button>
+        <button id="payBtn" class="pay-btn" onclick="showQrScanner()">📷</button>
+        <button id="historyBtn" onclick="showHistory()">🚀</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -772,12 +774,9 @@
 
         const startParam = tg.initDataUnsafe.start_param;
         if (startParam && startParam.startsWith("profile_")) {
-            profileUserId = parseInt(startParam.split("_")[1]);
-            profileUserName = profileUserId === currentUserId ? currentUserName : "Пользователь " + profileUserId;
-            if (!currentUserId) {
-                currentUserId = profileUserId;
-                console.log("Использую userId из start_param:", currentUserId);
-            }
+            showMain();
+        } else {
+            showMain();
         }
 
         if (!currentUserId) {
@@ -809,10 +808,6 @@
         let stream = null;
         let flashlightOn = false;
         let scanning = true;
-
-        if (startParam && startParam.startsWith("profile_")) {
-            showMain();
-        }
 
         async function fetchTransactionFee() {
             try {
@@ -1059,13 +1054,29 @@
                         return acc;
                     }, {});
                     const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
+                    if (!qrFields["Sum"] || amountRub === 0) {
+                        result.innerHTML = `QR-код не читается.<br>Пожалуйста, используйте QR-код с платежного терминала.`;
+                        return;
+                    }
                     const name = qrFields["Name"] || "Не указано";
-                    qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB`;
+                    const commissionRate = 0.05;
+                    const rateResponse = fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub")
+                        .then(response => response.json())
+                        .then(data => {
+                            const usdtRate = (data.tether.rub || 0) - 0.5;
+                            const amountUsdt = amountRub / usdtRate;
+                            const commissionUsdt = amountUsdt * commissionRate;
+                            const totalUsdt = amountUsdt + commissionUsdt;
+                            qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT`;
+                        }).catch(err => {
+                            console.error("Ошибка получения курса:", err);
+                            qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: Ошибка расчёта`;
+                        });
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
                     qrScanner.style.display = "none";
                     qrConfirmScreen.style.display = "flex";
                 } else {
-                    result.innerText = "Не удалось распознать QR-код из изображения.";
+                    result.innerHTML = `QR-код не читается.<br>Пожалуйста, используйте QR-код с платежного терминала.`;
                     console.log("QR-код не найден в изображении");
                 }
             };
@@ -1095,15 +1106,31 @@
                             return acc;
                         }, {});
                         const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
+                        if (!qrFields["Sum"] || amountRub === 0) {
+                            result.innerHTML = `QR-код не читается.<br>Пожалуйста, используйте QR-код с платежного терминала.`;
+                            return;
+                        }
                         const name = qrFields["Name"] || "Не указано";
-                        qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB`;
+                        const commissionRate = 0.05;
+                        const rateResponse = fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub")
+                            .then(response => response.json())
+                            .then(data => {
+                                const usdtRate = (data.tether.rub || 0) - 0.5;
+                                const amountUsdt = amountRub / usdtRate;
+                                const commissionUsdt = amountUsdt * commissionRate;
+                                const totalUsdt = amountUsdt + commissionUsdt;
+                                qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT`;
+                            }).catch(err => {
+                                console.error("Ошибка получения курса:", err);
+                                qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: Ошибка расчёта`;
+                            });
                         console.log("QR-код успешно отсканирован:", qrData);
                         scanning = false;
                         qrScanner.style.display = "none";
                         qrConfirmScreen.style.display = "flex";
                         return;
                     } else {
-                        result.innerText = "Наведите камеру на QR-код.";
+                        result.innerText = "";
                         console.log("QR-код не найден в текущем кадре");
                     }
                 } else {
@@ -1146,9 +1173,8 @@
                     return acc;
                 }, {});
                 const amountRub = parseFloat(qrFields["Sum"] || 0) / 100;
-                if (!amountRub) {
-                    result.innerText = "В QR нет суммы, брат!";
-                    console.error("В QR нет суммы");
+                if (!qrFields["Sum"] || amountRub === 0) {
+                    result.innerHTML = `QR-код не читается.<br>Пожалуйста, используйте QR-код с платежного терминала.`;
                     return;
                 }
 
