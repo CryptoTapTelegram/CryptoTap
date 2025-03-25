@@ -520,11 +520,12 @@
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
-            display: flex;
+            display: none; /* Скрываем по умолчанию */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
         }
         #qrConfirmScreen #qrInfo {
             font-size: 18px;
@@ -564,7 +565,7 @@
             padding: 12px 20px;
             border-top: 1px solid #ddd;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            z-index: 1002; /* Увеличиваем z-index, чтобы панель была выше всех экранов */
         }
         .navbar button {
             background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
@@ -774,9 +775,12 @@
 
         const startParam = tg.initDataUnsafe.start_param;
         if (startParam && startParam.startsWith("profile_")) {
-            showMain();
-        } else {
-            showMain();
+            profileUserId = parseInt(startParam.split("_")[1]);
+            profileUserName = profileUserId === currentUserId ? currentUserName : "Пользователь " + profileUserId;
+            if (!currentUserId) {
+                currentUserId = profileUserId;
+                console.log("Использую userId из start_param:", currentUserId);
+            }
         }
 
         if (!currentUserId) {
@@ -807,7 +811,14 @@
         let qrData = null;
         let stream = null;
         let flashlightOn = false;
-        let scanning = true;
+        let scanning = false; // Изначально сканирование выключено
+
+        // Инициализация: сбрасываем qrData и скрываем qrConfirmScreen
+        qrData = null;
+        qrConfirmScreen.style.display = "none";
+
+        // Показываем главную страницу при старте
+        showMain();
 
         async function fetchTransactionFee() {
             try {
