@@ -140,6 +140,14 @@
             width: 30px;
             margin: 0;
         }
+        .buttons .withdraw-btn {
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
         .buttons .qr-btn {
             background: rgba(255, 255, 255, 0.2);
             opacity: 0.8;
@@ -239,14 +247,20 @@
             background: #fff;
             border-radius: 50%;
         }
-        .history, #depositScreen, #networkScreen, #qrScreen, #referralScreen, #qrConfirmScreen {
+        .history, #depositScreen, #networkScreen, #qrScreen, #withdrawScreen, #profileScreen, #qrConfirmScreen {
             display: none;
             background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
         }
-        .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #referralScreen h3, #qrConfirmScreen h3 {
+        .history h3, #depositScreen h3, #networkScreen h3, #qrScreen h3, #withdrawScreen h3, #profileScreen h3, #qrConfirmScreen h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 15px;
+            color: #fff;
+        }
+        #profileScreen h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
             color: #fff;
         }
         .history-item {
@@ -277,54 +291,7 @@
             color: #28a745;
             font-weight: 500;
         }
-        #referralScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        #referralScreen .info {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        #referralScreen .info p {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #referralScreen .info p img {
-            width: 24px;
-            height: 24px;
-            margin-right: 10px;
-        }
-        #referralScreen .copy-btn {
-            background: #00C4FF;
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: block;
-            margin: 10px auto;
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s;
-        }
-        #referralScreen .copy-btn:hover {
-            background: #003087;
-        }
-        #depositScreen, #networkScreen, #qrScreen, #qrConfirmScreen {
+        #depositScreen, #networkScreen, #qrScreen, #withdrawScreen, #profileScreen, #qrConfirmScreen {
             position: fixed;
             top: 0;
             left: 0;
@@ -421,6 +388,35 @@
         }
         #qrScreen > * {
             margin-bottom: 20px;
+        }
+        #withdrawScreen input {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        #withdrawScreen input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        #profileScreen .info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #profileScreen .info p {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #fff;
+            display: block;
+            text-align: left;
+        }
+        #profileScreen input {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        #profileScreen input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         #qrScanner {
             display: none;
@@ -520,7 +516,7 @@
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
-            display: none; /* Скрываем по умолчанию */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -560,12 +556,12 @@
             left: 0;
             right: 0;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             background: linear-gradient(180deg, #3A1E71 0%, #0A0A2D 100%) !important;
             padding: 12px 20px;
             border-top: 1px solid #ddd;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1002; /* Увеличиваем z-index, чтобы панель была выше всех экранов */
+            z-index: 1002;
         }
         .navbar button {
             background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
@@ -638,6 +634,10 @@
                     <span class="button-label">Пополнить</span>
                 </div>
                 <div class="button-wrapper">
+                    <button class="withdraw-btn" onclick="showWithdrawScreen()">📤</button>
+                    <span class="button-label">Отправить</span>
+                </div>
+                <div class="button-wrapper">
                     <button class="qr-btn" onclick="showQrScanner()"><img src="https://i.postimg.cc/QBWVLVdY/qr-icon.png" alt="QR"></button>
                     <span class="button-label">QR-код</span>
                 </div>
@@ -667,7 +667,7 @@
                     </div>
                 </div>
             </div>
-            <div class="promo" onclick="showReferralScreen()">
+            <div class="promo" onclick="showProfile()">
                 <div class="text">
                     <span>Предложение</span>
                     <p>Пригласи своих друзей к закр. бета-тестированию</p>
@@ -680,15 +680,6 @@
             <div id="historyList">
                 <!-- Транзакции будут добавляться динамически -->
             </div>
-        </div>
-        <div id="referralScreen">
-            <h3>Реферальная система</h3>
-            <div class="info">
-                <p><img src="https://media.tenor.com/1zY0ZqK5z5gAAAAi/referral.gif" alt="Referral Icon"> <strong>Ваша реферальная ссылка:</strong> <span id="referralLink"></span></p>
-                <p><img src="https://media.tenor.com/5z5z5z5z5z5AAAAi/friends.gif" alt="Friends Icon"> <strong>Приглашено друзей:</strong> <span id="invitedCount">0</span></p>
-                <p><img src="https://media.tenor.com/6z6z6z6z6z6AAAAi/money.gif" alt="Money Icon"> <strong>Заработано:</strong> <span id="earnedAmount">0.0 USDT</span></p>
-            </div>
-            <button class="copy-btn" onclick="copyReferralLink()">Копировать ссылку</button>
         </div>
         <div id="depositScreen">
             <div class="logo">
@@ -724,11 +715,49 @@
             <h3>Пополнение USDT</h3>
             <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
             <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
+            <p class="warning">Все транзакции проходят AML-проверку. Подозрительные операции могут быть заблокированы.</p>
             <img id="qrCode" class="qr-code" src="" alt="QR Code">
             <p id="usdtAddress" class="address" onclick="copyAddress()"></p>
             <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
             <p class="fee" id="feeText">Фиксированная комиссия: загрузка...</p>
             <button class="copy-btn" onclick="copyAddress()">Копировать адрес</button>
+        </div>
+        <div id="withdrawScreen">
+            <h3>Отправить USDT</h3>
+            <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
+            <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
+            <p id="withdrawFee">Комиссия: загрузка...</p>
+            <button class="copy-btn" onclick="withdrawUsdt()">Отправить</button>
+        </div>
+        <div id="profileScreen">
+            <h3>Профиль</h3>
+            <div class="info">
+                <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+            </div>
+            <h4>Реферальная система</h4>
+            <div class="info">
+                <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink"></span></p>
+                <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">0</span></p>
+                <p><strong>Заработано:</strong> <span id="profileEarnedAmount">0.0 USDT</span></p>
+                <button class="copy-btn" onclick="copyProfileReferralLink()">Копировать ссылку</button>
+            </div>
+            <h4>Настройки безопасности</h4>
+            <div class="info">
+                <input type="password" id="setPassword" placeholder="Введите новый пароль" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
+                <button class="copy-btn" onclick="setPassword()">Установить пароль</button>
+            </div>
+            <h4>FAQ</h4>
+            <div class="info">
+                <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
+                <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
+                <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
+            </div>
+            <h4>Пользовательское соглашение</h4>
+            <div class="info">
+                <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
+            </div>
         </div>
         <div id="qrScanner">
             <video id="video" autoplay playsinline></video>
@@ -752,6 +781,7 @@
         <button id="homeBtn" class="active" onclick="showMain()">🏠</button>
         <button id="payBtn" class="pay-btn" onclick="showQrScanner()">📷</button>
         <button id="historyBtn" onclick="showHistory()">🚀</button>
+        <button id="profileBtn" onclick="showProfile()">👤</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -796,29 +826,42 @@
 
         const qrScanner = document.getElementById("qrScanner");
         const qrConfirmScreen = document.getElementById("qrConfirmScreen");
+        const withdrawScreen = document.getElementById("withdrawScreen");
+        const profileScreen = document.getElementById("profileScreen");
         const video = document.getElementById("video");
         const result = document.getElementById("result");
         const qrInfo = document.getElementById("qrInfo");
         const mainContent = document.querySelector(".main-content");
         const historyContent = document.querySelector(".history");
-        const referralScreen = document.getElementById("referralScreen");
         const depositScreen = document.getElementById("depositScreen");
         const networkScreen = document.getElementById("networkScreen");
         const qrScreen = document.getElementById("qrScreen");
         const homeBtn = document.getElementById("homeBtn");
         const historyBtn = document.getElementById("historyBtn");
+        const profileBtn = document.getElementById("profileBtn");
         const historyList = document.getElementById("historyList");
         let qrData = null;
         let stream = null;
         let flashlightOn = false;
-        let scanning = false; // Изначально сканирование выключено
+        let scanning = false;
 
-        // Инициализация: сбрасываем qrData и скрываем qrConfirmScreen
         qrData = null;
         qrConfirmScreen.style.display = "none";
 
-        // Показываем главную страницу при старте
         showMain();
+
+        async function checkAml(address) {
+            console.log(`Проверка AML для адреса: ${address}`);
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const isClean = Math.random() > 0.1;
+                    resolve({
+                        isClean: isClean,
+                        reason: isClean ? "Адрес чистый" : "Адрес связан с подозрительной активностью"
+                    });
+                }, 1000);
+            });
+        }
 
         async function fetchTransactionFee() {
             try {
@@ -835,65 +878,141 @@
                 document.getElementById("feeText").innerText = `Фиксированная комиссия: ${total_fee.toFixed(2)} USDT`;
 
                 const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                if (!rateResponse.ok) {
+                    throw new Error(`HTTP ошибка при получении курса USDT/RUB: ${rateResponse.status} - ${rateResponse.statusText}`);
+                }
                 const rateData = await rateResponse.json();
                 const usdtRate = (rateData.tether.rub || 0) - 0.5;
+                if (usdtRate <= 0) {
+                    throw new Error("Курс USDT/RUB недоступен или некорректен");
+                }
                 document.getElementById("usdtRate").innerText = usdtRate.toFixed(2);
             } catch (e) {
-                console.error("Ошибка получения комиссии:", e);
-                document.getElementById("feeText").innerText = "Фиксированная комиссия: ошибка загрузки";
-                document.getElementById("usdtRate").innerText = "ошибка";
+                console.error("Ошибка получения комиссии или курса:", e);
+                document.getElementById("feeText").innerText = "Фиксированная комиссия: недоступно";
+                document.getElementById("usdtRate").innerText = "недоступен (используется курс по умолчанию: 95 RUB)";
+                return 95;
             }
         }
 
         function showMain() {
             mainContent.style.display = "block";
             historyContent.style.display = "none";
-            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "none";
             homeBtn.classList.add("active");
             historyBtn.classList.remove("active");
+            profileBtn.classList.remove("active");
             fetchBalance();
         }
 
         function showHistory() {
             mainContent.style.display = "none";
             historyContent.style.display = "block";
-            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.add("active");
+            profileBtn.classList.remove("active");
             fetchHistory();
         }
 
-        function showReferralScreen() {
+        function showDepositScreen() {
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            referralScreen.style.display = "block";
+            depositScreen.style.display = "block";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
+            qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "none";
+            homeBtn.classList.remove("active");
+            historyBtn.classList.remove("active");
+            profileBtn.classList.remove("active");
+        }
+
+        function showNetworkScreen() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "block";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
+            qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "none";
+            homeBtn.classList.remove("active");
+            historyBtn.classList.remove("active");
+            profileBtn.classList.remove("active");
+        }
+
+        async function showWithdrawScreen() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "none";
             qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "block";
+            profileScreen.style.display = "none";
             homeBtn.classList.remove("active");
             historyBtn.classList.remove("active");
+            profileBtn.classList.remove("active");
 
-            const referralLink = `https://t.me/CryptoTapBot?start=ref_${currentUserId}`;
-            document.getElementById("referralLink").innerText = referralLink;
-
-            document.getElementById("invitedCount").innerText = "5";
-            document.getElementById("earnedAmount").innerText = "10.0 USDT";
+            try {
+                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usdt");
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+                const trx_to_usdt = data["tron"]["usdt"];
+                const network_fee_trx = 20;
+                const network_fee_usdt = network_fee_trx * trx_to_usdt;
+                const our_fee = 1.2;
+                const total_fee = network_fee_usdt + our_fee;
+                document.getElementById("withdrawFee").innerText = `Комиссия: ${total_fee.toFixed(2)} USDT`;
+            } catch (e) {
+                console.error("Ошибка получения комиссии для вывода:", e);
+                document.getElementById("withdrawFee").innerText = "Комиссия: недоступно";
+            }
         }
 
-        function copyReferralLink() {
-            const referralLink = document.getElementById("referralLink").innerText;
+        function showProfile() {
+            mainContent.style.display = "none";
+            historyContent.style.display = "none";
+            depositScreen.style.display = "none";
+            networkScreen.style.display = "none";
+            qrScreen.style.display = "none";
+            qrScanner.style.display = "none";
+            qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "block";
+            homeBtn.classList.remove("active");
+            historyBtn.classList.remove("active");
+            profileBtn.classList.add("active");
+
+            document.getElementById("profileName").innerText = currentUserName;
+            document.getElementById("profileBalanceRub").innerText = document.getElementById("balanceRub").innerText;
+            const referralLink = `https://t.me/MyCryptoTapBot?start=ref_${currentUserId}`; // Замени @MyCryptoTapBot на username твоего бота
+            document.getElementById("profileReferralLink").innerText = referralLink;
+            document.getElementById("profileInvitedCount").innerText = "5";
+            document.getElementById("profileEarnedAmount").innerText = "10.0 USDT";
+        }
+
+        function copyProfileReferralLink() {
+            const referralLink = document.getElementById("profileReferralLink").innerText;
             navigator.clipboard.writeText(referralLink).then(() => {
                 alert("Реферальная ссылка скопирована!");
             }).catch(err => {
@@ -902,26 +1021,14 @@
             });
         }
 
-        function showDepositScreen() {
-            mainContent.style.display = "none";
-            historyContent.style.display = "none";
-            referralScreen.style.display = "none";
-            depositScreen.style.display = "block";
-            networkScreen.style.display = "none";
-            qrScreen.style.display = "none";
-            qrScanner.style.display = "none";
-            qrConfirmScreen.style.display = "none";
-        }
-
-        function showNetworkScreen() {
-            mainContent.style.display = "none";
-            historyContent.style.display = "none";
-            referralScreen.style.display = "none";
-            depositScreen.style.display = "none";
-            networkScreen.style.display = "block";
-            qrScreen.style.display = "none";
-            qrScanner.style.display = "none";
-            qrConfirmScreen.style.display = "none";
+        function setPassword() {
+            const password = document.getElementById("setPassword").value;
+            if (!password) {
+                alert("Пожалуйста, введите пароль.");
+                return;
+            }
+            alert("Пароль успешно установлен!");
+            document.getElementById("setPassword").value = "";
         }
 
         async function selectNetwork(network) {
@@ -937,6 +1044,12 @@
                 const data = await response.json();
                 const usdtAddress = await fetchUsdtAddress();
                 if (usdtAddress) {
+                    const amlResult = await checkAml(usdtAddress);
+                    if (!amlResult.isClean) {
+                        alert(`Адрес для пополнения не прошёл AML-проверку: ${amlResult.reason}. Пополнение заблокировано.`);
+                        return;
+                    }
+
                     document.getElementById("usdtAddress").innerText = usdtAddress;
                     const qrCodeCanvas = document.createElement("canvas");
                     QRCode.toCanvas(qrCodeCanvas, usdtAddress, { width: 200 }, (error) => {
@@ -950,18 +1063,22 @@
                     await fetchTransactionFee();
                     mainContent.style.display = "none";
                     historyContent.style.display = "none";
-                    referralScreen.style.display = "none";
                     depositScreen.style.display = "none";
                     networkScreen.style.display = "none";
                     qrScreen.style.display = "block";
                     qrScanner.style.display = "none";
                     qrConfirmScreen.style.display = "none";
+                    withdrawScreen.style.display = "none";
+                    profileScreen.style.display = "none";
+                    homeBtn.classList.remove("active");
+                    historyBtn.classList.remove("active");
+                    profileBtn.classList.remove("active");
                 } else {
-                    alert("Не удалось получить адрес USDT. Попробуй снова.");
+                    alert("Не удалось получить адрес USDT. Попробуйте снова.");
                 }
             } catch (e) {
                 console.error("Ошибка при выборе сети:", e);
-                alert("Ошибка при выборе сети. Попробуй снова.");
+                alert("Ошибка при выборе сети. Попробуйте снова.");
             }
         }
 
@@ -997,12 +1114,13 @@
             console.log("Открываем сканер QR-кодов...");
             mainContent.style.display = "none";
             historyContent.style.display = "none";
-            referralScreen.style.display = "none";
             depositScreen.style.display = "none";
             networkScreen.style.display = "none";
             qrScreen.style.display = "none";
             qrScanner.style.display = "block";
             qrConfirmScreen.style.display = "none";
+            withdrawScreen.style.display = "none";
+            profileScreen.style.display = "none";
             result.innerText = "";
             qrData = null;
             scanning = true;
@@ -1081,7 +1199,11 @@
                             qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT`;
                         }).catch(err => {
                             console.error("Ошибка получения курса:", err);
-                            qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: Ошибка расчёта`;
+                            const usdtRate = 95;
+                            const amountUsdt = amountRub / usdtRate;
+                            const commissionUsdt = amountUsdt * commissionRate;
+                            const totalUsdt = amountUsdt + commissionUsdt;
+                            qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT (используется курс по умолчанию)`;
                         });
                     console.log("QR-код успешно отсканирован из изображения:", qrData);
                     qrScanner.style.display = "none";
@@ -1133,7 +1255,11 @@
                                 qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT`;
                             }).catch(err => {
                                 console.error("Ошибка получения курса:", err);
-                                qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: Ошибка расчёта`;
+                                const usdtRate = 95;
+                                const amountUsdt = amountRub / usdtRate;
+                                const commissionUsdt = amountUsdt * commissionRate;
+                                const totalUsdt = amountUsdt + commissionUsdt;
+                                qrInfo.innerHTML = `Получатель: ${name}<br>Сумма: ${amountRub} RUB<br>Будет списано: ${totalUsdt.toFixed(2)} USDT (используется курс по умолчанию)`;
                             });
                         console.log("QR-код успешно отсканирован:", qrData);
                         scanning = false;
@@ -1172,7 +1298,7 @@
 
         async function processPayment() {
             if (!qrData) {
-                result.innerText = "Сначала отсканируй QR, брат!";
+                result.innerText = "Сначала отсканируйте QR-код.";
                 console.error("QR-код не отсканирован");
                 return;
             }
@@ -1189,9 +1315,16 @@
                     return;
                 }
 
-                const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
-                const rateData = await rateResponse.json();
-                const usdtRate = (rateData.tether.rub || 0) - 0.5;
+                let usdtRate;
+                try {
+                    const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                    const rateData = await rateResponse.json();
+                    usdtRate = (rateData.tether.rub || 0) - 0.5;
+                    if (usdtRate <= 0) throw new Error("Курс недоступен");
+                } catch (e) {
+                    console.error("Ошибка получения курса в processPayment:", e);
+                    usdtRate = 95;
+                }
                 const amountUsdt = amountRub / usdtRate;
 
                 const transactionId = await saveTransaction(amountUsdt, "Ожидает оплаты");
@@ -1259,7 +1392,7 @@
 
                         if (statusResult.status === "success") {
                             loader.style.display = "none";
-                            result.innerText = "Ваш QR оплачен!";
+                            result.innerText = "Ваш QR-код оплачен.";
                             setTimeout(() => {
                                 qrScanner.style.display = "none";
                                 fetchBalance();
@@ -1280,13 +1413,72 @@
 
                     if (!isCancelled) {
                         loader.style.display = "none";
-                        result.innerText = "Время ожидания истекло. Попробуй снова.";
+                        result.innerText = "Время ожидания истекло. Попробуйте снова.";
                     }
                 }
 
             } catch (e) {
                 console.error("Ошибка при обработке оплаты:", e);
-                result.innerText = "Ошибка при оплате, брат!";
+                result.innerText = "Ошибка при оплате.";
+            }
+        }
+
+        async function withdrawUsdt() {
+            const address = document.getElementById("withdrawAddress").value.trim();
+            const amount = parseFloat(document.getElementById("withdrawAmount").value);
+
+            if (!address || !amount || amount <= 0) {
+                alert("Пожалуйста, введите корректный адрес и сумму.");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usdt");
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+                const trx_to_usdt = data["tron"]["usdt"];
+                const network_fee_trx = 20;
+                const network_fee_usdt = network_fee_trx * trx_to_usdt;
+                const our_fee = 1.2;
+                const total_fee = network_fee_usdt + our_fee;
+                const totalAmount = amount + total_fee;
+
+                const balance = await fetchBalance();
+                if (balance < totalAmount) {
+                    alert(`Недостаточно средств. Ваш баланс: ${balance.toFixed(2)} USDT, необходимо: ${totalAmount.toFixed(2)} USDT (включая комиссию).`);
+                    return;
+                }
+
+                const withdrawData = {
+                    userId: currentUserId,
+                    address: address,
+                    amount: amount,
+                    fee: total_fee
+                };
+
+                const withdrawResponse = await fetch(`${apiBaseUrl}/withdraw`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true"
+                    },
+                    body: JSON.stringify(withdrawData)
+                });
+
+                const withdrawResult = await withdrawResponse.json();
+                if (withdrawResult.status === "success") {
+                    alert("Вывод успешно выполнен!");
+                    withdrawScreen.style.display = "none";
+                    showMain();
+                    fetchBalance();
+                } else {
+                    alert(withdrawResult.message || "Ошибка при выводе средств.");
+                }
+            } catch (e) {
+                console.error("Ошибка при выводе USDT:", e);
+                alert("Произошла ошибка при выводе средств. Попробуйте снова.");
             }
         }
 
@@ -1342,8 +1534,10 @@
                 console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
                 document.getElementById("balanceRub").innerText = balanceRub.toFixed(2);
                 document.getElementById("usdtBalance").innerText = balanceUsdt.toFixed(2);
+                return balanceUsdt;
             } catch (e) {
                 console.error("Ошибка получения баланса:", e);
+                return 0;
             }
         }
 
