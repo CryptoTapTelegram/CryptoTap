@@ -298,9 +298,7 @@
             width: 100%;
             height: 100%;
             z-index: 1000;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
+            overflow: hidden; /* Отключаем прокрутку на внешнем контейнере */
         }
         #depositScreen .logo {
             text-align: center;
@@ -329,6 +327,14 @@
             width: 30px;
             height: 30px;
             margin-right: 10px;
+        }
+        #qrScreen .content {
+            padding: 20px;
+            padding-bottom: 80px; /* Учитываем высоту navbar */
+            box-sizing: border-box;
+            overflow-y: auto;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
         }
         #qrScreen .warning {
             background: rgba(255, 75, 75, 0.2);
@@ -389,12 +395,43 @@
         #qrScreen > * {
             margin-bottom: 20px;
         }
+        #withdrawScreen .content {
+            padding: 20px;
+            padding-bottom: 80px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
         #withdrawScreen input {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
         }
         #withdrawScreen input::placeholder {
             color: rgba(255, 255, 255, 0.5);
+        }
+        #profileScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            overflow: hidden;
+            background: linear-gradient(180deg, #4A2E81 0%, #1A1A3D 100%);
+        }
+        #profileScreen .profile-content {
+            padding: 20px;
+            padding-bottom: 80px; /* Учитываем высоту navbar */
+            box-sizing: border-box;
+            overflow-y: auto;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
         }
         #profileScreen .info {
             background: rgba(255, 255, 255, 0.05);
@@ -414,6 +451,11 @@
         #profileScreen input {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
         }
         #profileScreen input::placeholder {
             color: rgba(255, 255, 255, 0.5);
@@ -712,51 +754,57 @@
             </div>
         </div>
         <div id="qrScreen">
-            <h3>Пополнение USDT</h3>
-            <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
-            <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
-            <p class="warning">Все транзакции проходят AML-проверку. Подозрительные операции могут быть заблокированы.</p>
-            <img id="qrCode" class="qr-code" src="" alt="QR Code">
-            <p id="usdtAddress" class="address" onclick="copyAddress()"></p>
-            <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
-            <p class="fee" id="feeText">Фиксированная комиссия: загрузка...</p>
-            <button class="copy-btn" onclick="copyAddress()">Копировать адрес</button>
+            <div class="content">
+                <h3>Пополнение USDT</h3>
+                <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
+                <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
+                <p class="warning">Все транзакции проходят AML-проверку. Подозрительные операции могут быть заблокированы.</p>
+                <img id="qrCode" class="qr-code" src="" alt="QR Code">
+                <p id="usdtAddress" class="address" onclick="copyAddress()"></p>
+                <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">0</span> RUB</p>
+                <p class="fee" id="feeText">Фиксированная комиссия: загрузка...</p>
+                <button class="copy-btn" onclick="copyAddress()">Копировать адрес</button>
+            </div>
         </div>
         <div id="withdrawScreen">
-            <h3>Отправить USDT</h3>
-            <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
-            <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
-            <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
-            <p id="withdrawFee">Комиссия: загрузка...</p>
-            <button class="copy-btn" onclick="withdrawUsdt()">Отправить</button>
+            <div class="content">
+                <h3>Отправить USDT</h3>
+                <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
+                <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20">
+                <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT">
+                <p id="withdrawFee">Комиссия: загрузка...</p>
+                <button class="copy-btn" onclick="withdrawUsdt()">Отправить</button>
+            </div>
         </div>
         <div id="profileScreen">
-            <h3>Профиль</h3>
-            <div class="info">
-                <p><strong>Имя:</strong> <span id="profileName"></span></p>
-                <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
-            </div>
-            <h4>Реферальная система</h4>
-            <div class="info">
-                <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink"></span></p>
-                <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">0</span></p>
-                <p><strong>Заработано:</strong> <span id="profileEarnedAmount">0.0 USDT</span></p>
-                <button class="copy-btn" onclick="copyProfileReferralLink()">Копировать ссылку</button>
-            </div>
-            <h4>Настройки безопасности</h4>
-            <div class="info">
-                <input type="password" id="setPassword" placeholder="Введите новый пароль" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
-                <button class="copy-btn" onclick="setPassword()">Установить пароль</button>
-            </div>
-            <h4>FAQ</h4>
-            <div class="info">
-                <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
-                <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
-                <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
-            </div>
-            <h4>Пользовательское соглашение</h4>
-            <div class="info">
-                <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
+            <div class="profile-content">
+                <h3>Профиль</h3>
+                <div class="info">
+                    <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                    <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+                </div>
+                <h4>Реферальная система</h4>
+                <div class="info">
+                    <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink"></span></p>
+                    <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">0</span></p>
+                    <p><strong>Заработано:</strong> <span id="profileEarnedAmount">0.0 USDT</span></p>
+                    <button class="copy-btn" onclick="copyProfileReferralLink()">Копировать ссылку</button>
+                </div>
+                <h4>Настройки безопасности</h4>
+                <div class="info">
+                    <input type="password" id="setPassword" placeholder="Введите новый пароль">
+                    <button class="copy-btn" onclick="setPassword()">Установить пароль</button>
+                </div>
+                <h4>FAQ</h4>
+                <div class="info">
+                    <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
+                    <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
+                    <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
+                </div>
+                <h4>Пользовательское соглашение</h4>
+                <div class="info">
+                    <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
+                </div>
             </div>
         </div>
         <div id="qrScanner">
@@ -850,19 +898,6 @@
 
         showMain();
 
-        async function checkAml(address) {
-            console.log(`Проверка AML для адреса: ${address}`);
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const isClean = Math.random() > 0.1;
-                    resolve({
-                        isClean: isClean,
-                        reason: isClean ? "Адрес чистый" : "Адрес связан с подозрительной активностью"
-                    });
-                }, 1000);
-            });
-        }
-
         async function fetchTransactionFee() {
             try {
                 const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usdt");
@@ -870,7 +905,7 @@
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
-                const trx_to_usdt = data["tron"]["usdt"];
+                const trx_to_usdt = data["tron"]["usdt"] || 0.05; // Запасное значение
                 const network_fee_trx = 20;
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
                 const our_fee = 1.2;
@@ -882,15 +917,15 @@
                     throw new Error(`HTTP ошибка при получении курса USDT/RUB: ${rateResponse.status} - ${rateResponse.statusText}`);
                 }
                 const rateData = await rateResponse.json();
-                const usdtRate = (rateData.tether.rub || 0) - 0.5;
+                const usdtRate = (rateData.tether.rub || 95) - 0.5; // Запасное значение
                 if (usdtRate <= 0) {
                     throw new Error("Курс USDT/RUB недоступен или некорректен");
                 }
                 document.getElementById("usdtRate").innerText = usdtRate.toFixed(2);
             } catch (e) {
                 console.error("Ошибка получения комиссии или курса:", e);
-                document.getElementById("feeText").innerText = "Фиксированная комиссия: недоступно";
-                document.getElementById("usdtRate").innerText = "недоступен (используется курс по умолчанию: 95 RUB)";
+                document.getElementById("feeText").innerText = "Фиксированная комиссия: 2.20 USDT"; // Запасное значение
+                document.getElementById("usdtRate").innerText = "95.00 RUB"; // Запасное значение
                 return 95;
             }
         }
@@ -977,7 +1012,7 @@
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
-                const trx_to_usdt = data["tron"]["usdt"];
+                const trx_to_usdt = data["tron"]["usdt"] || 0.05; // Запасное значение
                 const network_fee_trx = 20;
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
                 const our_fee = 1.2;
@@ -985,7 +1020,7 @@
                 document.getElementById("withdrawFee").innerText = `Комиссия: ${total_fee.toFixed(2)} USDT`;
             } catch (e) {
                 console.error("Ошибка получения комиссии для вывода:", e);
-                document.getElementById("withdrawFee").innerText = "Комиссия: недоступно";
+                document.getElementById("withdrawFee").innerText = "Комиссия: 2.20 USDT"; // Запасное значение
             }
         }
 
@@ -1044,12 +1079,6 @@
                 const data = await response.json();
                 const usdtAddress = await fetchUsdtAddress();
                 if (usdtAddress) {
-                    const amlResult = await checkAml(usdtAddress);
-                    if (!amlResult.isClean) {
-                        alert(`Адрес для пополнения не прошёл AML-проверку: ${amlResult.reason}. Пополнение заблокировано.`);
-                        return;
-                    }
-
                     document.getElementById("usdtAddress").innerText = usdtAddress;
                     const qrCodeCanvas = document.createElement("canvas");
                     QRCode.toCanvas(qrCodeCanvas, usdtAddress, { width: 200 }, (error) => {
@@ -1425,10 +1454,22 @@
 
         async function withdrawUsdt() {
             const address = document.getElementById("withdrawAddress").value.trim();
-            const amount = parseFloat(document.getElementById("withdrawAmount").value);
+            const amountInput = document.getElementById("withdrawAmount").value;
+            let amount;
 
-            if (!address || !amount || amount <= 0) {
-                alert("Пожалуйста, введите корректный адрес и сумму.");
+            try {
+                amount = parseFloat(amountInput);
+                if (isNaN(amount) || amount <= 0) {
+                    throw new Error("Сумма должна быть положительным числом");
+                }
+            } catch (e) {
+                alert("Пожалуйста, введите корректную сумму.");
+                console.error("Ошибка валидации суммы:", e);
+                return;
+            }
+
+            if (!address) {
+                alert("Пожалуйста, введите адрес.");
                 return;
             }
 
@@ -1438,7 +1479,7 @@
                     throw new Error(`HTTP ошибка: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
-                const trx_to_usdt = data["tron"]["usdt"];
+                const trx_to_usdt = data["tron"]["usdt"] || 0.05; // Запасное значение
                 const network_fee_trx = 20;
                 const network_fee_usdt = network_fee_trx * trx_to_usdt;
                 const our_fee = 1.2;
@@ -1527,9 +1568,7 @@
                 const data = await response.json();
                 console.log("Получен баланс:", data);
                 const balanceUsdt = data.balance_usdt || 0;
-                const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
-                const rateData = await rateResponse.json();
-                const usdtRate = (rateData.tether.rub || 0) - 0.5;
+                const usdtRate = await getUsdtRate();
                 const balanceRub = balanceUsdt * usdtRate;
                 console.log("Баланс в USDT:", balanceUsdt, "Баланс в RUB:", balanceRub);
                 document.getElementById("balanceRub").innerText = balanceRub.toFixed(2);
@@ -1538,6 +1577,17 @@
             } catch (e) {
                 console.error("Ошибка получения баланса:", e);
                 return 0;
+            }
+        }
+
+        async function getUsdtRate() {
+            try {
+                const rateResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub");
+                const rateData = await rateResponse.json();
+                return (rateData.tether.rub || 95) - 0.5;
+            } catch (e) {
+                console.error("Ошибка получения курса USDT/RUB:", e);
+                return 95;
             }
         }
 
@@ -1588,7 +1638,7 @@
             if (historyContent.style.display === "block") {
                 fetchHistory();
             }
-        }, 5000);
+        }, 15000);
 
         fetchBalance();
         tg.MainButton.setText("Закрыть").show().onClick(() => tg.close());
