@@ -42,7 +42,7 @@
         }
         .container {
             flex: 1;
-            padding-bottom: 80px;
+            padding-bottom: 120px; /* Увеличил отступ снизу, чтобы учесть высоту .navbar */
             position: relative;
             z-index: 2;
             overflow-x: hidden;
@@ -159,6 +159,8 @@
             align-items: center;
             justify-content: center;
             position: absolute;
+            width: 154px;
+            height: 38px;
         }
         .action-buttons .action-btn.deposit-btn {
             left: 26px;
@@ -171,6 +173,7 @@
         .action-buttons .action-btn img {
             width: 154px;
             height: 38px;
+            object-fit: contain; /* Предотвращаем обрезку */
         }
         .action-buttons .action-btn:hover {
             transform: scale(1.05);
@@ -240,6 +243,7 @@
             width: 30px;
             height: 30px;
             margin-right: 10px;
+            object-fit: contain;
         }
         #depositScreen .network-option p, #networkScreen .network-option p {
             font-size: 14px;
@@ -260,6 +264,7 @@
             width: 100px;
             height: 100px;
             margin-bottom: 20px;
+            object-fit: contain;
         }
         #qrScreen .warning {
             background: rgba(255, 75, 75, 0.2);
@@ -278,6 +283,7 @@
             height: 200px;
             border: 5px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
+            object-fit: contain;
         }
         #qrScreen .address {
             font-size: 16px;
@@ -561,22 +567,22 @@
             background: #1E1E1E;
             padding: 12px 20px;
             z-index: 1002;
-            height: 74px;
+            height: 120px; /* Увеличил высоту, чтобы вместить иконки 100x100px */
         }
         .navbar .nav-btn {
             background: none;
             border: none;
             padding: 0;
-            width: 50px;
-            height: 50px;
+            width: 100px; /* Увеличил в 2 раза */
+            height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
         }
         .navbar .nav-btn img {
-            width: 50px;
-            height: 50px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
         }
         .navbar .nav-btn.active img {
@@ -607,6 +613,7 @@
         #welcomeScreen .get-started-btn img {
             width: 200px;
             height: auto;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -797,4 +804,5 @@
         }
     </script>
 </body>
+</html>
 </html>
