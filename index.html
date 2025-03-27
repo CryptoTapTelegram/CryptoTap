@@ -13,6 +13,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden; /* Убирает горизонтальный скроллинг */
         }
         .header {
             display: flex;
@@ -41,16 +42,17 @@
         }
         .balance {
             margin: 0 20px;
-            padding: 20px;
+            padding: 10px; /* Уменьшил padding для компактности */
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
             color: #070707; /* Оставил как ты указал, но текст не виден */
-            position: relative;
-            height: 150px;
+            width: 327px; /* Фиксированная ширина */
+            height: 100px; /* Фиксированная высота */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-sizing: border-box; /* Учитывает padding в размерах */
         }
         .balance p {
             margin: 0;
@@ -58,14 +60,14 @@
             text-align: left;
         }
         .balance h2 {
-            font-size: 53px; /* Увеличено на 20% с 44px до 53px */
+            font-size: 53px;
             margin: 0;
             text-align: left;
         }
         .balance .graph-icon {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             width: 20px;
             height: 20px;
         }
@@ -121,9 +123,12 @@
             border-top: 1px solid #ddd;
             position: sticky;
             bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden; /* Убирает горизонтальный скроллинг */
         }
         .nav-bar img {
-            width: 154px; /* Увеличено на 60% с 96px до 154px */
+            width: 50px; /* Уменьшил с 154px до 50px, чтобы уместить в окне */
             object-fit: contain; /* Сохраняет пропорции */
         }
     </style>
