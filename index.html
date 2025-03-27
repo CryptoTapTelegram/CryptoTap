@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -110,29 +110,31 @@
         }
         .asset-item {
             display: flex;
-            justify-content: flex-start; /* Выравнивание в строку */
             align-items: center;
             padding: 10px 0;
         }
         .asset-item img {
-            width: 45px; /* Увеличено на 50% с 30px */
+            width: 45px;
             height: 45px;
-            margin-right: 10px; /* Отступ справа от иконки */
+            margin-right: 10px;
         }
         .asset-info {
             display: flex;
-            flex-direction: row; /* В строку */
-            align-items: center;
+            flex-direction: column; /* Вертикальное расположение */
             color: #fff;
-            margin-left: 0; /* Убрал отступ слева */
         }
         .asset-info p {
-            margin: 0 5px 0 0; /* Уменьшил расстояние между USDT и rub */
+            margin: 2px 0; /* Уменьшил расстояние между строками */
         }
         .asset-values {
-            margin-left: auto; /* Выравнивание значений вправо */
+            margin-left: auto;
+            display: flex;
+            flex-direction: column; /* Вертикальное расположение значений */
             color: #fff;
             text-align: right;
+        }
+        .asset-values p {
+            margin: 2px 0; /* Выравнивание по Y с USDT и rub */
         }
         .nav-bar {
             display: flex;
@@ -153,10 +155,10 @@
             object-fit: contain;
         }
         .nav-bar img.middle-icon {
-            width: 130px; /* Увеличено на 30% с 100px */
+            width: 130px;
         }
         .nav-bar img:active {
-            filter: brightness(0) saturate(100%) invert(34%) sepia(73%) saturate(4978%) hue-rotate(233deg) brightness(95%) contrast(92%); /* Пример для #6552FE */
+            filter: brightness(0) saturate(100%) invert(34%) sepia(73%) saturate(4978%) hue-rotate(233deg) brightness(95%) contrast(92%);
         }
     </style>
 </head>
@@ -213,5 +215,4 @@
         <img src="Tab Three.png" alt="QR Code Icon">
     </div>
 </body>
-</html>
 </html>
