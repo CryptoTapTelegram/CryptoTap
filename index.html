@@ -13,29 +13,46 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: #0A0A0A;
+            background: #0A0A0A; /* Цвет фона */
             color: #FFFFFF;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
         }
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('Group 48095464 (1).png');
+            background-size: cover;
+            background-position: center;
+            z-index: 1; /* Промежуточный слой */
+        }
         .container {
             flex: 1;
             padding-bottom: 80px;
+            position: relative;
+            z-index: 2; /* Выше промежуточного слоя */
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background: #0A0A0A;
+            background: transparent;
+            position: relative;
         }
         .header .greeting {
             font-size: 20px;
             font-weight: 600;
             line-height: 24px;
             color: #FFFFFF;
+            position: absolute;
+            left: 24px;
+            top: 128px;
         }
         .header .avatar {
             width: 32px;
@@ -48,6 +65,9 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            position: absolute;
+            left: 24px;
+            top: 64px;
         }
         .header .avatar img {
             width: 100%;
@@ -67,9 +87,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 0 auto;
+            position: absolute;
+            left: 24px;
+            top: 170px;
             border-radius: 12px;
-            position: relative;
         }
         .balance-section .balance-header {
             display: flex;
@@ -83,6 +104,9 @@
             font-weight: 700;
             line-height: 44px;
             color: #FFFFFF;
+            position: absolute;
+            left: 44px;
+            top: 222px;
         }
         .balance-section .balance-header .eye-icon {
             cursor: pointer;
@@ -107,6 +131,7 @@
             justify-content: center;
             gap: 16px;
             padding: 20px;
+            position: relative;
         }
         .action-buttons .action-btn {
             background: none;
@@ -116,6 +141,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: absolute;
+        }
+        .action-buttons .action-btn.deposit-btn {
+            left: 26px;
+            top: 288px;
+        }
+        .action-buttons .action-btn.withdraw-btn {
+            left: 196px;
+            top: 288px;
         }
         .action-buttons .action-btn img {
             width: 160px;
@@ -126,6 +160,7 @@
         }
         .assets-section {
             padding: 20px;
+            position: relative;
         }
         .assets-section h3 {
             font-size: 18px;
@@ -133,112 +168,9 @@
             line-height: 22px;
             margin-bottom: 15px;
             color: #FFFFFF;
-        }
-        .asset-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-        .asset-item.usdt {
-            background-image: url('Group 48095460.png');
-            background-size: cover;
-            background-position: center;
-        }
-        .asset-item .left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .asset-item .left img {
-            width: 30px;
-            height: 30px;
-        }
-        .asset-item .left div p {
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 17px;
-            color: #FFFFFF;
-        }
-        .asset-item .right {
-            text-align: right;
-        }
-        .asset-item .right p {
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 17px;
-            color: #FFFFFF;
-        }
-        .asset-item .right .coming-soon {
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 17px;
-            color: #FF2E63;
-        }
-        .history {
-            display: none;
-            background: #0A0A0A;
-        }
-        .history h3 {
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 22px;
-            margin-bottom: 15px;
-            color: #FFFFFF;
-            padding: 20px 20px 0;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            background: #1E1E1E;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px 20px;
-        }
-        .history-item .left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .history-item .left .icon {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(90deg, #FF2E63 0%, #FF5E62 100%);
-            border-radius: 50%;
-        }
-        .history-item .left div p {
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 17px;
-            color: #FFFFFF;
-        }
-        .history-item .left div p.status {
-            font-size: 12px;
-            font-weight: 400;
-            line-height: 15px;
-            color: #A0A0A0;
-        }
-        .history-item .right {
-            text-align: right;
-        }
-        .history-item .right .amount {
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 17px;
-        }
-        .history-item .right .amount.incoming {
-            color: #28A745;
-        }
-        .history-item .right .amount.outgoing {
-            color: #FF2E63;
-        }
-        .history-item .right p.status {
-            font-size: 12px;
-            font-weight: 400;
-            line-height: 15px;
-            color: #A0A0A0;
+            position: absolute;
+            left: 24px;
+            top: 366px;
         }
         #depositScreen, #networkScreen, #qrScreen, #withdrawScreen, #profileScreen, #qrConfirmScreen {
             display: none;
@@ -607,7 +539,7 @@
             justify-content: space-around;
             background: #1E1E1E;
             padding: 12px 20px;
-            z-index: 1002;
+            z-index: 1002; /* Выше промежуточного слоя */
             width: 100%;
             height: 74px;
         }
@@ -615,16 +547,16 @@
             background: none;
             border: none;
             padding: 0;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
         }
         .navbar .nav-btn img {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             object-fit: contain;
         }
         .navbar .nav-btn.active img {
@@ -659,24 +591,15 @@
     </style>
 </head>
 <body>
+    <!-- Промежуточный слой с PNG -->
+    <div class="background-layer"></div>
+
     <!-- Окно приветствия -->
     <div id="welcomeScreen">
         <button class="get-started-btn" onclick="hideWelcomeScreen()">
             <img src="getStartedButton.png" alt="Get Started">
         </button>
     </div>
-
-    <!-- SVG-фильтр для градиента -->
-    <svg width="0" height="0">
-        <defs>
-            <filter id="gradient-filter">
-                <feColorMatrix type="matrix" values="0 0 0 0 1
-                                                     0 0 0 0 0.37
-                                                     0 0 0 0 0.38
-                                                     0 0 0 1 0" />
-            </filter>
-        </defs>
-    </svg>
 
     <div class="container">
         <div class="main-content">
@@ -708,28 +631,7 @@
             </div>
             <div class="assets-section">
                 <h3>Your Assets</h3>
-                <div class="asset-item usdt">
-                    <div class="left">
-                        <img src="https://img.icons8.com/color/48/tether--v1.png" alt="Tether">
-                        <div>
-                            <p>Tether (USDT)</p>
-                        </div>
-                    </div>
-                    <div class="right">
-                        <p id="usdtBalance">0.0 USDT</p>
-                    </div>
-                </div>
-                <div class="asset-item">
-                    <div class="left">
-                        <img src="https://img.icons8.com/color/48/ton.png" alt="TON">
-                        <div>
-                            <p>The Open Network (TON)</p>
-                        </div>
-                    </div>
-                    <div class="right">
-                        <p class="coming-soon">Coming Soon</p>
-                    </div>
-                </div>
+                <!-- Активы удалены -->
             </div>
         </div>
         <div class="history">
