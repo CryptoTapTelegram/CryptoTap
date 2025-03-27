@@ -21,10 +21,14 @@
             padding: 10px 20px 0;
             background-color: #070707;
         }
-        .header img {
+        .header img.profile-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+        }
+        .header img.settings-icon {
+            width: 28px; /* Уменьшено на 30% с 40px */
+            height: 28px;
         }
         .greeting {
             padding: 10px 20px;
@@ -50,11 +54,11 @@
         }
         .balance p {
             margin: 0;
-            font-size: 14px;
+            font-size: 18px; /* Увеличено с 14px */
             text-align: left;
         }
         .balance h2 {
-            font-size: 29px; /* Уменьшено на 40% с 48px до 29px */
+            font-size: 35px; /* Увеличено на 20% с 29px до 35px */
             margin: 0;
             text-align: left;
         }
@@ -119,16 +123,16 @@
             bottom: 0;
         }
         .nav-bar img {
-            width: 25px;
-            height: 25px;
+            width: 24px; /* Установлено соотношение 24x24 */
+            height: 24px;
         }
     </style>
 </head>
 <body>
     <!-- Шапка -->
     <div class="header">
-        <img src="unsplash_pAtA8xe_iVM (1).png" alt="Profile Icon">
-        <img src="settings-3-line.png" alt="Settings Icon">
+        <img class="profile-icon" src="unsplash_pAtA8xe_iVM (1).png" alt="Profile Icon">
+        <img class="settings-icon" src="settings-3-line.png" alt="Settings Icon">
     </div>
 
     <!-- Приветствие -->
@@ -138,7 +142,7 @@
 
     <!-- Баланс -->
     <div class="balance">
-        <p>Total Balance</p>
+        <p>Ваш баланс</p>
         <h2>$12,548.36</h2>
         <img class="graph-icon" src="..." alt="Graph Icon">
     </div>
