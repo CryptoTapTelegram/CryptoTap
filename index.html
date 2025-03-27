@@ -41,20 +41,24 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #1E1E1E;
+            background-image: url('unsplash_pAtA8xe_iVM (1).png');
+            background-size: cover;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
         }
-        .header .avatar svg {
-            width: 20px;
-            height: 20px;
+        .header .avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .balance-section {
             text-align: center;
             padding: 20px;
-            background-image: url('Group 48095465.png'); /* Новый фон для баланса */
+            background-image: url('Group 48095465.png');
             background-size: cover;
             background-position: center;
             width: 360px;
@@ -65,6 +69,7 @@
             align-items: center;
             margin: 0 auto;
             border-radius: 12px;
+            position: relative;
         }
         .balance-section .balance-header {
             display: flex;
@@ -93,6 +98,9 @@
             line-height: 19px;
             color: #A0A0A0;
             text-transform: uppercase;
+            position: absolute;
+            left: 44px;
+            top: 182px;
         }
         .action-buttons {
             display: flex;
@@ -101,28 +109,17 @@
             padding: 20px;
         }
         .action-buttons .action-btn {
-            background: #000000;
+            background: none;
             border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 19px;
-            color: #FFFFFF;
             cursor: pointer;
             transition: transform 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            width: 160px;
-            height: 48px;
             justify-content: center;
         }
-        .action-buttons .action-btn svg {
-            width: 20px;
-            height: 20px;
-            stroke: #FFFFFF;
+        .action-buttons .action-btn img {
+            width: 160px;
+            height: 48px;
         }
         .action-buttons .action-btn:hover {
             transform: scale(1.05);
@@ -141,10 +138,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1E1E1E;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 10px;
+        }
+        .asset-item.usdt {
+            background-image: url('Group 48095460.png');
+            background-size: cover;
+            background-position: center;
         }
         .asset-item .left {
             display: flex;
@@ -398,6 +399,12 @@
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
+            position: relative;
+        }
+        #profileScreen .content .info p.rub-balance {
+            position: absolute;
+            left: 44px;
+            top: 222px;
         }
         #profileScreen .content .info p {
             margin: 10px 0;
@@ -607,7 +614,7 @@
         .navbar .nav-btn {
             background: none;
             border: none;
-            padding: 10px;
+            padding: 0;
             width: 50px;
             height: 50px;
             display: flex;
@@ -618,16 +625,47 @@
         .navbar .nav-btn img {
             width: 50px;
             height: 50px;
+            object-fit: contain;
         }
         .navbar .nav-btn.active img {
-            filter: url(#gradient-filter);
+            filter: brightness(0) saturate(100%) invert(37%) sepia(87%) saturate(1352%) hue-rotate(222deg) brightness(96%) contrast(96%); /* Цвет #6552FE */
         }
         .navbar .nav-btn:hover img {
-            filter: url(#gradient-filter);
+            filter: brightness(0) saturate(100%) invert(37%) sepia(87%) saturate(1352%) hue-rotate(222deg) brightness(96%) contrast(96%);
+        }
+        #welcomeScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('CryptX (2).jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        #welcomeScreen .get-started-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        #welcomeScreen .get-started-btn img {
+            width: 200px;
+            height: auto;
         }
     </style>
 </head>
 <body>
+    <!-- Окно приветствия -->
+    <div id="welcomeScreen">
+        <button class="get-started-btn" onclick="hideWelcomeScreen()">
+            <img src="getStartedButton.png" alt="Get Started">
+        </button>
+    </div>
+
     <!-- SVG-фильтр для градиента -->
     <svg width="0" height="0">
         <defs>
@@ -637,10 +675,6 @@
                                                      0 0 0 0 0.38
                                                      0 0 0 1 0" />
             </filter>
-            <linearGradient id="active-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#FF2E63;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#FF5E62;stop-opacity:1" />
-            </linearGradient>
         </defs>
     </svg>
 
@@ -649,10 +683,7 @@
             <div class="header">
                 <div class="greeting">Hello, <span id="userName"></span>!</div>
                 <div class="avatar">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <img id="userAvatar" src="" alt="User Avatar">
                 </div>
             </div>
             <div class="balance-section">
@@ -669,19 +700,15 @@
             </div>
             <div class="action-buttons">
                 <button class="action-btn deposit-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2V18M12 18L6 12M12 18L18 12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 22H22" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Пополнить
+                    <img src="Frame 48095456.png" alt="Deposit">
                 </button>
                 <button class="action-btn withdraw-btn">
-                    Вывод
+                    <img src="Frame 48095457 (1).png" alt="Withdraw">
                 </button>
             </div>
             <div class="assets-section">
                 <h3>Your Assets</h3>
-                <div class="asset-item">
+                <div class="asset-item usdt">
                     <div class="left">
                         <img src="https://img.icons8.com/color/48/tether--v1.png" alt="Tether">
                         <div>
@@ -796,7 +823,7 @@
                 <h3>Профиль</h3>
                 <div class="info">
                     <p><strong>Имя:</strong> <span id="profileName"></span></p>
-                    <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+                    <p class="rub-balance"><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
                 </div>
                 <h4>Реферальная система</h4>
                 <div class="info">
@@ -852,7 +879,7 @@
         </button>
     </div>
 
-    <!-- Подключаем Telegram Web App для получения ника пользователя -->
+    <!-- Подключаем Telegram Web App для получения ника и аватарки пользователя -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
@@ -862,9 +889,18 @@
         // Получаем ник пользователя из Telegram
         let userName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "User";
         document.getElementById("userName").innerText = userName;
-
-        // Устанавливаем имя в профиле
         document.getElementById("profileName").innerText = userName;
+
+        // Получаем аватарку пользователя из Telegram
+        let userAvatar = tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : '';
+        if (userAvatar) {
+            document.getElementById("userAvatar").src = userAvatar;
+        }
+
+        // Функция для скрытия окна приветствия
+        function hideWelcomeScreen() {
+            document.getElementById("welcomeScreen").style.display = "none";
+        }
     </script>
 </body>
 </html>
