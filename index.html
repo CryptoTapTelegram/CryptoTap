@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -63,7 +63,7 @@
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
-            color: #070707; /* Оставил как ты указал, но текст не виден */
+            color: #070707;
             width: 360px;
             height: 110px;
             display: flex;
@@ -93,6 +93,7 @@
             width: 154px;
             height: 38px;
             object-fit: contain;
+            cursor: pointer; /* Добавил курсор для кнопок */
         }
         .assets {
             padding: 20px;
@@ -120,21 +121,23 @@
         }
         .asset-info {
             display: flex;
-            flex-direction: column; /* Вертикальное расположение */
+            flex-direction: column;
             color: #fff;
         }
         .asset-info p {
-            margin: 2px 0; /* Уменьшил расстояние между строками */
+            font-family: 'Poppins', sans-serif;
+            margin: 2px 0;
         }
         .asset-values {
             margin-left: auto;
             display: flex;
-            flex-direction: column; /* Вертикальное расположение значений */
+            flex-direction: column;
             color: #fff;
             text-align: right;
         }
         .asset-values p {
-            margin: 2px 0; /* Выравнивание по Y с USDT и rub */
+            font-family: 'Poppins', sans-serif;
+            margin: 2px 0;
         }
         .nav-bar {
             display: flex;
@@ -153,12 +156,220 @@
         .nav-bar img {
             width: 100px;
             object-fit: contain;
+            cursor: pointer; /* Добавил курсор для кнопок */
         }
         .nav-bar img.middle-icon {
             width: 130px;
         }
-        .nav-bar img:active {
+        .nav-bar img.active {
             filter: brightness(0) saturate(100%) invert(34%) sepia(73%) saturate(4978%) hue-rotate(233deg) brightness(95%) contrast(92%);
+        }
+        /* Стили для экранов */
+        #depositScreen, #withdrawScreen, #qrScanner, #profileScreen, #qrConfirmScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            overflow: hidden;
+            background: #070707;
+        }
+        #depositScreen .content, #withdrawScreen .content, #qrScanner .content, #profileScreen .content {
+            padding: 20px;
+            padding-bottom: 80px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+        #depositScreen h3, #withdrawScreen h3, #qrScanner h3, #profileScreen h3, #qrConfirmScreen h3 {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 22px;
+            margin-bottom: 15px;
+            color: #FFFFFF;
+            padding: 20px 20px 0;
+        }
+        #depositScreen p, #withdrawScreen p {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 17px;
+            color: #FFFFFF;
+            padding: 0 20px;
+        }
+        #depositScreen .network-option, #networkScreen .network-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1E1E1E;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        #depositScreen .network-option img, #networkScreen .network-option img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+        #depositScreen .network-option p, #networkScreen .network-option p {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 17px;
+            color: #FFFFFF;
+        }
+        #depositScreen .network-option p.subtext, #networkScreen .network-option p.subtext {
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 15px;
+            color: #A0A0A0;
+        }
+        #qrScanner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+        }
+        #qrScanner video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #qrScanner #warning {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 17px;
+        }
+        #qrScanner #result {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            right: 20px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 17px;
+            text-align: center;
+        }
+        #qrScanner #loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: #FF2E63;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 19px;
+        }
+        #qrScanner #loader::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #FF2E63;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #qrScanner #flashlightBtn, #qrScanner #uploadBtn {
+            position: absolute;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            z-index: 1001;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #qrScanner #flashlightBtn {
+            left: 50%;
+            transform: translateX(-120%);
+        }
+        #qrScanner #uploadBtn {
+            left: 50%;
+            transform: translateX(20%);
+        }
+        #qrScanner #uploadInput {
+            display: none;
+        }
+        #qrConfirmScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #070707;
+        }
+        #qrConfirmScreen h3 {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 22px;
+            color: #FFFFFF;
+        }
+        #qrConfirmScreen #qrInfo {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 22px;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+        #qrConfirmScreen .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #qrConfirmScreen .action-buttons button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 19px;
+        }
+        #qrConfirmScreen .action-buttons .confirm-btn {
+            background: linear-gradient(90deg, #FF2E63 0%, #FF5E62 100%);
+            color: #FFFFFF;
+        }
+        #qrConfirmScreen .action-buttons .cancel-btn {
+            background: #1E1E1E;
+            color: #FFFFFF;
         }
     </style>
 </head>
@@ -166,12 +377,12 @@
     <!-- Шапка -->
     <div class="header">
         <img class="profile-icon" src="unsplash_pAtA8xe_iVM (1).png" alt="Profile Icon">
-        <img class="settings-icon" src="settings-3-line.png" alt="Settings Icon">
+        <img class="settings-icon" src="settings-3-line.png" alt="Settings Icon" onclick="showScreen('profileScreen')">
     </div>
 
     <!-- Приветствие -->
     <div class="greeting">
-        <h1>Hello, Alex</h1>
+        <h1>Hello, <span id="userName">Alex</span></h1>
     </div>
 
     <!-- Баланс с дополнительным фоном -->
@@ -179,14 +390,14 @@
         <img class="balance-background" src="Group 48095464 (2).png" alt="Balance Background">
         <div class="balance">
             <p>Ваш баланс</p>
-            <h2>$12,548.36</h2>
+            <h2>$<span id="balanceRub">12,548.36</span></h2>
         </div>
     </div>
 
     <!-- Кнопки Send и Receive -->
     <div class="buttons">
-        <img src="Frame 48095456.png" alt="Send Button">
-        <img src="Frame 48095457 (1).png" alt="Receive Button">
+        <img src="Frame 48095456.png" alt="Send Button" onclick="showScreen('depositScreen')">
+        <img src="Frame 48095457 (1).png" alt="Receive Button" onclick="showScreen('withdrawScreen')">
     </div>
 
     <!-- Секция Assets -->
@@ -205,14 +416,148 @@
                 <p>5,230.50 USDT</p>
             </div>
         </div>
-        <!-- Дополнительные элементы списка можно добавить -->
     </div>
 
     <!-- Нижняя навигационная панель -->
     <div class="nav-bar">
-        <img src="Tab Two.png" alt="Home Icon">
-        <img class="middle-icon" src="qr-logo.png" alt="Profile Icon">
-        <img src="Tab Three.png" alt="QR Code Icon">
+        <img src="Tab Two.png" alt="Home Icon" class="active" onclick="showScreen('mainScreen')">
+        <img class="middle-icon" src="qr-logo.png" alt="QR Code Icon" onclick="showScreen('qrScanner')">
+        <img src="Tab Three.png" alt="Profile Icon" onclick="showScreen('profileScreen')">
     </div>
+
+    <!-- Экраны -->
+    <div id="mainScreen">
+        <!-- Главная страница уже отображается -->
+    </div>
+
+    <div id="depositScreen">
+        <div class="content">
+            <h3>Deposit</h3>
+            <p>Как вы хотите пополнить криптовалюту на CryptoTap</p>
+            <div class="network-option">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
+                    <div>
+                        <p>Внешний кошелёк</p>
+                        <p class="subtext">Перевод с другого кошелька</p>
+                    </div>
+                </div>
+                <span>></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdrawScreen">
+        <div class="content">
+            <h3>Отправить USDT</h3>
+            <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
+            <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT">
+            <p id="withdrawFee">Комиссия: 2.20 USDT</p>
+            <button class="copy-btn">Отправить</button>
+        </div>
+    </div>
+
+    <div id="qrScanner">
+        <video id="video" autoplay playsinline></video>
+        <button id="flashlightBtn">🔦</button>
+        <button id="uploadBtn">📤</button>
+        <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
+        <p id="result"></p>
+        <div id="loader" class="loader">Ожидайте подтверждения...</div>
+        <input type="file" id="uploadInput" accept="image/*">
+    </div>
+
+    <div id="profileScreen">
+        <div class="content">
+            <h3>Профиль</h3>
+            <div class="info">
+                <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+            </div>
+            <h4>Реферальная система</h4>
+            <div class="info">
+                <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink">https://t.me/MyCryptoTapBot?start=ref_123</span></p>
+                <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">5</span></p>
+                <p><strong>Заработано:</strong> <span id="profileEarnedAmount">10.0 USDT</span></p>
+                <button class="copy-btn">Копировать ссылку</button>
+            </div>
+            <h4>Настройки безопасности</h4>
+            <div class="info">
+                <input type="password" id="setPassword" placeholder="Введите новый пароль">
+                <button class="copy-btn">Установить пароль</button>
+            </div>
+            <h4>FAQ</h4>
+            <div class="info">
+                <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
+                <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
+                <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
+            </div>
+            <h4>Пользовательское соглашение</h4>
+            <div class="info">
+                <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrConfirmScreen">
+        <h3>Подтверждение оплаты</h3>
+        <p id="qrInfo">Получатель: Example<br>Сумма: 100 RUB<br>Будет списано: 1.05 USDT</p>
+        <div class="action-buttons">
+            <button class="confirm-btn">Подтвердить</button>
+            <button class="cancel-btn">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Подключаем Telegram Web App для получения ника и аватарки пользователя -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Получаем ник пользователя из Telegram
+        let userName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Alex";
+        document.getElementById("userName").innerText = userName;
+        document.getElementById("profileName").innerText = userName;
+
+        // Получаем аватарку пользователя из Telegram
+        let userAvatar = tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : '';
+        if (userAvatar) {
+            document.getElementById("userAvatar").src = userAvatar;
+        }
+
+        // Функция для переключения экранов
+        function showScreen(screenId) {
+            // Список всех экранов
+            const screens = ['mainScreen', 'depositScreen', 'withdrawScreen', 'qrScanner', 'profileScreen', 'qrConfirmScreen'];
+            
+            // Скрываем все экраны
+            screens.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            // Показываем выбранный экран
+            document.getElementById(screenId).style.display = 'block';
+
+            // Обновляем активный класс для кнопок навигации
+            const navButtons = document.querySelectorAll('.nav-bar img');
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Добавляем активный класс для соответствующей кнопки
+            if (screenId === 'mainScreen') {
+                document.querySelector('.nav-bar img[alt="Home Icon"]').classList.add('active');
+            } else if (screenId === 'qrScanner') {
+                document.querySelector('.nav-bar img[alt="QR Code Icon"]').classList.add('active');
+            } else if (screenId === 'profileScreen') {
+                document.querySelector('.nav-bar img[alt="Profile Icon"]').classList.add('active');
+            }
+        }
+
+        // Изначально показываем главную страницу
+        document.getElementById('mainScreen').style.display = 'block';
+    </script>
 </body>
 </html>
