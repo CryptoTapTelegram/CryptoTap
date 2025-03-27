@@ -27,7 +27,7 @@
             border-radius: 50%;
         }
         .header img.settings-icon {
-            width: 28px; /* Уменьшено на 30% с 40px */
+            width: 28px;
             height: 28px;
         }
         .greeting {
@@ -45,7 +45,7 @@
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
-            color: #fff;
+            color: #070707; /* Цвет текста в контейнере изменён на #070707 */
             position: relative;
             height: 150px;
             display: flex;
@@ -54,11 +54,11 @@
         }
         .balance p {
             margin: 0;
-            font-size: 18px; /* Увеличено с 14px */
+            font-size: 18px;
             text-align: left;
         }
         .balance h2 {
-            font-size: 35px; /* Увеличено на 20% с 29px до 35px */
+            font-size: 35px;
             margin: 0;
             text-align: left;
         }
@@ -123,8 +123,8 @@
             bottom: 0;
         }
         .nav-bar img {
-            width: 24px; /* Установлено соотношение 24x24 */
-            height: 24px;
+            width: 24px; /* Только ширина, чтобы сохранить пропорции */
+            object-fit: contain; /* Сохраняет пропорции иконок */
         }
     </style>
 </head>
