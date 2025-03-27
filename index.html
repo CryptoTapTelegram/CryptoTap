@@ -93,7 +93,7 @@
             width: 154px;
             height: 38px;
             object-fit: contain;
-            cursor: pointer; /* Добавил курсор для кнопок */
+            cursor: pointer;
         }
         .assets {
             padding: 20px;
@@ -146,17 +146,18 @@
             padding: 10px 0;
             background-color: #121212;
             border-top: 1px solid #ddd;
-            position: sticky;
+            position: fixed;
             bottom: 0;
             width: 100%;
             max-width: 360px;
             box-sizing: border-box;
             overflow-x: hidden;
+            z-index: 1002;
         }
         .nav-bar img {
             width: 100px;
             object-fit: contain;
-            cursor: pointer; /* Добавил курсор для кнопок */
+            cursor: pointer;
         }
         .nav-bar img.middle-icon {
             width: 130px;
@@ -165,16 +166,18 @@
             filter: brightness(0) saturate(100%) invert(34%) sepia(73%) saturate(4978%) hue-rotate(233deg) brightness(95%) contrast(92%);
         }
         /* Стили для экранов */
-        #depositScreen, #withdrawScreen, #qrScanner, #profileScreen, #qrConfirmScreen {
+        #mainScreen, #depositScreen, #withdrawScreen, #qrScanner, #profileScreen, #qrConfirmScreen {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 100%;
-            z-index: 1000;
-            overflow: hidden;
+            max-width: 360px;
+            margin: 0 auto;
+            min-height: 100vh;
             background: #070707;
+            z-index: 1;
+        }
+        #mainScreen {
+            display: block;
         }
         #depositScreen .content, #withdrawScreen .content, #qrScanner .content, #profileScreen .content {
             padding: 20px;
@@ -229,14 +232,7 @@
             color: #A0A0A0;
         }
         #qrScanner {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             background: #000;
-            z-index: 1000;
         }
         #qrScanner video {
             width: 100%;
@@ -321,13 +317,6 @@
             display: none;
         }
         #qrConfirmScreen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
             flex-direction: column;
@@ -380,40 +369,43 @@
         <img class="settings-icon" src="settings-3-line.png" alt="Settings Icon" onclick="showScreen('profileScreen')">
     </div>
 
-    <!-- Приветствие -->
-    <div class="greeting">
-        <h1>Hello, <span id="userName">Alex</span></h1>
-    </div>
-
-    <!-- Баланс с дополнительным фоном -->
-    <div class="balance-container">
-        <img class="balance-background" src="Group 48095464 (2).png" alt="Balance Background">
-        <div class="balance">
-            <p>Ваш баланс</p>
-            <h2>$<span id="balanceRub">12,548.36</span></h2>
+    <!-- Экраны -->
+    <div id="mainScreen">
+        <!-- Приветствие -->
+        <div class="greeting">
+            <h1>Hello, <span id="userName">Alex</span></h1>
         </div>
-    </div>
 
-    <!-- Кнопки Send и Receive -->
-    <div class="buttons">
-        <img src="Frame 48095456.png" alt="Send Button" onclick="showScreen('depositScreen')">
-        <img src="Frame 48095457 (1).png" alt="Receive Button" onclick="showScreen('withdrawScreen')">
-    </div>
-
-    <!-- Секция Assets -->
-    <div class="assets">
-        <div class="assets-header">
-            <h3>Активы</h3>
-        </div>
-        <div class="asset-item">
-            <img src="ETH Icon.png" alt="USDT Icon">
-            <div class="asset-info">
-                <p>USDT</p>
-                <p>rub</p>
+        <!-- Баланс с дополнительным фоном -->
+        <div class="balance-container">
+            <img class="balance-background" src="Group 48095464 (2).png" alt="Balance Background">
+            <div class="balance">
+                <p>Ваш баланс</p>
+                <h2><span id="balanceRub">0.00</span> ₽</h2>
             </div>
-            <div class="asset-values">
-                <p>$5,230.50</p>
-                <p>5,230.50 USDT</p>
+        </div>
+
+        <!-- Кнопки Send и Receive -->
+        <div class="buttons">
+            <img src="Frame 48095456.png" alt="Send Button" onclick="showScreen('depositScreen')">
+            <img src="Frame 48095457 (1).png" alt="Receive Button" onclick="showScreen('withdrawScreen')">
+        </div>
+
+        <!-- Секция Assets -->
+        <div class="assets">
+            <div class="assets-header">
+                <h3>Активы</h3>
+            </div>
+            <div class="asset-item">
+                <img src="ETH Icon.png" alt="USDT Icon">
+                <div class="asset-info">
+                    <p>USDT</p>
+                    <p>rub</p>
+                </div>
+                <div class="asset-values">
+                    <p><span id="usdtBalance">0.00</span> USDT</p>
+                    <p><span id="usdtBalanceRub">0.00</span> ₽</p>
+                </div>
             </div>
         </div>
     </div>
@@ -426,10 +418,6 @@
     </div>
 
     <!-- Экраны -->
-    <div id="mainScreen">
-        <!-- Главная страница уже отображается -->
-    </div>
-
     <div id="depositScreen">
         <div class="content">
             <h3>Deposit</h3>
@@ -453,7 +441,7 @@
             <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
             <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20">
             <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT">
-            <p id="withdrawFee">Комиссия: 2.20 USDT</p>
+            <p id="withdrawFee">Комиссия: <span id="withdrawFeeValue">0.00</span> USDT</p>
             <button class="copy-btn">Отправить</button>
         </div>
     </div>
@@ -473,7 +461,7 @@
             <h3>Профиль</h3>
             <div class="info">
                 <p><strong>Имя:</strong> <span id="profileName"></span></p>
-                <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+                <p><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.00</span> ₽</p>
             </div>
             <h4>Реферальная система</h4>
             <div class="info">
@@ -529,15 +517,10 @@
 
         // Функция для переключения экранов
         function showScreen(screenId) {
-            // Список всех экранов
             const screens = ['mainScreen', 'depositScreen', 'withdrawScreen', 'qrScanner', 'profileScreen', 'qrConfirmScreen'];
-            
-            // Скрываем все экраны
             screens.forEach(id => {
                 document.getElementById(id).style.display = 'none';
             });
-
-            // Показываем выбранный экран
             document.getElementById(screenId).style.display = 'block';
 
             // Обновляем активный класс для кнопок навигации
@@ -546,7 +529,6 @@
                 button.classList.remove('active');
             });
 
-            // Добавляем активный класс для соответствующей кнопки
             if (screenId === 'mainScreen') {
                 document.querySelector('.nav-bar img[alt="Home Icon"]').classList.add('active');
             } else if (screenId === 'qrScanner') {
@@ -556,8 +538,106 @@
             }
         }
 
-        // Изначально показываем главную страницу
-        document.getElementById('mainScreen').style.display = 'block';
+        // Функция для получения курса USDT/RUB с CoinGecko
+        async function getUsdtRubRate() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub');
+                const data = await response.json();
+                const rate = data.tether.rub - 0.5; // Вычитаем 0.5 RUB
+                return rate;
+            } catch (error) {
+                console.error('Ошибка при получении курса USDT/RUB:', error);
+                return 94.50; // Значение по умолчанию, если API недоступен
+            }
+        }
+
+        // Функция для получения курса TRX/USDT с CoinGecko
+        async function getTrxUsdtRate() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd');
+                const data = await response.json();
+                return data.tron.usd;
+            } catch (error) {
+                console.error('Ошибка при получении курса TRX/USDT:', error);
+                return 0.15; // Значение по умолчанию, если API недоступен
+            }
+        }
+
+        // Функция для расчёта комиссии
+        async function calculateFee() {
+            const trxFee = 1.5; // Пример: 1.5 TRX за транзакцию
+            const trxUsdtRate = await getTrxUsdtRate();
+            const trxFeeUsdt = trxFee * trxUsdtRate; // Комиссия TRX в USDT
+            const fixedFee = 1.2; // Фиксированная комиссия 1.2 USDT
+            const totalFee = trxFeeUsdt + fixedFee;
+            return totalFee.toFixed(2);
+        }
+
+        // Функция для получения баланса USDT через TronLink
+        async function getUsdtBalance() {
+            if (!window.tronLink || !window.tronLink.ready) {
+                console.error('TronLink не установлен или не готов');
+                return 0;
+            }
+
+            try {
+                const tronWeb = window.tronLink.tronWeb;
+                const userAddress = tronWeb.defaultAddress.base58;
+
+                // Адрес контракта USDT (TRC20) в сети TRON
+                const usdtContractAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+                const usdtContract = await tronWeb.contract().at(usdtContractAddress);
+
+                // Получаем баланс USDT
+                const balance = await usdtContract.balanceOf(userAddress).call();
+                const decimals = await usdtContract.decimals().call();
+                const usdtBalance = balance / Math.pow(10, decimals);
+                return usdtBalance.toFixed(2);
+            } catch (error) {
+                console.error('Ошибка при получении баланса USDT:', error);
+                return 0;
+            }
+        }
+
+        // Функция для обновления баланса
+        async function updateBalance() {
+            const usdtBalance = await getUsdtBalance();
+            const usdtRubRate = await getUsdtRubRate();
+            const rubBalance = (usdtBalance * usdtRubRate).toFixed(2);
+
+            // Обновляем баланс на главной странице
+            document.getElementById('balanceRub').innerText = rubBalance;
+            document.getElementById('usdtBalance').innerText = usdtBalance;
+            document.getElementById('usdtBalanceRub').innerText = rubBalance;
+
+            // Обновляем баланс в профиле
+            document.getElementById('profileBalanceRub').innerText = rubBalance;
+
+            // Обновляем комиссию
+            const fee = await calculateFee();
+            document.getElementById('withdrawFeeValue').innerText = fee;
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            await updateBalance();
+        });
+
+        // Подключаем Telegram Web App для получения ника и аватарки пользователя
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Получаем ник пользователя из Telegram
+        let userName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Alex";
+        document.getElementById("userName").innerText = userName;
+        document.getElementById("profileName").innerText = userName;
+
+        // Получаем аватарку пользователя из Telegram
+        let userAvatar = tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : '';
+        if (userAvatar) {
+            document.getElementById("userAvatar").src = userAvatar;
+        }
     </script>
 </body>
 </html>
