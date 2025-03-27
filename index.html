@@ -54,7 +54,7 @@
         .balance-section {
             text-align: center;
             padding: 20px;
-            background-image: url('balance-bg.png'); /* Укажи путь к PNG-файлу */
+            background-image: url('balance-bg.png'); /* Путь к PNG-файлу в корневой папке */
             background-size: cover;
             background-position: center;
             width: 360px;
@@ -299,6 +299,14 @@
             font-weight: 400;
             line-height: 15px;
             color: #A0A0A0;
+        }
+        #qrScreen .content {
+            text-align: center;
+        }
+        #qrScreen .qr-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
         }
         #qrScreen .warning {
             background: rgba(255, 75, 75, 0.2);
@@ -612,7 +620,7 @@
             height: 50px;
         }
         .navbar .nav-btn.active img {
-            filter: url(#gradient-filter); /* Применяем градиент для активной кнопки */
+            filter: url(#gradient-filter);
         }
         .navbar .nav-btn:hover img {
             filter: url(#gradient-filter);
@@ -761,6 +769,7 @@
         </div>
         <div id="qrScreen">
             <div class="content">
+                <img src="qr-logo.png" alt="QR Logo" class="qr-logo">
                 <h3>Пополнение USDT</h3>
                 <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
                 <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
