@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Wallet - Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"> <!-- Подключаем Poppins -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,8 +14,8 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden; /* Убирает горизонтальный скроллинг */
-            max-width: 360px; /* Ограничивает ширину под Telegram Mini App */
+            overflow-x: hidden;
+            max-width: 360px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -39,31 +40,47 @@
             text-align: left;
         }
         .greeting h1 {
-            font-size: 24px;
+            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
+            font-size: 17px; /* Уменьшено на 30% с 24px */
             margin: 0;
             color: #fff;
         }
-        .balance {
+        .balance-container {
+            position: relative;
             margin: 0 20px;
-            padding: 10px; /* Уменьшил padding для компактности */
+        }
+        .balance-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 360px;
+            height: 110px;
+            z-index: 1; /* Слой между фоном и балансом */
+        }
+        .balance {
+            position: relative;
+            padding: 10px;
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
             color: #070707; /* Оставил как ты указал, но текст не виден */
-            width: 360px; /* Уместил в Telegram Mini App */
-            height: 110px; /* Соотношение 327:100 при ширине 360px */
+            width: 360px;
+            height: 110px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
+            z-index: 2; /* Баланс поверх Group 48095464 */
         }
         .balance p {
+            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
             margin: 0;
-            font-size: 25px;
+            font-size: 18px; /* Уменьшено на 30% с 25px */
             text-align: left;
         }
         .balance h2 {
-            font-size: 53px;
+            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
+            font-size: 37px; /* Уменьшено на 30% с 53px */
             margin: 0;
             text-align: left;
         }
@@ -73,6 +90,7 @@
             right: 10px;
             width: 20px;
             height: 20px;
+            z-index: 3; /* Иконка графика поверх всего */
         }
         .buttons {
             display: flex;
@@ -127,13 +145,13 @@
             position: sticky;
             bottom: 0;
             width: 100%;
-            max-width: 360px; /* Уместил в Telegram Mini App */
+            max-width: 360px;
             box-sizing: border-box;
-            overflow-x: hidden; /* Убирает горизонтальный скроллинг */
+            overflow-x: hidden;
         }
         .nav-bar img {
-            width: 100px; /* Увеличил с 50px до 100px, уместил в 360px */
-            object-fit: contain; /* Сохраняет пропорции */
+            width: 100px;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -149,11 +167,14 @@
         <h1>Hello, Alex</h1>
     </div>
 
-    <!-- Баланс -->
-    <div class="balance">
-        <p>Ваш баланс</p>
-        <h2>$12,548.36</h2>
-        <img class="graph-icon" src="..." alt="Graph Icon">
+    <!-- Баланс с дополнительным фоном -->
+    <div class="balance-container">
+        <img class="balance-background" src="Group 48095464 (2).png" alt="Balance Background">
+        <div class="balance">
+            <p>Ваш баланс</p>
+            <h2>$12,548.36</h2>
+            <img class="graph-icon" src="..." alt="Graph Icon">
+        </div>
     </div>
 
     <!-- Кнопки Send и Receive -->
@@ -169,7 +190,7 @@
             <img src="..." alt="Filter Icon">
         </div>
         <div class="asset-item">
-            <img src="..." alt="USDT Icon">
+            <img src="ETH Icon.png" alt="USDT Icon">
             <div class="asset-info">
                 <p>USDT</p>
                 <p>Tether</p>
@@ -182,11 +203,11 @@
         <!-- Дополнительные элементы списка можно добавить -->
     </div>
 
-    <!-- Нижняя навигационная панель (3 кнопки) -->
+    <!-- Нижняя навигационная панель (3 кнопки, 2 и 3 поменяны местами) -->
     <div class="nav-bar">
         <img src="Tab Two.png" alt="Home Icon">
-        <img src="Tab Three.png" alt="QR Code Icon">
         <img src="qr-logo.png" alt="Profile Icon">
+        <img src="Tab Three.png" alt="QR Code Icon">
     </div>
 </body>
 </html>
