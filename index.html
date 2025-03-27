@@ -42,17 +42,17 @@
         }
         .balance {
             margin: 0 20px;
-            padding: 10px; /* Уменьшил padding для компактности */
+            padding: 20px;
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
             color: #070707; /* Оставил как ты указал, но текст не виден */
-            width: 327px; /* Фиксированная ширина */
-            height: 100px; /* Фиксированная высота */
+            width: 491px; /* Ширина для соотношения 327:100 при высоте 150px */
+            height: 150px; /* Оставил текущую высоту */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-sizing: border-box; /* Учитывает padding в размерах */
+            box-sizing: border-box;
         }
         .balance p {
             margin: 0;
@@ -66,8 +66,8 @@
         }
         .balance .graph-icon {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             width: 20px;
             height: 20px;
         }
@@ -128,7 +128,7 @@
             overflow-x: hidden; /* Убирает горизонтальный скроллинг */
         }
         .nav-bar img {
-            width: 50px; /* Уменьшил с 154px до 50px, чтобы уместить в окне */
+            width: 50px; /* Оставил 50px, чтобы уместить в Telegram Mini App */
             object-fit: contain; /* Сохраняет пропорции */
         }
     </style>
