@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Wallet - Homepage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"> <!-- Подключаем Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,8 +40,8 @@
             text-align: left;
         }
         .greeting h1 {
-            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
-            font-size: 17px; /* Уменьшено на 30% с 24px */
+            font-family: 'Poppins', sans-serif;
+            font-size: 17px;
             margin: 0;
             color: #fff;
         }
@@ -55,7 +55,7 @@
             left: 0;
             width: 360px;
             height: 110px;
-            z-index: 1; /* Слой между фоном и балансом */
+            z-index: 1;
         }
         .balance {
             position: relative;
@@ -70,27 +70,19 @@
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
-            z-index: 2; /* Баланс поверх Group 48095464 */
+            z-index: 2;
         }
         .balance p {
-            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            font-size: 18px; /* Уменьшено на 30% с 25px */
+            font-size: 18px;
             text-align: left;
         }
         .balance h2 {
-            font-family: 'Poppins', sans-serif; /* Шрифт Poppins */
-            font-size: 37px; /* Уменьшено на 30% с 53px */
+            font-family: 'Poppins', sans-serif;
+            font-size: 37px;
             margin: 0;
             text-align: left;
-        }
-        .balance .graph-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 20px;
-            height: 20px;
-            z-index: 3; /* Иконка графика поверх всего */
         }
         .buttons {
             display: flex;
@@ -116,24 +108,31 @@
             font-size: 18px;
             color: #fff;
         }
-        .assets-header img {
-            width: 20px;
-            height: 20px;
-        }
         .asset-item {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start; /* Выравнивание в строку */
             align-items: center;
             padding: 10px 0;
         }
         .asset-item img {
-            width: 30px;
-            height: 30px;
+            width: 45px; /* Увеличено на 50% с 30px */
+            height: 45px;
+            margin-right: 10px; /* Отступ справа от иконки */
         }
         .asset-info {
-            flex-grow: 1;
-            margin-left: 10px;
+            display: flex;
+            flex-direction: row; /* В строку */
+            align-items: center;
             color: #fff;
+            margin-left: 0; /* Убрал отступ слева */
+        }
+        .asset-info p {
+            margin: 0 5px 0 0; /* Уменьшил расстояние между USDT и rub */
+        }
+        .asset-values {
+            margin-left: auto; /* Выравнивание значений вправо */
+            color: #fff;
+            text-align: right;
         }
         .nav-bar {
             display: flex;
@@ -152,6 +151,12 @@
         .nav-bar img {
             width: 100px;
             object-fit: contain;
+        }
+        .nav-bar img.middle-icon {
+            width: 130px; /* Увеличено на 30% с 100px */
+        }
+        .nav-bar img:active {
+            filter: brightness(0) saturate(100%) invert(34%) sepia(73%) saturate(4978%) hue-rotate(233deg) brightness(95%) contrast(92%); /* Пример для #6552FE */
         }
     </style>
 </head>
@@ -173,7 +178,6 @@
         <div class="balance">
             <p>Ваш баланс</p>
             <h2>$12,548.36</h2>
-            <img class="graph-icon" src="..." alt="Graph Icon">
         </div>
     </div>
 
@@ -187,15 +191,14 @@
     <div class="assets">
         <div class="assets-header">
             <h3>Активы</h3>
-            <img src="..." alt="Filter Icon">
         </div>
         <div class="asset-item">
             <img src="ETH Icon.png" alt="USDT Icon">
             <div class="asset-info">
                 <p>USDT</p>
-                <p>Tether</p>
+                <p>rub</p>
             </div>
-            <div>
+            <div class="asset-values">
                 <p>$5,230.50</p>
                 <p>5,230.50 USDT</p>
             </div>
@@ -203,10 +206,10 @@
         <!-- Дополнительные элементы списка можно добавить -->
     </div>
 
-    <!-- Нижняя навигационная панель (3 кнопки, 2 и 3 поменяны местами) -->
+    <!-- Нижняя навигационная панель -->
     <div class="nav-bar">
         <img src="Tab Two.png" alt="Home Icon">
-        <img src="qr-logo.png" alt="Profile Icon">
+        <img class="middle-icon" src="qr-logo.png" alt="Profile Icon">
         <img src="Tab Three.png" alt="QR Code Icon">
     </div>
 </body>
