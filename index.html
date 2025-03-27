@@ -18,7 +18,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Отключаем горизонтальный скролл */
+            overflow-x: hidden;
         }
         .background-layer {
             position: fixed;
@@ -31,13 +31,22 @@
             background-position: center;
             z-index: 1;
         }
+        .app-wrapper {
+            width: 430px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            z-index: 2;
+        }
         .container {
             flex: 1;
             padding-bottom: 80px;
             position: relative;
             z-index: 2;
-            overflow-x: hidden; /* Отключаем горизонтальный скролл */
-            overflow-y: auto; /* Включаем вертикальный скролл */
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         .header {
             display: flex;
@@ -54,7 +63,9 @@
             color: #FFFFFF;
             position: absolute;
             left: 24px;
-            top: 70px; /* Уточни координаты, если не совпадают */
+            top: 70px;
+            width: 382px;
+            height: 24px;
         }
         .header .avatar {
             width: 32px;
@@ -69,7 +80,7 @@
             cursor: pointer;
             position: absolute;
             left: 24px;
-            top: 20px; /* Уточни координаты, если не совпадают */
+            top: 20px;
         }
         .header .avatar img {
             width: 100%;
@@ -83,7 +94,7 @@
             background-image: url('Group 48095465.png');
             background-size: cover;
             background-position: center;
-            width: 360px;
+            width: 382px;
             height: 150px;
             display: flex;
             flex-direction: column;
@@ -91,7 +102,7 @@
             align-items: center;
             position: absolute;
             left: 24px;
-            top: 100px; /* Уточни координаты, если не совпадают */
+            top: 100px;
             border-radius: 12px;
         }
         .balance-section .balance-header {
@@ -108,7 +119,9 @@
             color: #FFFFFF;
             position: absolute;
             left: 44px;
-            top: 80px; /* Уточни координаты, если не совпадают */
+            top: 80px;
+            width: 338px;
+            height: 44px;
         }
         .balance-section .balance-header .eye-icon {
             cursor: pointer;
@@ -126,7 +139,9 @@
             text-transform: uppercase;
             position: absolute;
             left: 44px;
-            top: 110px; /* Уточни координаты, если не совпадают */
+            top: 110px;
+            width: 338px;
+            height: 19px;
         }
         .action-buttons {
             display: flex;
@@ -147,11 +162,11 @@
         }
         .action-buttons .action-btn.deposit-btn {
             left: 26px;
-            top: 230px; /* Уточни координаты, если не совпадают */
+            top: 230px;
         }
         .action-buttons .action-btn.withdraw-btn {
             left: 196px;
-            top: 230px; /* Уточни координаты, если не совпадают */
+            top: 230px;
         }
         .action-buttons .action-btn img {
             width: 154px;
@@ -172,7 +187,9 @@
             color: #FFFFFF;
             position: absolute;
             left: 24px;
-            top: 250px; /* Уточни координаты, если не совпадают */
+            top: 250px;
+            width: 382px;
+            height: 22px;
         }
         #depositScreen, #networkScreen, #qrScreen, #withdrawScreen, #profileScreen, #qrConfirmScreen {
             display: none;
@@ -190,7 +207,7 @@
             padding-bottom: 80px;
             box-sizing: border-box;
             overflow-y: auto;
-            overflow-x: hidden; /* Отключаем горизонтальный скролл */
+            overflow-x: hidden;
             height: 100%;
             -webkit-overflow-scrolling: touch;
         }
@@ -536,34 +553,34 @@
         .navbar {
             position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
+            width: 430px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             justify-content: space-around;
             background: #1E1E1E;
             padding: 12px 20px;
             z-index: 1002;
-            width: 100%;
             height: 74px;
         }
         .navbar .nav-btn {
             background: none;
             border: none;
             padding: 0;
-            width: 300px; /* Увеличил в 5 раз (60px * 5) */
-            height: 300px;
+            width: 50px;
+            height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
         }
         .navbar .nav-btn img {
-            width: 300px;
-            height: 300px;
+            width: 50px;
+            height: 50px;
             object-fit: contain;
         }
         .navbar .nav-btn.active img {
-            filter: brightness(0) saturate(100%) invert(37%) sepia(87%) saturate(1352%) hue-rotate(222deg) brightness(96%) contrast(96%); /* Цвет #6552FE */
+            filter: brightness(0) saturate(100%) invert(37%) sepia(87%) saturate(1352%) hue-rotate(222deg) brightness(96%) contrast(96%);
         }
         .navbar .nav-btn:hover img {
             filter: brightness(0) saturate(100%) invert(37%) sepia(87%) saturate(1352%) hue-rotate(222deg) brightness(96%) contrast(96%);
@@ -604,154 +621,156 @@
         </button>
     </div>
 
-    <div class="container">
-        <div class="main-content">
-            <div class="header">
-                <div class="greeting">Hello, <span id="userName"></span>!</div>
-                <div class="avatar">
-                    <img id="userAvatar" src="" alt="User Avatar">
-                </div>
-            </div>
-            <div class="balance-section">
-                <div class="balance-header">
-                    <h2><span id="balanceRub">0.0</span> ₽</h2>
-                    <div class="eye-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="#A0A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#A0A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+    <div class="app-wrapper">
+        <div class="container">
+            <div class="main-content">
+                <div class="header">
+                    <div class="greeting">Hello, <span id="userName"></span>!</div>
+                    <div class="avatar">
+                        <img id="userAvatar" src="" alt="User Avatar">
                     </div>
                 </div>
-                <p>ВАШ БАЛАНС</p>
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn deposit-btn">
-                    <img src="Frame 48095456.png" alt="Deposit">
-                </button>
-                <button class="action-btn withdraw-btn">
-                    <img src="Frame 48095457 (1).png" alt="Withdraw">
-                </button>
-            </div>
-            <div class="assets-section">
-                <h3>Your Assets</h3>
-                <!-- Активы удалены -->
-            </div>
-        </div>
-        <!-- Секция истории переводов удалена -->
-        <div id="depositScreen">
-            <div class="content">
-                <h3>Deposit</h3>
-                <p>Как вы хотите пополнить криптовалюту на CryptoTap</p>
-                <div class="network-option">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
-                        <div>
-                            <p>Внешний кошелёк</p>
-                            <p class="subtext">Перевод с другого кошелька</p>
+                <div class="balance-section">
+                    <div class="balance-header">
+                        <h2><span id="balanceRub">0.0</span> ₽</h2>
+                        <div class="eye-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="#A0A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#A0A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                         </div>
                     </div>
-                    <span>></span>
+                    <p>ВАШ БАЛАНС</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn deposit-btn">
+                        <img src="Frame 48095456.png" alt="Deposit">
+                    </button>
+                    <button class="action-btn withdraw-btn">
+                        <img src="Frame 48095457 (1).png" alt="Withdraw">
+                    </button>
+                </div>
+                <div class="assets-section">
+                    <h3>Your Assets</h3>
+                    <!-- Активы удалены -->
                 </div>
             </div>
-        </div>
-        <div id="networkScreen">
-            <div class="content">
-                <h3>Выберите криптовалюту</h3>
-                <div class="network-option">
-                    <div style="display: flex; align-items: center;">
-                        <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
-                        <div>
-                            <p>USDT</p>
-                            <p class="subtext">0.0 USDT</p>
+            <!-- Секция истории переводов удалена -->
+            <div id="depositScreen">
+                <div class="content">
+                    <h3>Deposit</h3>
+                    <p>Как вы хотите пополнить криптовалюту на CryptoTap</p>
+                    <div class="network-option">
+                        <div style="display: flex; align-items: center;">
+                            <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
+                            <div>
+                                <p>Внешний кошелёк</p>
+                                <p class="subtext">Перевод с другого кошелька</p>
+                            </div>
                         </div>
+                        <span>></span>
                     </div>
-                    <span>></span>
+                </div>
+            </div>
+            <div id="networkScreen">
+                <div class="content">
+                    <h3>Выберите криптовалюту</h3>
+                    <div class="network-option">
+                        <div style="display: flex; align-items: center;">
+                            <img src="https://img.icons8.com/color/48/tether--v1.png" alt="USDT">
+                            <div>
+                                <p>USDT</p>
+                                <p class="subtext">0.0 USDT</p>
+                            </div>
+                        </div>
+                        <span>></span>
+                    </div>
+                </div>
+            </div>
+            <div id="qrScreen">
+                <div class="content">
+                    <img src="qr-logo.png" alt="QR Logo" class="qr-logo">
+                    <h3>Пополнение USDT</h3>
+                    <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
+                    <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
+                    <p class="warning">Все транзакции проходят AML-проверку. Подозрительные операции могут быть заблокированы.</p>
+                    <img id="qrCode" class="qr-code" src="https://via.placeholder.com/200" alt="QR Code">
+                    <p id="usdtAddress" class="address">TYourUSDTAddressHere...</p>
+                    <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">95.00</span> RUB</p>
+                    <p class="fee" id="feeText">Фиксированная комиссия: 2.20 USDT</p>
+                    <button class="copy-btn">Копировать адрес</button>
+                </div>
+            </div>
+            <div id="withdrawScreen">
+                <div class="content">
+                    <h3>Отправить USDT</h3>
+                    <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
+                    <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20">
+                    <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT">
+                    <p id="withdrawFee">Комиссия: 2.20 USDT</p>
+                    <button class="copy-btn">Отправить</button>
+                </div>
+            </div>
+            <div id="profileScreen">
+                <div class="content">
+                    <h3>Профиль</h3>
+                    <div class="info">
+                        <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                        <p class="rub-balance"><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
+                    </div>
+                    <h4>Реферальная система</h4>
+                    <div class="info">
+                        <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink">https://t.me/MyCryptoTapBot?start=ref_123</span></p>
+                        <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">5</span></p>
+                        <p><strong>Заработано:</strong> <span id="profileEarnedAmount">10.0 USDT</span></p>
+                        <button class="copy-btn">Копировать ссылку</button>
+                    </div>
+                    <h4>Настройки безопасности</h4>
+                    <div class="info">
+                        <input type="password" id="setPassword" placeholder="Введите новый пароль">
+                        <button class="copy-btn">Установить пароль</button>
+                    </div>
+                    <h4>FAQ</h4>
+                    <div class="info">
+                        <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
+                        <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
+                        <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
+                    </div>
+                    <h4>Пользовательское соглашение</h4>
+                    <div class="info">
+                        <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="qrScanner">
+                <video id="video" autoplay playsinline></video>
+                <button id="flashlightBtn">🔦</button>
+                <button id="uploadBtn">📤</button>
+                <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
+                <p id="result"></p>
+                <div id="loader" class="loader">Ожидайте подтверждения...</div>
+                <input type="file" id="uploadInput" accept="image/*">
+            </div>
+            <div id="qrConfirmScreen">
+                <h3>Подтверждение оплаты</h3>
+                <p id="qrInfo">Получатель: Example<br>Сумма: 100 RUB<br>Будет списано: 1.05 USDT</p>
+                <div class="action-buttons">
+                    <button class="confirm-btn">Подтвердить</button>
+                    <button class="cancel-btn">Отмена</button>
                 </div>
             </div>
         </div>
-        <div id="qrScreen">
-            <div class="content">
-                <img src="qr-logo.png" alt="QR Logo" class="qr-logo">
-                <h3>Пополнение USDT</h3>
-                <p class="warning">Данный адрес предназначен только для получения USDT в сети TRC20. Отправка активов в других сетях приведёт к их безвозвратной потере!</p>
-                <p class="warning">Для зачисления средств на ваш счёт необходимо выполнить перевод(ы) на общую сумму более 5 USDT.</p>
-                <p class="warning">Все транзакции проходят AML-проверку. Подозрительные операции могут быть заблокированы.</p>
-                <img id="qrCode" class="qr-code" src="https://via.placeholder.com/200" alt="QR Code">
-                <p id="usdtAddress" class="address">TYourUSDTAddressHere...</p>
-                <p id="exchangeRate" class="exchange-rate"><strong>Курс:</strong> 1 USDT = <span id="usdtRate">95.00</span> RUB</p>
-                <p class="fee" id="feeText">Фиксированная комиссия: 2.20 USDT</p>
-                <button class="copy-btn">Копировать адрес</button>
-            </div>
+        <div class="navbar">
+            <button id="homeBtn" class="nav-btn active">
+                <img src="Tab Two.png" alt="Home">
+            </button>
+            <button id="payBtn" class="nav-btn">
+                <img src="qr-logo.png" alt="QR Code">
+            </button>
+            <button id="profileBtn" class="nav-btn">
+                <img src="Tab Three.png" alt="Profile">
+            </button>
         </div>
-        <div id="withdrawScreen">
-            <div class="content">
-                <h3>Отправить USDT</h3>
-                <p>Введите адрес и сумму для вывода USDT (сеть TRC20).</p>
-                <input type="text" id="withdrawAddress" placeholder="Введите адрес TRC20">
-                <input type="number" id="withdrawAmount" placeholder="Введите сумму в USDT">
-                <p id="withdrawFee">Комиссия: 2.20 USDT</p>
-                <button class="copy-btn">Отправить</button>
-            </div>
-        </div>
-        <div id="profileScreen">
-            <div class="content">
-                <h3>Профиль</h3>
-                <div class="info">
-                    <p><strong>Имя:</strong> <span id="profileName"></span></p>
-                    <p class="rub-balance"><strong>Рублёвый баланс:</strong> <span id="profileBalanceRub">0.0</span> ₽</p>
-                </div>
-                <h4>Реферальная система</h4>
-                <div class="info">
-                    <p><strong>Ваша реферальная ссылка:</strong> <span id="profileReferralLink">https://t.me/MyCryptoTapBot?start=ref_123</span></p>
-                    <p><strong>Приглашено друзей:</strong> <span id="profileInvitedCount">5</span></p>
-                    <p><strong>Заработано:</strong> <span id="profileEarnedAmount">10.0 USDT</span></p>
-                    <button class="copy-btn">Копировать ссылку</button>
-                </div>
-                <h4>Настройки безопасности</h4>
-                <div class="info">
-                    <input type="password" id="setPassword" placeholder="Введите новый пароль">
-                    <button class="copy-btn">Установить пароль</button>
-                </div>
-                <h4>FAQ</h4>
-                <div class="info">
-                    <p><strong>Что такое CryptoTap?</strong><br>CryptoTap — это криптовалютный кошелёк, который позволяет безопасно хранить, пополнять, отправлять и оплачивать с помощью USDT в сети TRC20.</p>
-                    <p><strong>Как пополнить баланс?</strong><br>Нажмите на кнопку "Пополнить", выберите сеть TRC20, скопируйте адрес и отправьте USDT с другого кошелька.</p>
-                    <p><strong>Как вывести USDT?</strong><br>Нажмите на кнопку "Отправить", введите адрес получателя и сумму, подтвердите операцию.</p>
-                </div>
-                <h4>Пользовательское соглашение</h4>
-                <div class="info">
-                    <p>Используя CryptoTap, вы соглашаетесь с нашими условиями. Мы не несем ответственности за утерю средств из-за ошибок пользователя. Все операции с криптовалютой необратимы.</p>
-                </div>
-            </div>
-        </div>
-        <div id="qrScanner">
-            <video id="video" autoplay playsinline></video>
-            <button id="flashlightBtn">🔦</button>
-            <button id="uploadBtn">📤</button>
-            <p id="warning">Мы можем распознавать QR-коды только с платежных терминалов.</p>
-            <p id="result"></p>
-            <div id="loader" class="loader">Ожидайте подтверждения...</div>
-            <input type="file" id="uploadInput" accept="image/*">
-        </div>
-        <div id="qrConfirmScreen">
-            <h3>Подтверждение оплаты</h3>
-            <p id="qrInfo">Получатель: Example<br>Сумма: 100 RUB<br>Будет списано: 1.05 USDT</p>
-            <div class="action-buttons">
-                <button class="confirm-btn">Подтвердить</button>
-                <button class="cancel-btn">Отмена</button>
-            </div>
-        </div>
-    </div>
-    <div class="navbar">
-        <button id="homeBtn" class="nav-btn active">
-            <img src="Tab Two.png" alt="Home">
-        </button>
-        <button id="payBtn" class="nav-btn">
-            <img src="qr-logo.png" alt="QR Code">
-        </button>
-        <button id="profileBtn" class="nav-btn">
-            <img src="Tab Three.png" alt="Profile">
-        </button>
     </div>
 
     <!-- Подключаем Telegram Web App для получения ника и аватарки пользователя -->
