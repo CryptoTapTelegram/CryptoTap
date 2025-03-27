@@ -14,6 +14,9 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden; /* Убирает горизонтальный скроллинг */
+            max-width: 360px; /* Ограничивает ширину под Telegram Mini App */
+            margin-left: auto;
+            margin-right: auto;
         }
         .header {
             display: flex;
@@ -42,13 +45,13 @@
         }
         .balance {
             margin: 0 20px;
-            padding: 20px;
+            padding: 10px; /* Уменьшил padding для компактности */
             background: url('Rectangle 39390.png') no-repeat center;
             background-size: cover;
             border-radius: 15px;
             color: #070707; /* Оставил как ты указал, но текст не виден */
-            width: 491px; /* Ширина для соотношения 327:100 при высоте 150px */
-            height: 150px; /* Оставил текущую высоту */
+            width: 360px; /* Уместил в Telegram Mini App */
+            height: 110px; /* Соотношение 327:100 при ширине 360px */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -66,8 +69,8 @@
         }
         .balance .graph-icon {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             width: 20px;
             height: 20px;
         }
@@ -124,11 +127,12 @@
             position: sticky;
             bottom: 0;
             width: 100%;
+            max-width: 360px; /* Уместил в Telegram Mini App */
             box-sizing: border-box;
             overflow-x: hidden; /* Убирает горизонтальный скроллинг */
         }
         .nav-bar img {
-            width: 50px; /* Оставил 50px, чтобы уместить в Telegram Mini App */
+            width: 100px; /* Увеличил с 50px до 100px, уместил в 360px */
             object-fit: contain; /* Сохраняет пропорции */
         }
     </style>
