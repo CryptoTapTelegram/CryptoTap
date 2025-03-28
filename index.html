@@ -530,6 +530,10 @@
             document.getElementById("userAvatar").src = userAvatar;
         }
 
+        // Получаем userId
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
+        console.log('User ID:', userId);
+
         // Функция для переключения экранов
         function showScreen(screenId) {
             try {
@@ -621,10 +625,13 @@
         // Функция для получения данных пользователя из Firestore
         async function getUserData(userId) {
             try {
+                console.log('Попытка получить данные пользователя для userId:', userId);
                 const userRef = db.collection('users').doc(userId);
                 const doc = await userRef.get();
                 if (doc.exists) {
-                    return doc.data();
+                    const userData = doc.data();
+                    console.log('Данные пользователя получены:', userData);
+                    return userData;
                 } else {
                     console.log('Пользователь не найден, создаём нового');
                     const newUser = {
@@ -639,6 +646,7 @@
                         last_updated: 0
                     };
                     await userRef.set(newUser);
+                    console.log('Новый пользователь создан:', newUser);
                     return newUser;
                 }
             } catch (error) {
@@ -650,6 +658,7 @@
         // Функция для обновления баланса в Firestore
         async function updateUserBalance(userId, usdtBalance) {
             try {
+                console.log('Обновление баланса для userId:', userId, 'usdtBalance:', usdtBalance);
                 const usdtRubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * usdtRubRate).toFixed(2);
                 const last_updated = Date.now();
@@ -659,6 +668,7 @@
                     rub_balance: parseFloat(rubBalance),
                     last_updated: last_updated
                 });
+                console.log('Баланс обновлён:', { usdtBalance, rubBalance, last_updated });
                 return { usdtBalance, rubBalance, last_updated };
             } catch (error) {
                 console.error('Ошибка при обновлении баланса в Firestore:', error);
@@ -669,6 +679,7 @@
         // Функция для обновления UI на основе данных пользователя
         function updateUI(userData) {
             try {
+                console.log('Обновление UI с данными:', userData);
                 const usdtBalance = userData.usdt_balance || 0;
                 const rubBalance = userData.rub_balance || 0;
 
@@ -692,6 +703,7 @@
         // Функция для подписки на изменения в Firestore
         function subscribeToBalanceUpdates(userId) {
             try {
+                console.log('Подписка на обновления для userId:', userId);
                 const userRef = db.collection('users').doc(userId);
                 userRef.onSnapshot((doc) => {
                     if (doc.exists) {
@@ -723,9 +735,13 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
-                let userData = await getUserData(userId);
+                console.log('Инициализация приложения...');
+                console.log('Telegram initDataUnsafe:', tg.initDataUnsafe);
 
+                const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
+                console.log('User ID:', userId);
+
+                let userData = await getUserData(userId);
                 if (!userData) {
                     throw new Error('Не удалось получить данные пользователя');
                 }
