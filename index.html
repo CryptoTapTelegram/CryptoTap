@@ -666,31 +666,11 @@
             }
         }
 
-        // Функция для обновления баланса на странице
-        async function updateBalance() {
+        // Функция для обновления UI на основе данных пользователя
+        function updateUI(userData) {
             try {
-                const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
-                let userData = await getUserData(userId);
-
-                if (!userData) {
-                    throw new Error('Не удалось получить данные пользователя');
-                }
-
-                // Проверяем, нужно ли обновить баланс через TronLink
-                const lastUpdated = userData.last_updated || 0;
-                const now = Date.now();
-                const updateInterval = 5 * 60 * 1000; // Обновляем каждые 5 минут
-
-                let usdtBalance = userData.usdt_balance;
-                let rubBalance = userData.rub_balance;
-
-                if (now - lastUpdated > updateInterval && userData.wallet_address) {
-                    usdtBalance = await getUsdtBalanceFromTronLink(userData.wallet_address);
-                    const updatedBalances = await updateUserBalance(userId, usdtBalance);
-                    if (updatedBalances) {
-                        rubBalance = updatedBalances.rub_balance;
-                    }
-                }
+                const usdtBalance = userData.usdt_balance || 0;
+                const rubBalance = userData.rub_balance || 0;
 
                 // Обновляем баланс на странице
                 document.getElementById('balanceRub').innerText = rubBalance;
@@ -701,22 +681,61 @@
                 document.getElementById('profileBalanceRub').innerText = rubBalance;
 
                 // Обновляем реферальные данные
-                document.getElementById('profileReferralLink').innerText = userData.referral_link;
-                document.getElementById('profileInvitedCount').innerText = userData.invited_count;
-                document.getElementById('profileEarnedAmount').innerText = userData.earned_amount.toFixed(2);
-
-                // Обновляем комиссию
-                const fee = await calculateFee();
-                document.getElementById('withdrawFeeValue').innerText = fee;
+                document.getElementById('profileReferralLink').innerText = userData.referral_link || '';
+                document.getElementById('profileInvitedCount').innerText = userData.invited_count || 0;
+                document.getElementById('profileEarnedAmount').innerText = (userData.earned_amount || 0).toFixed(2);
             } catch (error) {
-                console.error('Ошибка при обновлении баланса:', error);
+                console.error('Ошибка при обновлении UI:', error);
+            }
+        }
+
+        // Функция для подписки на изменения в Firestore
+        function subscribeToBalanceUpdates(userId) {
+            try {
+                const userRef = db.collection('users').doc(userId);
+                userRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        console.log('Данные пользователя обновлены:', userData);
+                        updateUI(userData);
+
+                        // Проверяем, нужно ли обновить баланс через TronLink
+                        const lastUpdated = userData.last_updated || 0;
+                        const now = Date.now();
+                        const updateInterval = 5 * 60 * 1000; // Обновляем каждые 5 минут
+
+                        if (now - lastUpdated > updateInterval && userData.wallet_address) {
+                            getUsdtBalanceFromTronLink(userData.wallet_address).then(usdtBalance => {
+                                updateUserBalance(userId, usdtBalance);
+                            });
+                        }
+                    } else {
+                        console.error('Документ пользователя не найден');
+                    }
+                }, (error) => {
+                    console.error('Ошибка при подписке на обновления:', error);
+                });
+            } catch (error) {
+                console.error('Ошибка при настройке подписки:', error);
             }
         }
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                await updateBalance();
+                const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
+                let userData = await getUserData(userId);
+
+                if (!userData) {
+                    throw new Error('Не удалось получить данные пользователя');
+                }
+
+                // Подписываемся на изменения в Firestore
+                subscribeToBalanceUpdates(userId);
+
+                // Обновляем комиссию
+                const fee = await calculateFee();
+                document.getElementById('withdrawFeeValue').innerText = fee;
             } catch (error) {
                 console.error('Ошибка при инициализации:', error);
             }
