@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Wallet - Homepage</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <!-- Подключаем Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -500,6 +503,18 @@
     <!-- Подключаем Telegram Web App для получения ника и аватарки пользователя -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYhhCM_3BrFt6K3UaWqmRlLAV6r4qqIzo",
+            authDomain: "crypttap.firebaseapp.com",
+            projectId: "crypttap",
+            storageBucket: "crypttap.firebasestorage.app",
+            messagingSenderId: "451356109142",
+            appId: "1:451356109142:web:e1de65eca338bd8f5d4ef7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
@@ -517,24 +532,28 @@
 
         // Функция для переключения экранов
         function showScreen(screenId) {
-            const screens = ['mainScreen', 'depositScreen', 'withdrawScreen', 'qrScanner', 'profileScreen', 'qrConfirmScreen'];
-            screens.forEach(id => {
-                document.getElementById(id).style.display = 'none';
-            });
-            document.getElementById(screenId).style.display = 'block';
+            try {
+                const screens = ['mainScreen', 'depositScreen', 'withdrawScreen', 'qrScanner', 'profileScreen', 'qrConfirmScreen'];
+                screens.forEach(id => {
+                    document.getElementById(id).style.display = 'none';
+                });
+                document.getElementById(screenId).style.display = 'block';
 
-            // Обновляем активный класс для кнопок навигации
-            const navButtons = document.querySelectorAll('.nav-bar img');
-            navButtons.forEach(button => {
-                button.classList.remove('active');
-            });
+                // Обновляем активный класс для кнопок навигации
+                const navButtons = document.querySelectorAll('.nav-bar img');
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
 
-            if (screenId === 'mainScreen') {
-                document.querySelector('.nav-bar img[alt="Home Icon"]').classList.add('active');
-            } else if (screenId === 'qrScanner') {
-                document.querySelector('.nav-bar img[alt="QR Code Icon"]').classList.add('active');
-            } else if (screenId === 'profileScreen') {
-                document.querySelector('.nav-bar img[alt="Profile Icon"]').classList.add('active');
+                if (screenId === 'mainScreen') {
+                    document.querySelector('.nav-bar img[alt="Home Icon"]').classList.add('active');
+                } else if (screenId === 'qrScanner') {
+                    document.querySelector('.nav-bar img[alt="QR Code Icon"]').classList.add('active');
+                } else if (screenId === 'profileScreen') {
+                    document.querySelector('.nav-bar img[alt="Profile Icon"]').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Ошибка при переключении экрана:', error);
             }
         }
 
@@ -547,7 +566,7 @@
                 return rate;
             } catch (error) {
                 console.error('Ошибка при получении курса USDT/RUB:', error);
-                return 94.50; // Значение по умолчанию, если API недоступен
+                return 94.50; // Значение по умолчанию
             }
         }
 
@@ -559,22 +578,27 @@
                 return data.tron.usd;
             } catch (error) {
                 console.error('Ошибка при получении курса TRX/USDT:', error);
-                return 0.15; // Значение по умолчанию, если API недоступен
+                return 0.15; // Значение по умолчанию
             }
         }
 
         // Функция для расчёта комиссии
         async function calculateFee() {
-            const trxFee = 1.5; // Пример: 1.5 TRX за транзакцию
-            const trxUsdtRate = await getTrxUsdtRate();
-            const trxFeeUsdt = trxFee * trxUsdtRate; // Комиссия TRX в USDT
-            const fixedFee = 1.2; // Фиксированная комиссия 1.2 USDT
-            const totalFee = trxFeeUsdt + fixedFee;
-            return totalFee.toFixed(2);
+            try {
+                const trxFee = 1.5; // Пример: 1.5 TRX за транзакцию
+                const trxUsdtRate = await getTrxUsdtRate();
+                const trxFeeUsdt = trxFee * trxUsdtRate;
+                const fixedFee = 1.2;
+                const totalFee = trxFeeUsdt + fixedFee;
+                return totalFee.toFixed(2);
+            } catch (error) {
+                console.error('Ошибка при расчёте комиссии:', error);
+                return 1.425; // Значение по умолчанию
+            }
         }
 
         // Функция для получения баланса USDT через TronLink
-        async function getUsdtBalance() {
+        async function getUsdtBalanceFromTronLink(walletAddress) {
             if (!window.tronLink || !window.tronLink.ready) {
                 console.error('TronLink не установлен или не готов');
                 return 0;
@@ -582,62 +606,121 @@
 
             try {
                 const tronWeb = window.tronLink.tronWeb;
-                const userAddress = tronWeb.defaultAddress.base58;
-
-                // Адрес контракта USDT (TRC20) в сети TRON
                 const usdtContractAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
                 const usdtContract = await tronWeb.contract().at(usdtContractAddress);
-
-                // Получаем баланс USDT
-                const balance = await usdtContract.balanceOf(userAddress).call();
+                const balance = await usdtContract.balanceOf(walletAddress).call();
                 const decimals = await usdtContract.decimals().call();
                 const usdtBalance = balance / Math.pow(10, decimals);
                 return usdtBalance.toFixed(2);
             } catch (error) {
-                console.error('Ошибка при получении баланса USDT:', error);
+                console.error('Ошибка при получении баланса USDT через TronLink:', error);
                 return 0;
             }
         }
 
-        // Функция для обновления баланса
+        // Функция для получения данных пользователя из Firestore
+        async function getUserData(userId) {
+            try {
+                const userRef = db.collection('users').doc(userId);
+                const doc = await userRef.get();
+                if (doc.exists) {
+                    return doc.data();
+                } else {
+                    console.log('Пользователь не найден, создаём нового');
+                    const newUser = {
+                        user_id: userId,
+                        username: userName,
+                        wallet_address: window.tronLink ? window.tronLink.tronWeb.defaultAddress.base58 : '',
+                        usdt_balance: 0,
+                        rub_balance: 0,
+                        referral_link: `https://t.me/MyCryptoTapBot?start=ref_${userId}`,
+                        invited_count: 0,
+                        earned_amount: 0,
+                        last_updated: 0
+                    };
+                    await userRef.set(newUser);
+                    return newUser;
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных пользователя:', error);
+                return null;
+            }
+        }
+
+        // Функция для обновления баланса в Firestore
+        async function updateUserBalance(userId, usdtBalance) {
+            try {
+                const usdtRubRate = await getUsdtRubRate();
+                const rubBalance = (usdtBalance * usdtRubRate).toFixed(2);
+                const last_updated = Date.now();
+                const userRef = db.collection('users').doc(userId);
+                await userRef.update({
+                    usdt_balance: parseFloat(usdtBalance),
+                    rub_balance: parseFloat(rubBalance),
+                    last_updated: last_updated
+                });
+                return { usdtBalance, rubBalance, last_updated };
+            } catch (error) {
+                console.error('Ошибка при обновлении баланса в Firestore:', error);
+                return null;
+            }
+        }
+
+        // Функция для обновления баланса на странице
         async function updateBalance() {
-            const usdtBalance = await getUsdtBalance();
-            const usdtRubRate = await getUsdtRubRate();
-            const rubBalance = (usdtBalance * usdtRubRate).toFixed(2);
+            try {
+                const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'default_user';
+                let userData = await getUserData(userId);
 
-            // Обновляем баланс на главной странице
-            document.getElementById('balanceRub').innerText = rubBalance;
-            document.getElementById('usdtBalance').innerText = usdtBalance;
-            document.getElementById('usdtBalanceRub').innerText = rubBalance;
+                if (!userData) {
+                    throw new Error('Не удалось получить данные пользователя');
+                }
 
-            // Обновляем баланс в профиле
-            document.getElementById('profileBalanceRub').innerText = rubBalance;
+                // Проверяем, нужно ли обновить баланс через TronLink
+                const lastUpdated = userData.last_updated || 0;
+                const now = Date.now();
+                const updateInterval = 5 * 60 * 1000; // Обновляем каждые 5 минут
 
-            // Обновляем комиссию
-            const fee = await calculateFee();
-            document.getElementById('withdrawFeeValue').innerText = fee;
+                let usdtBalance = userData.usdt_balance;
+                let rubBalance = userData.rub_balance;
+
+                if (now - lastUpdated > updateInterval && userData.wallet_address) {
+                    usdtBalance = await getUsdtBalanceFromTronLink(userData.wallet_address);
+                    const updatedBalances = await updateUserBalance(userId, usdtBalance);
+                    if (updatedBalances) {
+                        rubBalance = updatedBalances.rub_balance;
+                    }
+                }
+
+                // Обновляем баланс на странице
+                document.getElementById('balanceRub').innerText = rubBalance;
+                document.getElementById('usdtBalance').innerText = usdtBalance;
+                document.getElementById('usdtBalanceRub').innerText = rubBalance;
+
+                // Обновляем баланс в профиле
+                document.getElementById('profileBalanceRub').innerText = rubBalance;
+
+                // Обновляем реферальные данные
+                document.getElementById('profileReferralLink').innerText = userData.referral_link;
+                document.getElementById('profileInvitedCount').innerText = userData.invited_count;
+                document.getElementById('profileEarnedAmount').innerText = userData.earned_amount.toFixed(2);
+
+                // Обновляем комиссию
+                const fee = await calculateFee();
+                document.getElementById('withdrawFeeValue').innerText = fee;
+            } catch (error) {
+                console.error('Ошибка при обновлении баланса:', error);
+            }
         }
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', async () => {
-            await updateBalance();
+            try {
+                await updateBalance();
+            } catch (error) {
+                console.error('Ошибка при инициализации:', error);
+            }
         });
-
-        // Подключаем Telegram Web App для получения ника и аватарки пользователя
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        // Получаем ник пользователя из Telegram
-        let userName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Alex";
-        document.getElementById("userName").innerText = userName;
-        document.getElementById("profileName").innerText = userName;
-
-        // Получаем аватарку пользователя из Telegram
-        let userAvatar = tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : '';
-        if (userAvatar) {
-            document.getElementById("userAvatar").src = userAvatar;
-        }
     </script>
 </body>
 </html>
