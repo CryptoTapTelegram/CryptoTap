@@ -27,13 +27,20 @@
             background: #070707;
         }
         .header img {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             cursor: pointer;
         }
+        .greeting {
+            text-align: center;
+            padding: 10px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
         .balance {
-            margin: 20px;
-            padding: 20px;
+            margin: 10px 20px;
+            padding: 15px;
             background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
             border-radius: 20px;
             text-align: center;
@@ -41,11 +48,11 @@
         }
         .balance p {
             margin: 0;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
         }
         .balance h2 {
-            font-size: 32px;
+            font-size: 28px;
             margin: 5px 0;
             font-weight: 600;
         }
@@ -65,6 +72,15 @@
             font-size: 14px;
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .buttons button.send-btn {
+            background: transparent;
+            border: 2px solid #007aff;
+            color: #007aff;
+        }
+        .buttons button.send-btn:active {
+            background: linear-gradient(90deg, #007aff, #005bb5);
+            color: white;
         }
         .assets {
             padding: 0 20px 80px;
@@ -208,8 +224,16 @@
             margin: 0 0 30px;
         }
         #welcomeScreen button {
-            padding: 15px 40px;
-            font-size: 16px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #007aff, #005bb5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -217,14 +241,15 @@
     <div id="welcomeScreen" class="screen active">
         <h1>Добро пожаловать в CrypTon!</h1>
         <p>Храните и переводите USDT, оплачивайте покупки в магазинах и кафе через QR-код с терминалов. Быстро, удобно, безопасно.</p>
-        <button onclick="showScreen('mainScreen')">Начать</button>
+        <button onclick="startApp()">Начать</button>
     </div>
 
     <div id="mainScreen" class="screen">
         <div class="header">
-            <img src="profile-icon.png" alt="Profile" onclick="showScreen('profileScreen')">
+            <img id="userAvatar" alt="Profile" onclick="showScreen('profileScreen')">
             <img src="settings-icon.png" alt="Settings" onclick="showScreen('profileScreen')">
         </div>
+        <div class="greeting">Здравствуйте, <span id="userNameGreeting"></span></div>
         <div class="balance">
             <p>Ваш баланс</p>
             <h2 id="balance">0 USDT</h2>
@@ -232,7 +257,7 @@
         <div class="buttons">
             <button onclick="showScreen('depositScreen')">Deposit</button>
             <button onclick="showScreen('qrScreen')">QR</button>
-            <button onclick="showScreen('withdrawScreen')">Send</button>
+            <button class="send-btn" onclick="showScreen('withdrawScreen')">Send</button>
         </div>
         <div class="assets">
             <h3>Активы</h3>
@@ -303,7 +328,10 @@
         tg.expand();
 
         const userName = tg.initDataUnsafe.user?.first_name || "User";
+        const userAvatar = tg.initDataUnsafe.user?.photo_url || "default-avatar.png";
         document.getElementById("profileName").innerText = userName;
+        document.getElementById("userNameGreeting").innerText = `@${userName}`;
+        document.getElementById("userAvatar").src = userAvatar;
 
         let stream, qrData;
 
@@ -315,6 +343,15 @@
 
             if (screenId === 'qrScreen') startQrScanner();
             else stopQrScanner();
+        }
+
+        async function startApp() {
+            showScreen('mainScreen');
+            // Генерация адреса при старте
+            const response = await fetch('http://localhost:8000/generate_address', { method: 'POST' });
+            const data = await response.json();
+            document.getElementById('depositAddress').innerText = data.trc20;
+            document.getElementById('trc20Address').innerText = data.trc20;
         }
 
         async function getUsdtRubRate() {
@@ -424,9 +461,9 @@
         async function processQrCode(data) {
             stopQrScanner();
             document.getElementById('loader').style.display = 'block';
-            qrData = JSON.parse(data); // Предполагаем, что QR содержит JSON с полями recipient, name, amount
+            qrData = JSON.parse(data);
             const usdtBalance = await fetchBalances();
-            const amountWithFee = qrData.amount * 1.05; // Комиссия 5%
+            const amountWithFee = qrData.amount * 1.05;
 
             if (usdtBalance >= amountWithFee) {
                 document.getElementById('qrInfo').innerHTML = `
