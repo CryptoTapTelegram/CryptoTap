@@ -248,38 +248,38 @@
             to { transform: rotate(360deg); }
         }
         #welcomeScreen {
-            display: none; /* Окно скрыто по умолчанию */
+            display: none;
             flex-direction: column;
             justify-content: center;
-            align-items: center; /* Центрируем контент */
-            text-align: center; /* Текст по центру */
+            align-items: center;
+            text-align: center;
             padding: 20px;
             height: 100vh;
             background: linear-gradient(135deg, #070707, #121212);
-            position: fixed; /* Фиксируем на весь экран */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
-            overflow: hidden; /* Убираем скроллинг */
+            overflow: hidden;
         }
         #welcomeScreen.active {
-            display: flex; /* Показываем, когда активно */
+            display: flex;
         }
         #welcomeScreen h1 {
-            font-size: 32px; /* Увеличиваем размер текста */
+            font-size: 32px;
             font-weight: 600;
             margin: 0 0 20px;
-            line-height: 1.2; /* Для переноса на две строки */
-            max-width: 300px; /* Ограничиваем ширину, чтобы помещалось */
-            word-wrap: break-word; /* Перенос слов */
+            line-height: 1.2;
+            max-width: 300px;
+            word-wrap: break-word;
         }
         #welcomeScreen p {
             font-size: 14px;
             font-weight: 400;
             background: none;
             margin: 0 0 30px;
-            max-width: 300px; /* Ограничиваем ширину текста */
+            max-width: 300px;
         }
         #welcomeScreen button {
             padding: 12px 20px;
@@ -449,18 +449,19 @@
         }
 
         async function startApp() {
-            document.getElementById('welcomeScreen').classList.remove('active'); // Закрываем окно приветствия
+            document.getElementById('welcomeScreen').classList.remove('active');
             showScreen('mainScreen');
             try {
-                const response = await fetch('http://localhost:8000/check_registration', {
+                const checkResponse = await fetch('http://localhost:8000/check_registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                console.log('Check registration response:', data);
-                if (!data.registered) {
+                if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status} - ${await checkResponse.text()}`);
+                const checkData = await checkResponse.json();
+                console.log('Check registration response:', checkData);
+
+                if (!checkData.registered) {
                     alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
                     document.getElementById('depositAddress').innerText = 'Не зарегистрирован';
                     document.getElementById('trc20Address').innerText = 'Не зарегистрирован';
@@ -470,8 +471,8 @@
                 }
             } catch (error) {
                 console.error('Ошибка проверки регистрации:', error);
-                document.getElementById('depositAddress').innerText = 'Ошибка загрузки';
-                document.getElementById('trc20Address').innerText = 'Ошибка загрузки';
+                document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
+                document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
             }
         }
 
@@ -489,7 +490,7 @@
         async function fetchBalances() {
             try {
                 const response = await fetch(`http://localhost:8000/balances/${userId}`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
                 console.log('Balance response:', data);
                 const usdtBalance = data.usdt_trc20;
@@ -502,7 +503,7 @@
                 return usdtBalance;
             } catch (error) {
                 console.error('Ошибка загрузки баланса:', error);
-                document.getElementById('usdtTrc20Balance').innerText = 'Ошибка';
+                document.getElementById('usdtTrc20Balance').innerText = `Ошибка: ${error.message}`;
                 document.getElementById('usdtTrc20BalanceRub').innerText = 'Ошибка';
                 document.getElementById('balance').innerText = 'Ошибка';
                 return 0;
@@ -513,6 +514,7 @@
             try {
                 const response = await fetch(`http://localhost:8000/history/${userId}`);
                 const data = await response.json();
+                console.log('History response:', data);
                 const transactionsDiv = document.getElementById('transactions');
                 transactionsDiv.innerHTML = '';
                 data.transactions.forEach(tx => {
@@ -558,7 +560,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId, amount: 100 })
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) throw new Error(`Test deposit failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
                 console.log('Test deposit response:', data);
                 if (data.status === 'deposited') {
@@ -568,7 +570,7 @@
                 }
             } catch (error) {
                 console.error('Ошибка тестового пополнения:', error);
-                alert('Ошибка тестового пополнения');
+                alert(`Ошибка тестового пополнения: ${error.message}`);
             }
         }
 
@@ -773,24 +775,20 @@
 
         async function fetchAddresses() {
             try {
-                const response = await fetch('http://localhost:8000/check_registration', {
+                const response = await fetch('http://localhost:8000/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
+                if (!response.ok) throw new Error(`Fetch address failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
-                if (data.registered) {
-                    const addressResponse = await fetch('http://localhost:8000/register', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user_id: userId })
-                    });
-                    const addressData = await addressResponse.json();
-                    document.getElementById('depositAddress').innerText = addressData.trc20;
-                    document.getElementById('trc20Address').innerText = addressData.trc20;
-                }
+                console.log('Fetch addresses response:', data);
+                document.getElementById('depositAddress').innerText = data.trc20;
+                document.getElementById('trc20Address').innerText = data.trc20;
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
+                document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
+                document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
             }
         }
     </script>
