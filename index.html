@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrypTon</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -152,6 +153,18 @@
             font-size: 14px;
             font-weight: 400;
             box-sizing: border-box;
+        }
+        #depositScreen #qrCode {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #depositScreen #qrCode canvas {
+            max-width: 200px;
+        }
+        #depositScreen .commission-notice {
+            font-size: 12px;
+            color: #ff1744;
+            margin-top: 10px;
         }
         #qrScreen {
             position: relative;
@@ -336,6 +349,8 @@
     <div id="depositScreen" class="screen">
         <h3>Пополнить USDT (TRC20)</h3>
         <p>Ваш адрес: <span id="depositAddress">Загрузка...</span></p>
+        <div id="qrCode"></div>
+        <p class="commission-notice">Внимание: при пополнении взимается комиссия 1%.</p>
         <button onclick="copyAddress()">Скопировать адрес</button>
         <button onclick="testDeposit()">Тестовое пополнение</button>
     </div>
@@ -425,25 +440,31 @@
             if (screenId === 'qrScreen') startQrScanner();
             else stopQrScanner();
             if (screenId === 'historyScreen') fetchHistory();
+            if (screenId === 'depositScreen') generateQRCode();
         }
 
         async function startApp() {
             document.getElementById('welcomeScreen').classList.remove('active');
             showScreen('mainScreen');
             try {
-                const response = await fetch('http://localhost:8000/register', {
+                const response = await fetch('http://localhost:8000/check_registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                console.log('Register response:', data);
-                document.getElementById('depositAddress').innerText = data.trc20;
-                document.getElementById('trc20Address').innerText = data.trc20;
-                await fetchBalances();
+                console.log('Check registration response:', data);
+                if (!data.registered) {
+                    alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
+                    document.getElementById('depositAddress').innerText = 'Не зарегистрирован';
+                    document.getElementById('trc20Address').innerText = 'Не зарегистрирован';
+                } else {
+                    await fetchAddresses();
+                    await fetchBalances();
+                }
             } catch (error) {
-                console.error('Ошибка при регистрации:', error);
+                console.error('Ошибка проверки регистрации:', error);
                 document.getElementById('depositAddress').innerText = 'Ошибка загрузки';
                 document.getElementById('trc20Address').innerText = 'Ошибка загрузки';
             }
@@ -591,6 +612,18 @@
             }
         }
 
+        async function generateQRCode() {
+            const address = document.getElementById('depositAddress').innerText;
+            if (address && address !== 'Загрузка...' && address !== 'Не зарегистрирован' && address !== 'Ошибка загрузки') {
+                const qrCodeDiv = document.getElementById('qrCode');
+                qrCodeDiv.innerHTML = '';
+                QRCode.toCanvas(address, { width: 200 }, (error, canvas) => {
+                    if (error) console.error(error);
+                    qrCodeDiv.appendChild(canvas);
+                });
+            }
+        }
+
         async function startQrScanner() {
             const video = document.getElementById('video');
             stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -683,6 +716,7 @@
                 }
             } catch (error) {
                 console.error('Ошибка заморозки средств:', error);
+                alert('Ошибка при оплате');
             }
             document.getElementById('paymentLoader').style.display = 'none';
         }
@@ -723,22 +757,31 @@
                     showScreen('mainScreen');
                     fetchBalances();
                     fetchAddresses();
+                } else {
+                    alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
                 }
             }).catch(error => {
                 console.error('Ошибка проверки регистрации:', error);
+                alert('Ошибка проверки регистрации. Проверьте подключение к серверу.');
             });
         };
 
         async function fetchAddresses() {
             try {
-                const response = await fetch('http://localhost:8000/register', {
+                const response = await fetch('http://localhost:8000/check_registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
                 const data = await response.json();
-                document.getElementById('depositAddress').innerText = data.trc20;
-                document.getElementById('trc20Address').innerText = data.trc20;
+                if (data.registered) {
+                    with closing(sqlite3.connect(DB_PATH)) as conn:
+                        with closing(conn.cursor()) as cursor:
+                            cursor.execute("SELECT address FROM users WHERE user_id = ?", (userId,))
+                            address = cursor.fetchone()[0]
+                            document.getElementById('depositAddress').innerText = address;
+                            document.getElementById('trc20Address').innerText = address;
+                }
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
             }
