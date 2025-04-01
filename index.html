@@ -427,7 +427,6 @@
         tg.ready();
         tg.expand();
 
-        // Преобразуем userId в строку
         const userId = String(tg.initDataUnsafe.user?.id || "test_user");
         const userName = tg.initDataUnsafe.user?.first_name || "User";
         const userAvatar = tg.initDataUnsafe.user?.photo_url || "default-avatar.png";
@@ -435,8 +434,8 @@
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
 
-        // Замените этот URL на ваш ngrok-URL
-        const API_BASE_URL = "https://270b-212-111-88-251.ngrok-free.app";
+        // Замените на ваш ngrok-URL
+        const API_BASE_URL = "https://ca20-212-111-88-251.ngrok-free.app";
 
         let stream, qrData;
 
@@ -483,21 +482,29 @@
         async function getUsdtRubRate() {
             try {
                 const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub');
+                if (!response.ok) throw new Error(`Failed to fetch rate: ${response.status}`);
                 const data = await response.json();
                 return data.tether.rub - 0.5;
             } catch (error) {
                 console.error('Ошибка получения курса:', error);
-                return 100;
+                return 100; // Значение по умолчанию при ошибке
             }
         }
 
         async function fetchBalances() {
             try {
-                const response = await fetch(`${API_BASE_URL}/balances/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/balances/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
                 if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
                 console.log('Balance response:', data);
-                const usdtBalance = data.usdt_trc20;
+
+                // Проверяем, что usdt_trc20 - число
+                const usdtBalance = Number(data.usdt_trc20);
+                if (isNaN(usdtBalance)) throw new Error('usdt_trc20 is not a valid number');
+
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
 
@@ -517,6 +524,7 @@
         async function fetchHistory() {
             try {
                 const response = await fetch(`${API_BASE_URL}/history/${userId}`);
+                if (!response.ok) throw new Error(`Fetch history failed: ${response.status}`);
                 const data = await response.json();
                 console.log('History response:', data);
                 const transactionsDiv = document.getElementById('transactions');
