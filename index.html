@@ -248,33 +248,38 @@
             to { transform: rotate(360deg); }
         }
         #welcomeScreen {
-            display: none;
+            display: none; /* Окно скрыто по умолчанию */
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
-            text-align: left;
+            align-items: center; /* Центрируем контент */
+            text-align: center; /* Текст по центру */
             padding: 20px;
             height: 100vh;
             background: linear-gradient(135deg, #070707, #121212);
-            position: absolute;
+            position: fixed; /* Фиксируем на весь экран */
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
+            overflow: hidden; /* Убираем скроллинг */
         }
         #welcomeScreen.active {
-            display: flex;
+            display: flex; /* Показываем, когда активно */
         }
         #welcomeScreen h1 {
-            font-size: 24px;
+            font-size: 32px; /* Увеличиваем размер текста */
             font-weight: 600;
             margin: 0 0 20px;
+            line-height: 1.2; /* Для переноса на две строки */
+            max-width: 300px; /* Ограничиваем ширину, чтобы помещалось */
+            word-wrap: break-word; /* Перенос слов */
         }
         #welcomeScreen p {
             font-size: 14px;
             font-weight: 400;
             background: none;
             margin: 0 0 30px;
+            max-width: 300px; /* Ограничиваем ширину текста */
         }
         #welcomeScreen button {
             padding: 12px 20px;
@@ -311,7 +316,7 @@
 </head>
 <body>
     <div id="welcomeScreen" class="screen active">
-        <h1>Добро пожаловать в CrypTon!</h1>
+        <h1>Добро пожаловать<br>в CrypTon!</h1>
         <p>Храните и переводите USDT, оплачивайте покупки в магазинах и кафе через QR-код с терминалов. Первый криптокошелек с ИИ — быстро, удобно, безопасно.</p>
         <button onclick="startApp()">Начать</button>
     </div>
@@ -444,7 +449,7 @@
         }
 
         async function startApp() {
-            document.getElementById('welcomeScreen').classList.remove('active');
+            document.getElementById('welcomeScreen').classList.remove('active'); // Закрываем окно приветствия
             showScreen('mainScreen');
             try {
                 const response = await fetch('http://localhost:8000/check_registration', {
@@ -775,12 +780,14 @@
                 });
                 const data = await response.json();
                 if (data.registered) {
-                    with closing(sqlite3.connect(DB_PATH)) as conn:
-                        with closing(conn.cursor()) as cursor:
-                            cursor.execute("SELECT address FROM users WHERE user_id = ?", (userId,))
-                            address = cursor.fetchone()[0]
-                            document.getElementById('depositAddress').innerText = address;
-                            document.getElementById('trc20Address').innerText = address;
+                    const addressResponse = await fetch('http://localhost:8000/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId })
+                    });
+                    const addressData = await addressResponse.json();
+                    document.getElementById('depositAddress').innerText = addressData.trc20;
+                    document.getElementById('trc20Address').innerText = addressData.trc20;
                 }
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
