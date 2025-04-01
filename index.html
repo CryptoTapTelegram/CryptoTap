@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
     <style>
+        /* Оставляем стили без изменений */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -434,6 +435,9 @@
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
 
+        // Замените этот URL на ваш ngrok-URL, например, "https://abcd-1234.ngrok-free.app"
+        const API_BASE_URL = "https://270b-212-111-88-251.ngrok-free.app";
+
         let stream, qrData;
 
         function showScreen(screenId) {
@@ -452,7 +456,7 @@
             document.getElementById('welcomeScreen').classList.remove('active');
             showScreen('mainScreen');
             try {
-                const checkResponse = await fetch('http://localhost:8000/check_registration', {
+                const checkResponse = await fetch(`${API_BASE_URL}/check_registration`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
@@ -489,7 +493,7 @@
 
         async function fetchBalances() {
             try {
-                const response = await fetch(`http://localhost:8000/balances/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/balances/${userId}`);
                 if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
                 console.log('Balance response:', data);
@@ -512,7 +516,7 @@
 
         async function fetchHistory() {
             try {
-                const response = await fetch(`http://localhost:8000/history/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/history/${userId}`);
                 const data = await response.json();
                 console.log('History response:', data);
                 const transactionsDiv = document.getElementById('transactions');
@@ -536,7 +540,7 @@
             const address = document.getElementById('withdrawAddress').value;
             const amount = document.getElementById('withdrawAmount').value;
             try {
-                const response = await fetch('http://localhost:8000/send', {
+                const response = await fetch(`${API_BASE_URL}/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
@@ -555,7 +559,7 @@
 
         async function testDeposit() {
             try {
-                const response = await fetch('http://localhost:8000/test_deposit', {
+                const response = await fetch(`${API_BASE_URL}/test_deposit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId, amount: 100 })
@@ -584,7 +588,7 @@
             const pin = document.getElementById('pinCode').value;
             if (pin.length === 4 && /^\d+$/.test(pin)) {
                 try {
-                    const response = await fetch('http://localhost:8000/set_pin', {
+                    const response = await fetch(`${API_BASE_URL}/set_pin`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, pin })
@@ -604,7 +608,7 @@
             const password = document.getElementById('password').value;
             if (email && password) {
                 try {
-                    const response = await fetch('http://localhost:8000/set_credentials', {
+                    const response = await fetch(`${API_BASE_URL}/set_credentials`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, email, password })
@@ -712,7 +716,7 @@
         async function confirmPayment() {
             document.getElementById('paymentLoader').style.display = 'block';
             try {
-                const response = await fetch('http://localhost:8000/freeze', {
+                const response = await fetch(`${API_BASE_URL}/freeze`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
@@ -731,7 +735,7 @@
         async function checkPaymentStatus(paymentId) {
             const interval = setInterval(async () => {
                 try {
-                    const response = await fetch(`http://localhost:8000/payment_status/${paymentId}`);
+                    const response = await fetch(`${API_BASE_URL}/payment_status/${paymentId}`);
                     const data = await response.json();
                     if (data.status === 'approved') {
                         clearInterval(interval);
@@ -753,7 +757,7 @@
         }
 
         window.onload = () => {
-            fetch('http://localhost:8000/check_registration', {
+            fetch(`${API_BASE_URL}/check_registration`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId })
@@ -775,7 +779,7 @@
 
         async function fetchAddresses() {
             try {
-                const response = await fetch('http://localhost:8000/register', {
+                const response = await fetch(`${API_BASE_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
