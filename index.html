@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +36,7 @@
             text-align: center;
             padding: 10px 0;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 400;
         }
         .balance {
             margin: 10px 20px;
@@ -49,7 +49,7 @@
         .balance p {
             margin: 0;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 400;
         }
         .balance h2 {
             font-size: 28px;
@@ -107,6 +107,7 @@
         .asset-values {
             text-align: right;
             font-size: 14px;
+            font-weight: 400;
         }
         .nav-bar {
             position: fixed;
@@ -147,6 +148,7 @@
             color: #fff;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
+            font-weight: 400;
             box-sizing: border-box;
         }
         #qrScreen video {
@@ -170,6 +172,7 @@
             padding: 15px;
             border-radius: 12px;
             margin: 20px 0;
+            font-weight: 400;
         }
         #qrConfirmScreen .action-buttons {
             display: flex;
@@ -188,6 +191,7 @@
             text-align: center;
             margin: 20px 0;
             display: none;
+            font-weight: 400;
         }
         .loader::after {
             content: '';
@@ -204,14 +208,22 @@
             to { transform: rotate(360deg); }
         }
         #welcomeScreen {
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            text-align: center;
+            align-items: flex-start;
+            text-align: left;
             padding: 20px;
             height: 100vh;
             background: linear-gradient(135deg, #070707, #121212);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
+        #welcomeScreen.active {
+            display: flex;
         }
         #welcomeScreen h1 {
             font-size: 24px;
@@ -220,6 +232,7 @@
         }
         #welcomeScreen p {
             font-size: 14px;
+            font-weight: 400;
             background: none;
             margin: 0 0 30px;
         }
@@ -235,19 +248,25 @@
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        #historyScreen .transaction {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div id="welcomeScreen" class="screen active">
         <h1>Добро пожаловать в CrypTon!</h1>
-        <p>Храните и переводите USDT, оплачивайте покупки в магазинах и кафе через QR-код с терминалов. Быстро, удобно, безопасно.</p>
+        <p>Храните и переводите USDT, оплачивайте покупки в магазинах и кафе через QR-код с терминалов. Первый криптокошелек с ИИ — быстро, удобно, безопасно.</p>
         <button onclick="startApp()">Начать</button>
     </div>
 
     <div id="mainScreen" class="screen">
         <div class="header">
             <img id="userAvatar" alt="Profile" onclick="showScreen('profileScreen')">
-            <img src="settings-icon.png" alt="Settings" onclick="showScreen('profileScreen')">
+            <img src="history-icon.png" alt="History" onclick="showScreen('historyScreen')">
         </div>
         <div class="greeting">Здравствуйте, <span id="userNameGreeting"></span></div>
         <div class="balance">
@@ -255,9 +274,9 @@
             <h2 id="balance">0 USDT</h2>
         </div>
         <div class="buttons">
-            <button onclick="showScreen('depositScreen')">Deposit</button>
+            <button onclick="showScreen('depositScreen')">Пополнить</button>
             <button onclick="showScreen('qrScreen')">QR</button>
-            <button class="send-btn" onclick="showScreen('withdrawScreen')">Send</button>
+            <button class="send-btn" onclick="showScreen('withdrawScreen')">Отправить</button>
         </div>
         <div class="assets">
             <h3>Активы</h3>
@@ -275,20 +294,21 @@
     </div>
 
     <div id="depositScreen" class="screen">
-        <h3>Deposit USDT (TRC20)</h3>
-        <p>Your address: <span id="depositAddress">Loading...</span></p>
-        <button onclick="copyAddress()">Copy Address</button>
+        <h3>Пополнить USDT (TRC20)</h3>
+        <p>Ваш адрес: <span id="depositAddress">Загрузка...</span></p>
+        <button onclick="copyAddress()">Скопировать адрес</button>
+        <button onclick="testDeposit()">Тестовое пополнение</button>
     </div>
 
     <div id="withdrawScreen" class="screen">
-        <h3>Send USDT (TRC20)</h3>
-        <input id="withdrawAddress" placeholder="Recipient Address">
-        <input id="withdrawAmount" placeholder="Amount (USDT)" type="number">
-        <button onclick="sendCrypto()">Send</button>
+        <h3>Отправить USDT (TRC20)</h3>
+        <input id="withdrawAddress" placeholder="Адрес получателя">
+        <input id="withdrawAmount" placeholder="Сумма (USDT)" type="number">
+        <button onclick="sendCrypto()">Отправить</button>
     </div>
 
     <div id="qrScreen" class="screen">
-        <h3>Scan QR Code</h3>
+        <h3>Сканировать QR-код</h3>
         <video id="video" autoplay playsinline></video>
         <div class="qr-buttons">
             <button id="flashlightBtn">🔦</button>
@@ -309,9 +329,20 @@
     </div>
 
     <div id="profileScreen" class="screen">
-        <h3>Profile</h3>
-        <p>Name: <span id="profileName"></span></p>
-        <p>TRC20 Address: <span id="trc20Address"></span></p>
+        <h3>Профиль</h3>
+        <p>Имя: <span id="profileName"></span></p>
+        <p>TRC20 Адрес: <span id="trc20Address"></span></p>
+        <h4>Безопасность</h4>
+        <input id="pinCode" placeholder="Установить PIN-код (4 цифры)" type="password" maxlength="4">
+        <button onclick="setPinCode()">Сохранить PIN</button>
+        <input id="email" placeholder="Email">
+        <input id="password" placeholder="Пароль" type="password">
+        <button onclick="setCredentials()">Привязать Email</button>
+    </div>
+
+    <div id="historyScreen" class="screen">
+        <h3>История транзакций</h3>
+        <div id="transactions"></div>
     </div>
 
     <div class="nav-bar">
@@ -327,6 +358,7 @@
         tg.ready();
         tg.expand();
 
+        const userId = tg.initDataUnsafe.user?.id || "test_user";
         const userName = tg.initDataUnsafe.user?.first_name || "User";
         const userAvatar = tg.initDataUnsafe.user?.photo_url || "default-avatar.png";
         document.getElementById("profileName").innerText = userName;
@@ -343,15 +375,21 @@
 
             if (screenId === 'qrScreen') startQrScanner();
             else stopQrScanner();
+            if (screenId === 'historyScreen') fetchHistory();
         }
 
         async function startApp() {
+            document.getElementById('welcomeScreen').classList.remove('active');
             showScreen('mainScreen');
-            // Генерация адреса при старте
-            const response = await fetch('http://localhost:8000/generate_address', { method: 'POST' });
+            const response = await fetch('http://localhost:8000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            });
             const data = await response.json();
             document.getElementById('depositAddress').innerText = data.trc20;
             document.getElementById('trc20Address').innerText = data.trc20;
+            fetchBalances();
         }
 
         async function getUsdtRubRate() {
@@ -366,7 +404,7 @@
         }
 
         async function fetchBalances() {
-            const response = await fetch('http://localhost:8000/balances');
+            const response = await fetch(`http://localhost:8000/balances/${userId}`);
             const data = await response.json();
             const usdtBalance = data.usdt_trc20;
             const rubRate = await getUsdtRubRate();
@@ -378,11 +416,21 @@
             return usdtBalance;
         }
 
-        async function fetchAddresses() {
-            const response = await fetch('http://localhost:8000/addresses');
+        async function fetchHistory() {
+            const response = await fetch(`http://localhost:8000/history/${userId}`);
             const data = await response.json();
-            document.getElementById('depositAddress').innerText = data.trc20;
-            document.getElementById('trc20Address').innerText = data.trc20;
+            const transactionsDiv = document.getElementById('transactions');
+            transactionsDiv.innerHTML = '';
+            data.transactions.forEach(tx => {
+                transactionsDiv.innerHTML += `
+                    <div class="transaction">
+                        <p>Тип: ${tx.type}</p>
+                        <p>Сумма: ${tx.amount} USDT</p>
+                        <p>Дата: ${new Date(tx.timestamp).toLocaleString()}</p>
+                        <p>Tx ID: ${tx.tx_id}</p>
+                    </div>
+                `;
+            });
         }
 
         async function sendCrypto() {
@@ -391,19 +439,65 @@
             const response = await fetch('http://localhost:8000/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ network: 'trc20', recipient: address, amount })
+                body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
             });
             const data = await response.json();
             if (data.status === 'sent') {
-                alert(`Sent! Tx: ${data.tx_id}`);
+                alert(`Отправлено! Tx: ${data.tx_id}`);
                 fetchBalances();
+                fetchHistory();
+            }
+        }
+
+        async function testDeposit() {
+            const response = await fetch('http://localhost:8000/test_deposit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, amount: 100 })
+            });
+            const data = await response.json();
+            if (data.status === 'deposited') {
+                alert('Тестовое пополнение на 100 USDT выполнено!');
+                fetchBalances();
+                fetchHistory();
             }
         }
 
         function copyAddress() {
             const address = document.getElementById('depositAddress').innerText;
             navigator.clipboard.writeText(address);
-            alert('Address copied!');
+            alert('Адрес скопирован!');
+        }
+
+        async function setPinCode() {
+            const pin = document.getElementById('pinCode').value;
+            if (pin.length === 4 && /^\d+$/.test(pin)) {
+                const response = await fetch('http://localhost:8000/set_pin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, pin })
+                });
+                const data = await response.json();
+                if (data.status === 'success') alert('PIN-код установлен!');
+            } else {
+                alert('Введите 4 цифры!');
+            }
+        }
+
+        async function setCredentials() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (email && password) {
+                const response = await fetch('http://localhost:8000/set_credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, email, password })
+                });
+                const data = await response.json();
+                if (data.status === 'success') alert('Email и пароль привязаны!');
+            } else {
+                alert('Заполните все поля!');
+            }
         }
 
         async function startQrScanner() {
@@ -485,7 +579,7 @@
             const response = await fetch('http://localhost:8000/freeze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData })
+                body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
             });
             const data = await response.json();
             if (data.status === 'frozen') {
@@ -502,6 +596,7 @@
                     document.getElementById('paymentLoader').style.display = 'none';
                     alert('Оплата прошла успешно!');
                     fetchBalances();
+                    fetchHistory();
                     showScreen('mainScreen');
                 } else if (data.status === 'rejected') {
                     clearInterval(interval);
@@ -513,8 +608,19 @@
         }
 
         window.onload = () => {
-            fetchBalances();
-            fetchAddresses();
+            // Проверка регистрации при загрузке
+            fetch('http://localhost:8000/check_registration', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            }).then(response => response.json()).then(data => {
+                if (data.registered) {
+                    document.getElementById('welcomeScreen').classList.remove('active');
+                    showScreen('mainScreen');
+                    fetchBalances();
+                    fetchAddresses();
+                }
+            });
         };
     </script>
 </body>
