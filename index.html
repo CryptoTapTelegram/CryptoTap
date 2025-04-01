@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
     <style>
-        /* Оставляем стили без изменений */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -428,14 +427,15 @@
         tg.ready();
         tg.expand();
 
-        const userId = tg.initDataUnsafe.user?.id || "test_user";
+        // Преобразуем userId в строку
+        const userId = String(tg.initDataUnsafe.user?.id || "test_user");
         const userName = tg.initDataUnsafe.user?.first_name || "User";
         const userAvatar = tg.initDataUnsafe.user?.photo_url || "default-avatar.png";
         document.getElementById("profileName").innerText = userName;
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
 
-        // Замените этот URL на ваш ngrok-URL, например, "https://abcd-1234.ngrok-free.app"
+        // Замените этот URL на ваш ngrok-URL
         const API_BASE_URL = "https://270b-212-111-88-251.ngrok-free.app";
 
         let stream, qrData;
