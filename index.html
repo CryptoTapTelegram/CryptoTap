@@ -289,6 +289,11 @@
             font-weight: 600;
             margin: 10px 0;
         }
+        #profileScreen .security-section button {
+            padding: 10px 15px;
+            font-size: 12px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -369,13 +374,18 @@
         <p>Имя: <span id="profileName"></span></p>
         <p>TRC20 Адрес: <span id="trc20Address"></span></p>
         <div class="security-section">
-            <h4>Подтверждение аккаунта</h4>
-            <input id="email" placeholder="Email">
-            <input id="password" placeholder="Пароль" type="password">
-            <button onclick="setCredentials()">Привязать Email</button>
-            <h4>Задать PIN-код</h4>
-            <input id="pinCode" placeholder="PIN-код (4 цифры)" type="password" maxlength="4">
-            <button onclick="setPinCode()">Сохранить PIN</button>
+            <h4>Безопасность</h4>
+            <div>
+                <h5>Подтверждение аккаунта</h5>
+                <input id="email" placeholder="Email">
+                <input id="password" placeholder="Пароль" type="password">
+                <button onclick="setCredentials()">Привязать Email</button>
+            </div>
+            <div>
+                <h5>Задать PIN-код</h5>
+                <input id="pinCode" placeholder="PIN-код (4 цифры)" type="password" maxlength="4">
+                <button onclick="setPinCode()">Сохранить PIN</button>
+            </div>
         </div>
     </div>
 
@@ -420,15 +430,21 @@
         async function startApp() {
             document.getElementById('welcomeScreen').classList.remove('active');
             showScreen('mainScreen');
-            const response = await fetch('http://localhost:8000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId })
-            });
-            const data = await response.json();
-            document.getElementById('depositAddress').innerText = data.trc20;
-            document.getElementById('trc20Address').innerText = data.trc20;
-            fetchBalances();
+            try {
+                const response = await fetch('http://localhost:8000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await response.json();
+                document.getElementById('depositAddress').innerText = data.trc20;
+                document.getElementById('trc20Address').innerText = data.trc20;
+                fetchBalances();
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                document.getElementById('depositAddress').innerText = 'Ошибка загрузки';
+                document.getElementById('trc20Address').innerText = 'Ошибка загрузки';
+            }
         }
 
         async function getUsdtRubRate() {
@@ -443,16 +459,21 @@
         }
 
         async function fetchBalances() {
-            const response = await fetch(`http://localhost:8000/balances/${userId}`);
-            const data = await response.json();
-            const usdtBalance = data.usdt_trc20;
-            const rubRate = await getUsdtRubRate();
-            const rubBalance = (usdtBalance * rubRate).toFixed(2);
+            try {
+                const response = await fetch(`http://localhost:8000/balances/${userId}`);
+                const data = await response.json();
+                const usdtBalance = data.usdt_trc20;
+                const rubRate = await getUsdtRubRate();
+                const rubBalance = (usdtBalance * rubRate).toFixed(2);
 
-            document.getElementById('usdtTrc20Balance').innerText = `${usdtBalance} USDT`;
-            document.getElementById('usdtTrc20BalanceRub').innerText = `${rubBalance} ₽`;
-            document.getElementById('balance').innerText = `${usdtBalance} USDT`;
-            return usdtBalance;
+                document.getElementById('usdtTrc20Balance').innerText = `${usdtBalance} USDT`;
+                document.getElementById('usdtTrc20BalanceRub').innerText = `${rubBalance} ₽`;
+                document.getElementById('balance').innerText = `${usdtBalance} USDT`;
+                return usdtBalance;
+            } catch (error) {
+                console.error('Ошибка загрузки баланса:', error);
+                return 0;
+            }
         }
 
         async function fetchHistory() {
@@ -489,16 +510,21 @@
         }
 
         async function testDeposit() {
-            const response = await fetch('http://localhost:8000/test_deposit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, amount: 100 })
-            });
-            const data = await response.json();
-            if (data.status === 'deposited') {
-                alert('Тестовое пополнение на 100 USDT выполнено!');
-                fetchBalances();
-                fetchHistory();
+            try {
+                const response = await fetch('http://localhost:8000/test_deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, amount: 100 })
+                });
+                const data = await response.json();
+                if (data.status === 'deposited') {
+                    alert('Тестовое пополнение на 100 USDT выполнено!');
+                    fetchBalances();
+                    fetchHistory();
+                }
+            } catch (error) {
+                console.error('Ошибка тестового пополнения:', error);
+                alert('Ошибка тестового пополнения');
             }
         }
 
@@ -547,7 +573,6 @@
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            const scanArea = document.querySelector('.scan-area');
 
             function tick() {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -665,6 +690,17 @@
                 }
             });
         };
+
+        async function fetchAddresses() {
+            const response = await fetch('http://localhost:8000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            });
+            const data = await response.json();
+            document.getElementById('depositAddress').innerText = data.trc20;
+            document.getElementById('trc20Address').innerText = data.trc20;
+        }
     </script>
 </body>
 </html>
