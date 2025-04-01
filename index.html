@@ -436,12 +436,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
+                console.log('Register response:', data);
                 document.getElementById('depositAddress').innerText = data.trc20;
                 document.getElementById('trc20Address').innerText = data.trc20;
-                fetchBalances();
+                await fetchBalances();
             } catch (error) {
-                console.error('Ошибка регистрации:', error);
+                console.error('Ошибка при регистрации:', error);
                 document.getElementById('depositAddress').innerText = 'Ошибка загрузки';
                 document.getElementById('trc20Address').innerText = 'Ошибка загрузки';
             }
@@ -461,7 +463,9 @@
         async function fetchBalances() {
             try {
                 const response = await fetch(`http://localhost:8000/balances/${userId}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
+                console.log('Balance response:', data);
                 const usdtBalance = data.usdt_trc20;
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
@@ -472,40 +476,52 @@
                 return usdtBalance;
             } catch (error) {
                 console.error('Ошибка загрузки баланса:', error);
+                document.getElementById('usdtTrc20Balance').innerText = 'Ошибка';
+                document.getElementById('usdtTrc20BalanceRub').innerText = 'Ошибка';
+                document.getElementById('balance').innerText = 'Ошибка';
                 return 0;
             }
         }
 
         async function fetchHistory() {
-            const response = await fetch(`http://localhost:8000/history/${userId}`);
-            const data = await response.json();
-            const transactionsDiv = document.getElementById('transactions');
-            transactionsDiv.innerHTML = '';
-            data.transactions.forEach(tx => {
-                transactionsDiv.innerHTML += `
-                    <div class="transaction">
-                        <p>Тип: ${tx.type}</p>
-                        <p>Сумма: ${tx.amount} USDT</p>
-                        <p>Дата: ${new Date(tx.timestamp * 1000).toLocaleString()}</p>
-                        <p>Tx ID: ${tx.tx_id}</p>
-                    </div>
-                `;
-            });
+            try {
+                const response = await fetch(`http://localhost:8000/history/${userId}`);
+                const data = await response.json();
+                const transactionsDiv = document.getElementById('transactions');
+                transactionsDiv.innerHTML = '';
+                data.transactions.forEach(tx => {
+                    transactionsDiv.innerHTML += `
+                        <div class="transaction">
+                            <p>Тип: ${tx.type}</p>
+                            <p>Сумма: ${tx.amount} USDT</p>
+                            <p>Дата: ${new Date(tx.timestamp * 1000).toLocaleString()}</p>
+                            <p>Tx ID: ${tx.tx_id}</p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки истории:', error);
+            }
         }
 
         async function sendCrypto() {
             const address = document.getElementById('withdrawAddress').value;
             const amount = document.getElementById('withdrawAmount').value;
-            const response = await fetch('http://localhost:8000/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
-            });
-            const data = await response.json();
-            if (data.status === 'sent') {
-                alert(`Отправлено! Tx: ${data.tx_id}`);
-                fetchBalances();
-                fetchHistory();
+            try {
+                const response = await fetch('http://localhost:8000/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
+                });
+                const data = await response.json();
+                if (data.status === 'sent') {
+                    alert(`Отправлено! Tx: ${data.tx_id}`);
+                    fetchBalances();
+                    fetchHistory();
+                }
+            } catch (error) {
+                console.error('Ошибка отправки:', error);
+                alert('Ошибка при отправке');
             }
         }
 
@@ -516,7 +532,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId, amount: 100 })
                 });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
+                console.log('Test deposit response:', data);
                 if (data.status === 'deposited') {
                     alert('Тестовое пополнение на 100 USDT выполнено!');
                     fetchBalances();
@@ -537,13 +555,17 @@
         async function setPinCode() {
             const pin = document.getElementById('pinCode').value;
             if (pin.length === 4 && /^\d+$/.test(pin)) {
-                const response = await fetch('http://localhost:8000/set_pin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, pin })
-                });
-                const data = await response.json();
-                if (data.status === 'success') alert('PIN-код установлен!');
+                try {
+                    const response = await fetch('http://localhost:8000/set_pin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, pin })
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') alert('PIN-код установлен!');
+                } catch (error) {
+                    console.error('Ошибка установки PIN:', error);
+                }
             } else {
                 alert('Введите 4 цифры!');
             }
@@ -553,13 +575,17 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             if (email && password) {
-                const response = await fetch('http://localhost:8000/set_credentials', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, email, password })
-                });
-                const data = await response.json();
-                if (data.status === 'success') alert('Email и пароль привязаны!');
+                try {
+                    const response = await fetch('http://localhost:8000/set_credentials', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, email, password })
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') alert('Email и пароль привязаны!');
+                } catch (error) {
+                    console.error('Ошибка привязки email:', error);
+                }
             } else {
                 alert('Заполните все поля!');
             }
@@ -645,33 +671,42 @@
 
         async function confirmPayment() {
             document.getElementById('paymentLoader').style.display = 'block';
-            const response = await fetch('http://localhost:8000/freeze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
-            });
-            const data = await response.json();
-            if (data.status === 'frozen') {
-                checkPaymentStatus(data.payment_id);
+            try {
+                const response = await fetch('http://localhost:8000/freeze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
+                });
+                const data = await response.json();
+                if (data.status === 'frozen') {
+                    checkPaymentStatus(data.payment_id);
+                }
+            } catch (error) {
+                console.error('Ошибка заморозки средств:', error);
             }
+            document.getElementById('paymentLoader').style.display = 'none';
         }
 
         async function checkPaymentStatus(paymentId) {
             const interval = setInterval(async () => {
-                const response = await fetch(`http://localhost:8000/payment_status/${paymentId}`);
-                const data = await response.json();
-                if (data.status === 'approved') {
-                    clearInterval(interval);
-                    document.getElementById('paymentLoader').style.display = 'none';
-                    alert('Оплата прошла успешно!');
-                    fetchBalances();
-                    fetchHistory();
-                    showScreen('mainScreen');
-                } else if (data.status === 'rejected') {
-                    clearInterval(interval);
-                    document.getElementById('paymentLoader').style.display = 'none';
-                    alert('Оплата не прошла. Неверный QR-код.');
-                    showScreen('qrScreen');
+                try {
+                    const response = await fetch(`http://localhost:8000/payment_status/${paymentId}`);
+                    const data = await response.json();
+                    if (data.status === 'approved') {
+                        clearInterval(interval);
+                        document.getElementById('paymentLoader').style.display = 'none';
+                        alert('Оплата прошла успешно!');
+                        fetchBalances();
+                        fetchHistory();
+                        showScreen('mainScreen');
+                    } else if (data.status === 'rejected') {
+                        clearInterval(interval);
+                        document.getElementById('paymentLoader').style.display = 'none';
+                        alert('Оплата не прошла. Неверный QR-код.');
+                        showScreen('qrScreen');
+                    }
+                } catch (error) {
+                    console.error('Ошибка проверки статуса оплаты:', error);
                 }
             }, 2000);
         }
@@ -682,24 +717,31 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId })
             }).then(response => response.json()).then(data => {
+                console.log('Check registration response:', data);
                 if (data.registered) {
                     document.getElementById('welcomeScreen').classList.remove('active');
                     showScreen('mainScreen');
                     fetchBalances();
                     fetchAddresses();
                 }
+            }).catch(error => {
+                console.error('Ошибка проверки регистрации:', error);
             });
         };
 
         async function fetchAddresses() {
-            const response = await fetch('http://localhost:8000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId })
-            });
-            const data = await response.json();
-            document.getElementById('depositAddress').innerText = data.trc20;
-            document.getElementById('trc20Address').innerText = data.trc20;
+            try {
+                const response = await fetch('http://localhost:8000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await response.json();
+                document.getElementById('depositAddress').innerText = data.trc20;
+                document.getElementById('trc20Address').innerText = data.trc20;
+            } catch (error) {
+                console.error('Ошибка загрузки адреса:', error);
+            }
         }
     </script>
 </body>
