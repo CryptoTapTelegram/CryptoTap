@@ -365,7 +365,7 @@
     </div>
 
     <div id="depositScreen" class="screen">
-        <h3>Пополнить USDT (TRC20)</h3>
+        <h3>ПаПополнить USDT (TRC20)</h3>
         <p>Ваш адрес: <span id="depositAddress">Загрузка...</span></p>
         <div id="qrCode"></div>
         <p class="commission-notice">Внимание: при пополнении взимается комиссия 1%.</p>
@@ -449,7 +449,8 @@
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
 
-        const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app";
+        // Замени на актуальный ngrok-URL после запуска ngrok
+        const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app"; // Обнови это!
 
         let stream, qrData;
 
@@ -478,7 +479,10 @@
             try {
                 const checkResponse = await fetch(`${API_BASE_URL}/check_registration`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
                     body: JSON.stringify({ user_id: userId })
                 });
                 if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status} - ${await checkResponse.text()}`);
@@ -514,10 +518,26 @@
 
         async function fetchBalances() {
             try {
-                const response = await fetch(`${API_BASE_URL}/balances/${userId}`);
-                if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
-                const data = await response.json();
-                console.log('Balance response:', data);
+                const response = await fetch(`${API_BASE_URL}/balances/${userId}`, {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('Request URL:', `${API_BASE_URL}/balances/${userId}`);
+                console.log('Response Status:', response.status);
+                console.log('Content-Type:', response.headers.get('content-type'));
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Fetch balances failed: ${response.status} - ${errorText.slice(0, 50)}...`);
+                }
+                const text = await response.text();
+                console.log('Raw Response:', text);
+
+                const data = JSON.parse(text);
+                console.log('Parsed Data:', data);
+
                 const usdtBalance = data.usdt_trc20;
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
@@ -538,7 +558,12 @@
 
         async function fetchHistory() {
             try {
-                const response = await fetch(`${API_BASE_URL}/history/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/history/${userId}`, {
+                    headers: { 
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    }
+                });
                 const data = await response.json();
                 const transactionsDiv = document.getElementById('transactions');
                 transactionsDiv.innerHTML = '';
@@ -563,7 +588,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/send`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
                 });
                 const data = await response.json();
@@ -582,7 +610,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/test_deposit`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ user_id: userId, amount: 100 })
                 });
                 if (!response.ok) throw new Error(`Test deposit failed: ${response.status} - ${await response.text()}`);
@@ -611,7 +642,10 @@
                 try {
                     const response = await fetch(`${API_BASE_URL}/set_pin`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'ngrok-skip-browser-warning': 'true',
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({ user_id: userId, pin })
                     });
                     const data = await response.json();
@@ -631,7 +665,10 @@
                 try {
                     const response = await fetch(`${API_BASE_URL}/set_credentials`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'ngrok-skip-browser-warning': 'true',
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({ user_id: userId, email, password })
                     });
                     const data = await response.json();
@@ -739,7 +776,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/freeze`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
                 });
                 const data = await response.json();
@@ -756,7 +796,12 @@
         async function checkPaymentStatus(paymentId) {
             const interval = setInterval(async () => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/payment_status/${paymentId}`);
+                    const response = await fetch(`${API_BASE_URL}/payment_status/${paymentId}`, {
+                        headers: { 
+                            'ngrok-skip-browser-warning': 'true',
+                            'Content-Type': 'application/json'
+                        }
+                    });
                     const data = await response.json();
                     if (data.status === 'approved') {
                         clearInterval(interval);
@@ -780,7 +825,10 @@
         window.onload = () => {
             fetch(`${API_BASE_URL}/check_registration`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'ngrok-skip-browser-warning': 'true',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ user_id: userId })
             }).then(response => response.json()).then(data => {
                 console.log('Check registration response:', data);
@@ -802,7 +850,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/register`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ user_id: userId })
                 });
                 if (!response.ok) throw new Error(`Fetch address failed: ${response.status} - ${await response.text()}`);
