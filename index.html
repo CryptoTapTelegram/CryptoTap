@@ -312,6 +312,19 @@
             font-size: 12px;
             width: 100%;
         }
+        #errorDebug {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            z-index: 3000;
+        }
     </style>
 </head>
 <body>
@@ -420,6 +433,8 @@
         <img src="profile-icon.png" alt="Profile" onclick="showScreen('profileScreen')" class="nav-icon">
     </div>
 
+    <div id="errorDebug"></div>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script>
@@ -434,7 +449,6 @@
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
 
-        // Замените на ваш ngrok-URL
         const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app";
 
         let stream, qrData;
@@ -449,6 +463,13 @@
             else stopQrScanner();
             if (screenId === 'historyScreen') fetchHistory();
             if (screenId === 'depositScreen') generateQRCode();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorDebug');
+            errorDiv.innerText = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
         }
 
         async function startApp() {
@@ -474,6 +495,7 @@
                 }
             } catch (error) {
                 console.error('Ошибка проверки регистрации:', error);
+                showError(`Ошибка проверки: ${error.message}`);
                 document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
                 document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
             }
@@ -482,29 +504,21 @@
         async function getUsdtRubRate() {
             try {
                 const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub');
-                if (!response.ok) throw new Error(`Failed to fetch rate: ${response.status}`);
                 const data = await response.json();
                 return data.tether.rub - 0.5;
             } catch (error) {
                 console.error('Ошибка получения курса:', error);
-                return 100; // Значение по умолчанию при ошибке
+                return 100;
             }
         }
 
         async function fetchBalances() {
             try {
-                const response = await fetch(`${API_BASE_URL}/balances/${userId}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                const response = await fetch(`${API_BASE_URL}/balances/${userId}`);
                 if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
                 console.log('Balance response:', data);
-
-                // Проверяем, что usdt_trc20 - число
-                const usdtBalance = Number(data.usdt_trc20);
-                if (isNaN(usdtBalance)) throw new Error('usdt_trc20 is not a valid number');
-
+                const usdtBalance = data.usdt_trc20;
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
 
@@ -514,6 +528,7 @@
                 return usdtBalance;
             } catch (error) {
                 console.error('Ошибка загрузки баланса:', error);
+                showError(`Ошибка баланса: ${error.message}`);
                 document.getElementById('usdtTrc20Balance').innerText = `Ошибка: ${error.message}`;
                 document.getElementById('usdtTrc20BalanceRub').innerText = 'Ошибка';
                 document.getElementById('balance').innerText = 'Ошибка';
@@ -524,9 +539,7 @@
         async function fetchHistory() {
             try {
                 const response = await fetch(`${API_BASE_URL}/history/${userId}`);
-                if (!response.ok) throw new Error(`Fetch history failed: ${response.status}`);
                 const data = await response.json();
-                console.log('History response:', data);
                 const transactionsDiv = document.getElementById('transactions');
                 transactionsDiv.innerHTML = '';
                 data.transactions.forEach(tx => {
@@ -781,7 +794,7 @@
                 }
             }).catch(error => {
                 console.error('Ошибка проверки регистрации:', error);
-                alert('Ошибка проверки регистрации. Проверьте подключение к серверу.');
+                showError(`Ошибка проверки: ${error.message}`);
             });
         };
 
@@ -799,6 +812,7 @@
                 document.getElementById('trc20Address').innerText = data.trc20;
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
+                showError(`Ошибка адреса: ${error.message}`);
                 document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
                 document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
             }
