@@ -75,6 +75,7 @@
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             flex: 1;
+            max-width: 120px; /* Ограничение ширины кнопок */
         }
         .buttons button.send-btn {
             background: transparent;
@@ -278,6 +279,9 @@
             background: none;
             margin: 0 0 30px;
             max-width: 300px;
+        }
+        #welcomeScreen button {
+            width: 120px; /* Фиксированная ширина кнопки */
         }
         #passwordScreen {
             display: none;
@@ -521,6 +525,7 @@
                 showScreen('passwordScreen');
             } else {
                 showScreen('mainScreen');
+                await loadInitialData(); // Загружаем данные сразу
             }
         }
 
@@ -534,6 +539,7 @@
             else stopQrScanner();
             if (screenId === 'historyScreen') fetchHistory();
             if (screenId === 'depositScreen') generateQRCode();
+            if (screenId === 'mainScreen') fetchBalances(); // Обновляем баланс при переходе
         }
 
         function showError(message) {
@@ -558,7 +564,6 @@
                     alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
                 } else {
                     await fetchAddresses();
-                    await fetchBalances();
                     checkPin();
                 }
             } catch (error) {
@@ -578,12 +583,19 @@
                 const data = await response.json();
                 if (data.valid) {
                     showScreen('mainScreen');
+                    await loadInitialData(); // Загружаем данные после ввода PIN
                 } else {
                     showError('Неверный PIN-код');
                 }
             } else {
                 showError('Введите 4 цифры');
             }
+        }
+
+        async function loadInitialData() {
+            await fetchBalances();
+            await fetchHistory();
+            await fetchAddresses();
         }
 
         async function getUsdtRubRate() {
