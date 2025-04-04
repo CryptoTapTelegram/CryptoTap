@@ -63,7 +63,7 @@
             padding: 0 20px 20px;
             gap: 10px;
         }
-        .buttons button {
+        .buttons button, .screen button {
             padding: 12px 20px;
             background: linear-gradient(90deg, #007aff, #005bb5);
             color: white;
@@ -116,12 +116,15 @@
             position: fixed;
             bottom: 0;
             width: 360px;
-            display: flex;
+            display: none;
             justify-content: space-around;
             padding: 10px 0;
             background: #121212;
             border-top: 1px solid #2a2a2a;
             z-index: 1000;
+        }
+        .nav-bar.active {
+            display: flex;
         }
         .nav-bar img {
             width: 30px;
@@ -161,11 +164,6 @@
         #depositScreen #qrCode canvas {
             max-width: 200px;
         }
-        #depositScreen .commission-notice {
-            font-size: 12px;
-            color: #ff1744;
-            margin-top: 10px;
-        }
         #qrScreen {
             position: relative;
             height: calc(100vh - 100px);
@@ -189,7 +187,7 @@
         }
         #qrScreen .qr-buttons {
             position: absolute;
-            bottom: 20px;
+            bottom: 60px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -281,17 +279,44 @@
             margin: 0 0 30px;
             max-width: 300px;
         }
-        #welcomeScreen button {
-            padding: 12px 20px;
-            background: linear-gradient(90deg, #007aff, #005bb5);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
+        #passwordScreen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            height: 100vh;
+            background: linear-gradient(135deg, #070707, #121212);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
+        #passwordScreen.active {
+            display: flex;
+        }
+        #passwordScreen img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        #passwordScreen h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 10px;
+        }
+        #passwordScreen p {
             font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: 400;
+            background: none;
+            margin: 0 0 20px;
+        }
+        #passwordScreen input {
+            width: 80%;
+            max-width: 300px;
         }
         #historyScreen .transaction {
             background: #1e1e1e;
@@ -307,10 +332,18 @@
             font-weight: 600;
             margin: 10px 0;
         }
-        #profileScreen .security-section button {
-            padding: 10px 15px;
-            font-size: 12px;
-            width: 100%;
+        #faqScreen {
+            padding-bottom: 80px;
+        }
+        #faqScreen h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px;
+        }
+        #faqScreen p {
+            font-size: 14px;
+            font-weight: 400;
+            margin: 0 0 10px;
         }
         #errorDebug {
             position: fixed;
@@ -334,10 +367,18 @@
         <button onclick="startApp()">Начать</button>
     </div>
 
+    <div id="passwordScreen" class="screen">
+        <img id="userAvatarPass" alt="User Avatar">
+        <h2>Приветствуем вас, <span id="userNamePass"></span></h2>
+        <p>Быстро. Безопасно. Удобно.</p>
+        <input id="pinInput" type="password" maxlength="4" placeholder="Введите PIN (4 цифры)">
+        <button onclick="verifyPin()">Войти</button>
+    </div>
+
     <div id="mainScreen" class="screen">
         <div class="header">
             <img id="userAvatar" alt="Profile" onclick="showScreen('profileScreen')">
-            <img src="history-icon.png" alt="History" onclick="showScreen('historyScreen')">
+            <img src="https://cdn-icons-png.flaticon.com/512/3524/3524335.png" alt="History" onclick="showScreen('historyScreen')">
         </div>
         <div class="greeting">Здравствуйте, <span id="userNameGreeting"></span></div>
         <div class="balance">
@@ -345,7 +386,7 @@
             <h2 id="balance">0 USDT</h2>
         </div>
         <div class="buttons">
-            <button onclick="showScreen('depositScreen')">Пополнить</button>
+            <button onclick="showScreen('networkSelectScreen')">Пополнить</button>
             <button onclick="showScreen('qrScreen')">QR</button>
             <button class="send-btn" onclick="showScreen('withdrawScreen')">Отправить</button>
         </div>
@@ -364,11 +405,17 @@
         </div>
     </div>
 
+    <div id="networkSelectScreen" class="screen">
+        <h3>Выберите сеть для пополнения</h3>
+        <p>Сеть: TRC20</p>
+        <p>Среднее время пополнения: ~5 минут</p>
+        <button onclick="showScreen('depositScreen')">Продолжить</button>
+    </div>
+
     <div id="depositScreen" class="screen">
-        <h3>ПаПополнить USDT (TRC20)</h3>
+        <h3>Пополнить USDT (TRC20)</h3>
         <p>Ваш адрес: <span id="depositAddress">Загрузка...</span></p>
         <div id="qrCode"></div>
-        <p class="commission-notice">Внимание: при пополнении взимается комиссия 1%.</p>
         <button onclick="copyAddress()">Скопировать адрес</button>
         <button onclick="testDeposit()">Тестовое пополнение</button>
     </div>
@@ -377,6 +424,7 @@
         <h3>Отправить USDT (TRC20)</h3>
         <input id="withdrawAddress" placeholder="Адрес получателя">
         <input id="withdrawAmount" placeholder="Сумма (USDT)" type="number">
+        <p>Комиссия: Сетевая + 0.3%</p>
         <button onclick="sendCrypto()">Отправить</button>
     </div>
 
@@ -409,17 +457,23 @@
         <div class="security-section">
             <h4>Безопасность</h4>
             <div>
-                <h5>Подтверждение аккаунта</h5>
-                <input id="email" placeholder="Email">
-                <input id="password" placeholder="Пароль" type="password">
-                <button onclick="setCredentials()">Привязать Email</button>
-            </div>
-            <div>
                 <h5>Задать PIN-код</h5>
                 <input id="pinCode" placeholder="PIN-код (4 цифры)" type="password" maxlength="4">
                 <button onclick="setPinCode()">Сохранить PIN</button>
             </div>
         </div>
+        <div class="security-section">
+            <h4>FAQ</h4>
+            <button onclick="showScreen('faqScreen')">Открыть FAQ</button>
+        </div>
+    </div>
+
+    <div id="faqScreen" class="screen">
+        <h3>FAQ</h3>
+        <p><strong>Пользовательское соглашение:</strong> Используя CrypTon, вы соглашаетесь с нашими условиями. Мы не несем ответственности за потерю средств из-за ошибок пользователя.</p>
+        <p><strong>Инструкции:</strong> Для пополнения выберите "Пополнить", скопируйте адрес TRC20 и отправьте USDT. Для вывода укажите адрес и сумму, учтите комиссию сети + 0.3%.</p>
+        <p><strong>Фишки:</strong> Сканирование QR-кодов для оплаты, ИИ-поддержка, быстрые транзакции через TRC20.</p>
+        <button onclick="showScreen('profileScreen')">Назад</button>
     </div>
 
     <div id="historyScreen" class="screen">
@@ -448,17 +502,33 @@
         document.getElementById("profileName").innerText = userName;
         document.getElementById("userNameGreeting").innerText = `@${userName}`;
         document.getElementById("userAvatar").src = userAvatar;
+        document.getElementById("userNamePass").innerText = `@${userName}`;
+        document.getElementById("userAvatarPass").src = userAvatar;
 
-        // Замени на актуальный ngrok-URL после запуска ngrok
-        const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app"; // Обнови это!
+        const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app"; // Обнови на актуальный ngrok-URL
 
-        let stream, qrData;
+        let stream, qrData, hasPin = false;
+
+        async function checkPin() {
+            const response = await fetch(`${API_BASE_URL}/check_pin`, {
+                method: 'POST',
+                headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            });
+            const data = await response.json();
+            hasPin = data.has_pin;
+            if (hasPin) {
+                showScreen('passwordScreen');
+            } else {
+                showScreen('mainScreen');
+            }
+        }
 
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
-            document.querySelector(`.nav-bar img[alt="${screenId === 'mainScreen' ? 'Home' : screenId === 'qrScreen' ? 'QR' : 'Profile'}"]`).classList.add('active');
+            document.querySelector(`.nav-bar img[alt="${screenId === 'mainScreen' ? 'Home' : screenId === 'qrScreen' ? 'QR' : 'Profile'}"]`)?.classList.add('active');
 
             if (screenId === 'qrScreen') startQrScanner();
             else stopQrScanner();
@@ -475,33 +545,44 @@
 
         async function startApp() {
             document.getElementById('welcomeScreen').classList.remove('active');
-            showScreen('mainScreen');
+            document.querySelector('.nav-bar').classList.add('active');
             try {
                 const checkResponse = await fetch(`${API_BASE_URL}/check_registration`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true'
-                    },
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
                 if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status} - ${await checkResponse.text()}`);
                 const checkData = await checkResponse.json();
-                console.log('Check registration response:', checkData);
-
                 if (!checkData.registered) {
                     alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
-                    document.getElementById('depositAddress').innerText = 'Не зарегистрирован';
-                    document.getElementById('trc20Address').innerText = 'Не зарегистрирован';
                 } else {
                     await fetchAddresses();
                     await fetchBalances();
+                    checkPin();
                 }
             } catch (error) {
                 console.error('Ошибка проверки регистрации:', error);
                 showError(`Ошибка проверки: ${error.message}`);
-                document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
-                document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
+            }
+        }
+
+        async function verifyPin() {
+            const pin = document.getElementById('pinInput').value;
+            if (pin.length === 4 && /^\d+$/.test(pin)) {
+                const response = await fetch(`${API_BASE_URL}/verify_pin`, {
+                    method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, pin })
+                });
+                const data = await response.json();
+                if (data.valid) {
+                    showScreen('mainScreen');
+                } else {
+                    showError('Неверный PIN-код');
+                }
+            } else {
+                showError('Введите 4 цифры');
             }
         }
 
@@ -519,25 +600,10 @@
         async function fetchBalances() {
             try {
                 const response = await fetch(`${API_BASE_URL}/balances/${userId}`, {
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
                 });
-                console.log('Request URL:', `${API_BASE_URL}/balances/${userId}`);
-                console.log('Response Status:', response.status);
-                console.log('Content-Type:', response.headers.get('content-type'));
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Fetch balances failed: ${response.status} - ${errorText.slice(0, 50)}...`);
-                }
-                const text = await response.text();
-                console.log('Raw Response:', text);
-
-                const data = JSON.parse(text);
-                console.log('Parsed Data:', data);
-
+                if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
+                const data = await response.json();
                 const usdtBalance = data.usdt_trc20;
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
@@ -549,9 +615,6 @@
             } catch (error) {
                 console.error('Ошибка загрузки баланса:', error);
                 showError(`Ошибка баланса: ${error.message}`);
-                document.getElementById('usdtTrc20Balance').innerText = `Ошибка: ${error.message}`;
-                document.getElementById('usdtTrc20BalanceRub').innerText = 'Ошибка';
-                document.getElementById('balance').innerText = 'Ошибка';
                 return 0;
             }
         }
@@ -559,10 +622,7 @@
         async function fetchHistory() {
             try {
                 const response = await fetch(`${API_BASE_URL}/history/${userId}`, {
-                    headers: { 
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
                 });
                 const data = await response.json();
                 const transactionsDiv = document.getElementById('transactions');
@@ -584,21 +644,19 @@
 
         async function sendCrypto() {
             const address = document.getElementById('withdrawAddress').value;
-            const amount = document.getElementById('withdrawAmount').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
             try {
                 const response = await fetch(`${API_BASE_URL}/send`, {
                     method: 'POST',
-                    headers: { 
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ network: 'trc20', recipient: address, amount, user_id: userId })
                 });
                 const data = await response.json();
                 if (data.status === 'sent') {
                     alert(`Отправлено! Tx: ${data.tx_id}`);
-                    fetchBalances();
+                    await fetchBalances();
                     fetchHistory();
+                    showScreen('mainScreen');
                 }
             } catch (error) {
                 console.error('Ошибка отправки:', error);
@@ -610,19 +668,16 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/test_deposit`, {
                     method: 'POST',
-                    headers: { 
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId, amount: 100 })
                 });
                 if (!response.ok) throw new Error(`Test deposit failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
-                console.log('Test deposit response:', data);
                 if (data.status === 'deposited') {
                     alert('Тестовое пополнение на 100 USDT выполнено!');
-                    fetchBalances();
+                    await fetchBalances();
                     fetchHistory();
+                    showScreen('mainScreen');
                 }
             } catch (error) {
                 console.error('Ошибка тестового пополнения:', error);
@@ -642,14 +697,15 @@
                 try {
                     const response = await fetch(`${API_BASE_URL}/set_pin`, {
                         method: 'POST',
-                        headers: { 
-                            'ngrok-skip-browser-warning': 'true',
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, pin })
                     });
                     const data = await response.json();
-                    if (data.status === 'success') alert('PIN-код установлен!');
+                    if (data.status === 'success') {
+                        alert('PIN-код установлен!');
+                        hasPin = true;
+                        showScreen('passwordScreen');
+                    }
                 } catch (error) {
                     console.error('Ошибка установки PIN:', error);
                 }
@@ -658,32 +714,9 @@
             }
         }
 
-        async function setCredentials() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (email && password) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/set_credentials`, {
-                        method: 'POST',
-                        headers: { 
-                            'ngrok-skip-browser-warning': 'true',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ user_id: userId, email, password })
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') alert('Email и пароль привязаны!');
-                } catch (error) {
-                    console.error('Ошибка привязки email:', error);
-                }
-            } else {
-                alert('Заполните все поля!');
-            }
-        }
-
         async function generateQRCode() {
             const address = document.getElementById('depositAddress').innerText;
-            if (address && address !== 'Загрузка...' && address !== 'Не зарегистрирован' && address !== 'Ошибка загрузки') {
+            if (address && address !== 'Загрузка...') {
                 const qrCodeDiv = document.getElementById('qrCode');
                 qrCodeDiv.innerHTML = '';
                 QRCode.toCanvas(address, { width: 200 }, (error, canvas) => {
@@ -776,10 +809,7 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/freeze`, {
                     method: 'POST',
-                    headers: { 
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount: qrData.amount * 1.05, qr_data: qrData, user_id: userId })
                 });
                 const data = await response.json();
@@ -797,10 +827,7 @@
             const interval = setInterval(async () => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/payment_status/${paymentId}`, {
-                        headers: { 
-                            'ngrok-skip-browser-warning': 'true',
-                            'Content-Type': 'application/json'
-                        }
+                        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
                     });
                     const data = await response.json();
                     if (data.status === 'approved') {
@@ -825,20 +852,14 @@
         window.onload = () => {
             fetch(`${API_BASE_URL}/check_registration`, {
                 method: 'POST',
-                headers: { 
-                    'ngrok-skip-browser-warning': 'true',
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId })
             }).then(response => response.json()).then(data => {
-                console.log('Check registration response:', data);
                 if (data.registered) {
-                    document.getElementById('welcomeScreen').classList.remove('active');
-                    showScreen('mainScreen');
-                    fetchBalances();
-                    fetchAddresses();
+                    document.querySelector('.nav-bar').classList.add('active');
+                    checkPin();
                 } else {
-                    alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
+                    showScreen('welcomeScreen');
                 }
             }).catch(error => {
                 console.error('Ошибка проверки регистрации:', error);
@@ -850,22 +871,16 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/register`, {
                     method: 'POST',
-                    headers: { 
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
                 if (!response.ok) throw new Error(`Fetch address failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
-                console.log('Fetch addresses response:', data);
                 document.getElementById('depositAddress').innerText = data.trc20;
                 document.getElementById('trc20Address').innerText = data.trc20;
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
                 showError(`Ошибка адреса: ${error.message}`);
-                document.getElementById('depositAddress').innerText = `Ошибка: ${error.message}`;
-                document.getElementById('trc20Address').innerText = `Ошибка: ${error.message}`;
             }
         }
     </script>
