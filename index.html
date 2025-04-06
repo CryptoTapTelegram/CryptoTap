@@ -128,6 +128,7 @@
         }
         .nav-bar img {
             width: 30px;
+            height: 30px;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -479,9 +480,9 @@
     </div>
 
     <div class="nav-bar">
-        <img src="home-icon.png" alt="Home" onclick="showScreen('mainScreen')" class="nav-icon active">
-        <img src="qr-icon.png" alt="QR" onclick="showScreen('qrScreen')" class="nav-icon">
-        <img src="profile-icon.png" alt="Profile" onclick="showScreen('profileScreen')" class="nav-icon">
+        <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" alt="Home" onclick="showScreen('mainScreen')" class="nav-icon active">
+        <img src="https://cdn-icons-png.flaticon.com/512/719/719477.png" alt="QR" onclick="showScreen('qrScreen')" class="nav-icon">
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="Profile" onclick="showScreen('profileScreen')" class="nav-icon">
     </div>
 
     <div id="errorDebug"></div>
@@ -505,6 +506,7 @@
         const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app"; // Обнови на актуальный ngrok-URL
 
         let stream, qrData, hasPin = false;
+        let cachedData = { balances: null, history: null, address: null }; // Кэш для ускорения загрузки
 
         async function checkPin() {
             console.log("Checking PIN for user:", userId);
@@ -514,35 +516,41 @@
                     headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
+                if (!response.ok) throw new Error(`Check PIN failed: ${response.status}`);
                 const data = await response.json();
                 console.log("Check PIN response:", data);
                 hasPin = data.has_pin;
                 if (hasPin) {
-                    showScreen('passwordScreen');
+                    showScreen('passwordScreen', false);
                 } else {
-                    showScreen('mainScreen');
+                    showScreen('mainScreen', true);
                     await loadInitialData();
                 }
             } catch (error) {
                 console.error('Ошибка проверки PIN:', error);
                 showError(`Ошибка проверки PIN: ${error.message}`);
-                showScreen('mainScreen');
+                showScreen('mainScreen', true);
                 await loadInitialData();
             }
         }
 
-        function showScreen(screenId) {
-            console.log("Showing screen:", screenId);
+        function showScreen(screenId, showNav = true) {
+            console.log("Showing screen:", screenId, "Show nav:", showNav);
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-            document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
-            document.querySelector(`.nav-bar img[alt="${screenId === 'mainScreen' ? 'Home' : screenId === 'qrScreen' ? 'QR' : 'Profile'}"]`)?.classList.add('active');
+            if (showNav) {
+                document.querySelector('.nav-bar').classList.add('active');
+                document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
+                document.querySelector(`.nav-bar img[alt="${screenId === 'mainScreen' ? 'Home' : screenId === 'qrScreen' ? 'QR' : 'Profile'}"]`)?.classList.add('active');
+            } else {
+                document.querySelector('.nav-bar').classList.remove('active');
+            }
 
             if (screenId === 'qrScreen') startQrScanner();
             else stopQrScanner();
             if (screenId === 'historyScreen') fetchHistory();
             if (screenId === 'depositScreen') generateQRCode();
-            if (screenId === 'mainScreen') fetchBalances();
+            if (screenId === 'mainScreen') loadCachedOrFetch('balances', fetchBalances);
         }
 
         function showError(message) {
@@ -555,14 +563,13 @@
         async function startApp() {
             console.log("Starting app for user:", userId);
             document.getElementById('welcomeScreen').classList.remove('active');
-            document.querySelector('.nav-bar').classList.add('active');
             try {
                 const checkResponse = await fetch(`${API_BASE_URL}/check_registration`, {
                     method: 'POST',
                     headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
-                if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status} - ${await checkResponse.text()}`);
+                if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status}`);
                 const checkData = await checkResponse.json();
                 console.log("Check registration response:", checkData);
                 if (!checkData.registered) {
@@ -574,7 +581,7 @@
             } catch (error) {
                 console.error('Ошибка проверки регистрации:', error);
                 showError(`Ошибка проверки: ${error.message}`);
-                showScreen('mainScreen');
+                showScreen('mainScreen', true);
                 await loadInitialData();
             }
         }
@@ -589,10 +596,11 @@
                         headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, pin })
                     });
+                    if (!response.ok) throw new Error(`Verify PIN failed: ${response.status}`);
                     const data = await response.json();
                     console.log("Verify PIN response:", data);
                     if (data.valid) {
-                        showScreen('mainScreen');
+                        showScreen('mainScreen', true);
                         await loadInitialData();
                     } else {
                         showError('Неверный PIN-код');
@@ -608,10 +616,41 @@
 
         async function loadInitialData() {
             console.log("Loading initial data...");
-            await fetchBalances();
-            await fetchHistory();
-            await fetchAddresses();
+            await Promise.all([
+                loadCachedOrFetch('balances', fetchBalances),
+                loadCachedOrFetch('history', fetchHistory),
+                loadCachedOrFetch('address', fetchAddresses)
+            ]);
             console.log("Initial data loaded.");
+        }
+
+        async function loadCachedOrFetch(type, fetchFunc) {
+            if (cachedData[type]) {
+                console.log(`Using cached ${type}:`, cachedData[type]);
+                if (type === 'balances') {
+                    document.getElementById('usdtTrc20Balance').innerText = `${cachedData[type].usdt_trc20} USDT`;
+                    document.getElementById('usdtTrc20BalanceRub').innerText = `${cachedData[type].rub_balance} ₽`;
+                    document.getElementById('balance').innerText = `${cachedData[type].usdt_trc20} USDT`;
+                } else if (type === 'history') {
+                    const transactionsDiv = document.getElementById('transactions');
+                    transactionsDiv.innerHTML = '';
+                    cachedData[type].forEach(tx => {
+                        transactionsDiv.innerHTML += `
+                            <div class="transaction">
+                                <p>Тип: ${tx.type}</p>
+                                <p>Сумма: ${tx.amount} USDT</p>
+                                <p>Дата: ${new Date(tx.timestamp * 1000).toLocaleString()}</p>
+                                <p>Tx ID: ${tx.tx_id}</p>
+                            </div>
+                        `;
+                    });
+                } else if (type === 'address') {
+                    document.getElementById('depositAddress').innerText = cachedData[type];
+                    document.getElementById('trc20Address').innerText = cachedData[type];
+                }
+            } else {
+                await fetchFunc();
+            }
         }
 
         async function getUsdtRubRate() {
@@ -640,6 +679,7 @@
                 document.getElementById('usdtTrc20Balance').innerText = `${usdtBalance} USDT`;
                 document.getElementById('usdtTrc20BalanceRub').innerText = `${rubBalance} ₽`;
                 document.getElementById('balance').innerText = `${usdtBalance} USDT`;
+                cachedData.balances = { usdt_trc20: usdtBalance, rub_balance: rubBalance };
                 return usdtBalance;
             } catch (error) {
                 console.error('Ошибка загрузки баланса:', error);
@@ -667,6 +707,7 @@
                         </div>
                     `;
                 });
+                cachedData.history = data.transactions;
             } catch (error) {
                 console.error('Ошибка загрузки истории:', error);
             }
@@ -686,7 +727,7 @@
                     alert(`Отправлено! Tx: ${data.tx_id}`);
                     await fetchBalances();
                     fetchHistory();
-                    showScreen('mainScreen');
+                    showScreen('mainScreen', true);
                 }
             } catch (error) {
                 console.error('Ошибка отправки:', error);
@@ -707,7 +748,7 @@
                     alert('Тестовое пополнение на 100 USDT выполнено!');
                     await fetchBalances();
                     fetchHistory();
-                    showScreen('mainScreen');
+                    showScreen('mainScreen', true);
                 }
             } catch (error) {
                 console.error('Ошибка тестового пополнения:', error);
@@ -723,6 +764,7 @@
 
         async function setPinCode() {
             const pin = document.getElementById('pinCode').value;
+            console.log("Setting PIN:", pin);
             if (pin.length === 4 && /^\d+$/.test(pin)) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/set_pin`, {
@@ -730,17 +772,20 @@
                         headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                         body: JSON.stringify({ user_id: userId, pin })
                     });
+                    if (!response.ok) throw new Error(`Set PIN failed: ${response.status} - ${await response.text()}`);
                     const data = await response.json();
+                    console.log("Set PIN response:", data);
                     if (data.status === 'success') {
                         alert('PIN-код установлен!');
                         hasPin = true;
-                        showScreen('passwordScreen');
+                        showScreen('passwordScreen', false);
                     }
                 } catch (error) {
                     console.error('Ошибка установки PIN:', error);
+                    showError(`Ошибка установки PIN: ${error.message}`);
                 }
             } else {
-                alert('Введите 4 цифры!');
+                showError('Введите 4 цифры!');
             }
         }
 
@@ -826,10 +871,10 @@
                     Сумма: ${qrData.amount} USDT<br>
                     С учетом комиссии (5%): ${amountWithFee.toFixed(2)} USDT
                 `;
-                showScreen('qrConfirmScreen');
+                showScreen('qrConfirmScreen', true);
             } else {
                 alert('Недостаточно средств на балансе!');
-                showScreen('qrScreen');
+                showScreen('qrScreen', true);
             }
             document.getElementById('loader').style.display = 'none';
         }
@@ -866,12 +911,12 @@
                         alert('Оплата прошла успешно!');
                         fetchBalances();
                         fetchHistory();
-                        showScreen('mainScreen');
+                        showScreen('mainScreen', true);
                     } else if (data.status === 'rejected') {
                         clearInterval(interval);
                         document.getElementById('paymentLoader').style.display = 'none';
                         alert('Оплата не прошла. Неверный QR-код.');
-                        showScreen('qrScreen');
+                        showScreen('qrScreen', true);
                     }
                 } catch (error) {
                     console.error('Ошибка проверки статуса оплаты:', error);
@@ -888,14 +933,14 @@
             }).then(response => response.json()).then(data => {
                 console.log("Initial check registration response:", data);
                 if (data.registered) {
-                    document.querySelector('.nav-bar').classList.add('active');
                     checkPin();
                 } else {
-                    showScreen('welcomeScreen');
+                    showScreen('welcomeScreen', false);
                 }
             }).catch(error => {
                 console.error('Ошибка проверки регистрации:', error);
                 showError(`Ошибка проверки: ${error.message}`);
+                showScreen('welcomeScreen', false);
             });
         };
 
@@ -911,6 +956,7 @@
                 console.log("Addresses response:", data);
                 document.getElementById('depositAddress').innerText = data.trc20;
                 document.getElementById('trc20Address').innerText = data.trc20;
+                cachedData.address = data.trc20;
             } catch (error) {
                 console.error('Ошибка загрузки адреса:', error);
                 showError(`Ошибка адреса: ${error.message}`);
