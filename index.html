@@ -11,8 +11,6 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #070707;
-            color: #fff;
             max-width: 360px;
             width: 360px;
             height: 100vh;
@@ -21,6 +19,15 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #070707;
+            color: #fff;
+        }
+        body.light-theme {
+            background-color: #f5f5f5;
+            color: #333;
         }
         .beta-label {
             position: absolute;
@@ -34,11 +41,21 @@
             font-weight: 500;
             z-index: 3000;
         }
+        .light-theme .beta-label {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
         .header {
             display: flex;
             justify-content: space-between;
             padding: 15px 20px;
+            transition: background-color 0.3s;
+        }
+        .dark-theme .header {
             background: #070707;
+        }
+        .light-theme .header {
+            background: #ffffff;
         }
         .header img {
             width: 32px;
@@ -55,10 +72,17 @@
         .balance {
             margin: 10px 20px;
             padding: 15px;
-            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s;
+        }
+        .dark-theme .balance {
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+        }
+        .light-theme .balance {
+            background: linear-gradient(135deg, #e0e0e0, #ffffff);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .balance p {
             margin: 0;
@@ -114,9 +138,16 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px;
-            background: #1e1e1e;
             border-radius: 12px;
             margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+        .dark-theme .asset-item {
+            background: #1e1e1e;
+        }
+        .light-theme .asset-item {
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .asset-item img {
             width: 24px;
@@ -135,9 +166,17 @@
             display: none;
             justify-content: space-around;
             padding: 10px 0;
-            background: #121212;
             border-top: 1px solid #2a2a2a;
             z-index: 1000;
+            transition: background 0.3s, border-top 0.3s;
+        }
+        .dark-theme .nav-bar {
+            background: #121212;
+            border-top: 1px solid #2a2a2a;
+        }
+        .light-theme .nav-bar {
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
         }
         .nav-bar.active {
             display: flex;
@@ -158,7 +197,13 @@
             padding-bottom: 80px;
             flex-grow: 1;
             overflow: hidden;
+            transition: background 0.3s;
+        }
+        .dark-theme .screen {
             background: #070707;
+        }
+        .light-theme .screen {
+            background: #f5f5f5;
         }
         .screen.active {
             display: block;
@@ -169,12 +214,20 @@
             margin: 10px 0;
             border-radius: 12px;
             border: none;
-            background: #1e1e1e;
-            color: #fff;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
             font-weight: 400;
             box-sizing: border-box;
+            transition: background 0.3s, color 0.3s;
+        }
+        .dark-theme input, .dark-theme p {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        .light-theme input, .light-theme p {
+            background: #ffffff;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #depositScreen #qrCode {
             text-align: center;
@@ -234,14 +287,27 @@
             color: white;
         }
         #qrConfirmScreen {
+            transition: background 0.3s;
+        }
+        .dark-theme #qrConfirmScreen {
             background: #070707;
         }
+        .light-theme #qrConfirmScreen {
+            background: #f5f5f5;
+        }
         #qrConfirmScreen .qr-info {
-            background: #1e1e1e;
             padding: 15px;
             border-radius: 12px;
             margin: 20px 0;
             font-weight: 400;
+            transition: background 0.3s;
+        }
+        .dark-theme #qrConfirmScreen .qr-info {
+            background: #1e1e1e;
+        }
+        .light-theme #qrConfirmScreen .qr-info {
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #qrConfirmScreen .action-buttons {
             display: flex;
@@ -281,13 +347,19 @@
             padding: 20px;
             text-align: center;
             height: 100vh;
-            background: linear-gradient(135deg, #070707, #121212);
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
             overflow: hidden;
+            transition: background 0.3s;
+        }
+        .dark-theme #welcomeScreen {
+            background: linear-gradient(135deg, #070707, #121212);
+        }
+        .light-theme #welcomeScreen {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
         }
         #welcomeScreen.active {
             display: block;
@@ -326,12 +398,18 @@
             text-align: center;
             padding: 20px;
             height: 100vh;
-            background: linear-gradient(135deg, #070707, #121212);
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
+            transition: background 0.3s;
+        }
+        .dark-theme #passwordScreen {
+            background: linear-gradient(135deg, #070707, #121212);
+        }
+        .light-theme #passwordScreen {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
         }
         #passwordScreen.active {
             display: block;
@@ -373,10 +451,17 @@
             overflow-y: auto;
         }
         #historyScreen .transaction {
-            background: #1e1e1e;
             padding: 10px;
             border-radius: 12px;
             margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+        .dark-theme #historyScreen .transaction {
+            background: #1e1e1e;
+        }
+        .light-theme #historyScreen .transaction {
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #profileScreen .security-section {
             margin-top: 20px;
@@ -385,6 +470,35 @@
             font-size: 16px;
             font-weight: 600;
             margin: 10px 0;
+        }
+        #profileScreen .theme-section {
+            margin-top: 20px;
+        }
+        #profileScreen .theme-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        #profileScreen .theme-section select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            box-sizing: border-box;
+            transition: background 0.3s, color 0.3s;
+        }
+        .dark-theme #profileScreen .theme-section select {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        .light-theme #profileScreen .theme-section select {
+            background: #ffffff;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #faqScreen {
             padding-bottom: 80px;
@@ -414,7 +528,7 @@
         }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <div class="beta-label">Beta</div>
     <div id="welcomeScreen" class="screen active">
         <h1>Добро пожаловать<br>в CrypTon!</h1>
@@ -500,11 +614,11 @@
     <div id="qrConfirmScreen" class="screen">
         <h3>Подтверждение оплаты</h3>
         <div class="qr-info" id="qrInfo"></div>
-        <div class="action-buttons">
+        <div class="action-buttons" id="actionButtons">
             <button class="confirm-btn" onclick="confirmPayment()">Оплатить</button>
             <button class="cancel-btn" onclick="showScreen('qrScreen')">Отменить</button>
         </div>
-        <div id="paymentLoader" class="loader">Ожидание оплаты...</div>
+        <div id="paymentLoader" class="loader">Оплачиваем ваш QR-код...</div>
     </div>
 
     <div id="profileScreen" class="screen">
@@ -518,6 +632,13 @@
                 <input id="pinCode" placeholder="PIN-код (4 цифры)" type="password" maxlength="4">
                 <button onclick="setPinCode()">Сохранить PIN</button>
             </div>
+        </div>
+        <div class="theme-section">
+            <h4>Тема</h4>
+            <select id="themeSelect" onchange="setTheme(this.value)">
+                <option value="dark">Тёмная</option>
+                <option value="light">Светлая</option>
+            </select>
         </div>
         <div class="security-section">
             <h4>FAQ</h4>
@@ -566,6 +687,45 @@
 
         let stream, qrData, hasPin = false;
         let cachedData = { balances: null, history: null, address: null };
+
+        // Загружаем тему при старте
+        async function loadTheme() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/get_theme/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error(`Failed to fetch theme: ${response.status}`);
+                const data = await response.json();
+                const theme = data.theme || 'dark';
+                document.body.classList.remove('dark-theme', 'light-theme');
+                document.body.classList.add(`${theme}-theme`);
+                document.getElementById('themeSelect').value = theme;
+                localStorage.setItem('theme', theme);
+            } catch (error) {
+                console.error('Ошибка загрузки темы:', error);
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                document.body.classList.add(`${savedTheme}-theme`);
+                document.getElementById('themeSelect').value = savedTheme;
+            }
+        }
+
+        async function setTheme(theme) {
+            try {
+                document.body.classList.remove('dark-theme', 'light-theme');
+                document.body.classList.add(`${theme}-theme`);
+                localStorage.setItem('theme', theme);
+                const response = await fetch(`${API_BASE_URL}/set_theme`, {
+                    method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, theme })
+                });
+                if (!response.ok) throw new Error(`Failed to set theme: ${response.status}`);
+                console.log(`Theme set to ${theme}`);
+            } catch (error) {
+                console.error('Ошибка установки темы:', error);
+                showError(`Ошибка установки темы: ${error.message}`);
+            }
+        }
 
         async function checkPin() {
             console.log("Checking PIN for user:", userId);
@@ -628,6 +788,7 @@
 
         async function startApp() {
             console.log("Starting app for user:", userId);
+            await loadTheme();
             try {
                 const checkResponse = await fetch(`${API_BASE_URL}/check_registration`, {
                     method: 'POST',
@@ -1023,7 +1184,13 @@
         }
 
         async function confirmPayment() {
+            // Скрываем кнопки и показываем только загрузчик
+            document.getElementById('actionButtons').style.display = 'none';
             document.getElementById('paymentLoader').style.display = 'block';
+
+            // Добавляем задержку 10-20 секунд
+            await new Promise(resolve => setTimeout(resolve, 15000)); // 15 секунд
+
             try {
                 const amountWithFee = parseFloat(document.getElementById('qrInfo').innerHTML.match(/С учетом комиссии \(5%\): ([\d.]+) USDT/)[1]);
                 console.log("Confirming payment, amount with fee:", amountWithFee);
@@ -1044,6 +1211,7 @@
                 console.error('Ошибка заморозки средств:', error);
                 alert('Ошибка при оплате');
                 document.getElementById('paymentLoader').style.display = 'none';
+                document.getElementById('actionButtons').style.display = 'flex';
             }
         }
 
@@ -1054,7 +1222,10 @@
                     const response = await fetch(`${API_BASE_URL}/payment_status/${paymentId}`, {
                         headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
                     });
-                    if (!response.ok) throw new Error(`Payment status check failed: ${response.status}`);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Payment status check failed: ${response.status} - ${errorText}`);
+                    }
                     const data = await response.json();
                     console.log("Payment status response:", data);
                     if (data.status === 'approved') {
@@ -1062,8 +1233,8 @@
                         await completePayment(paymentId);
                         document.getElementById('paymentLoader').style.display = 'none';
                         alert('Ваш QR-код успешно оплачен!\nСпасибо за покупку, приходите снова!');
-                        fetchBalances();
-                        fetchHistory();
+                        await fetchBalances();
+                        await fetchHistory();
                         showScreen('mainScreen', true);
                     } else if (data.status === 'rejected') {
                         clearInterval(interval);
@@ -1074,6 +1245,9 @@
                 } catch (error) {
                     console.error('Ошибка проверки статуса оплаты:', error);
                     showError(`Ошибка проверки статуса: ${error.message}`);
+                    clearInterval(interval);
+                    document.getElementById('paymentLoader').style.display = 'none';
+                    showScreen('qrScreen', true);
                 }
             }, 2000);
         }
