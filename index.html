@@ -365,8 +365,8 @@
     </div>
 
     <div id="passwordScreen" class="screen">
-        <img id="userAvatarPass" alt="User Avatar">
-        <h2>Приветствуем вас, <span id="userNamePass"></span></h2>
+        <img id="userAvatarPass" src="default-avatar.png" alt="User Avatar">
+        <h2>Приветствуем вас, <span id="userNamePass">User</span></h2>
         <p>Быстро. Безопасно. Удобно.</p>
         <input id="pinInput" type="password" maxlength="4" placeholder="Введите PIN (4 цифры)">
         <button onclick="verifyPin()">Войти</button>
@@ -507,22 +507,32 @@
         let stream, qrData, hasPin = false;
 
         async function checkPin() {
-            const response = await fetch(`${API_BASE_URL}/check_pin`, {
-                method: 'POST',
-                headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId })
-            });
-            const data = await response.json();
-            hasPin = data.has_pin;
-            if (hasPin) {
-                showScreen('passwordScreen');
-            } else {
+            console.log("Checking PIN for user:", userId);
+            try {
+                const response = await fetch(`${API_BASE_URL}/check_pin`, {
+                    method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await response.json();
+                console.log("Check PIN response:", data);
+                hasPin = data.has_pin;
+                if (hasPin) {
+                    showScreen('passwordScreen');
+                } else {
+                    showScreen('mainScreen');
+                    await loadInitialData();
+                }
+            } catch (error) {
+                console.error('Ошибка проверки PIN:', error);
+                showError(`Ошибка проверки PIN: ${error.message}`);
                 showScreen('mainScreen');
                 await loadInitialData();
             }
         }
 
         function showScreen(screenId) {
+            console.log("Showing screen:", screenId);
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
@@ -543,6 +553,7 @@
         }
 
         async function startApp() {
+            console.log("Starting app for user:", userId);
             document.getElementById('welcomeScreen').classList.remove('active');
             document.querySelector('.nav-bar').classList.add('active');
             try {
@@ -553,32 +564,42 @@
                 });
                 if (!checkResponse.ok) throw new Error(`Check registration failed: ${checkResponse.status} - ${await checkResponse.text()}`);
                 const checkData = await checkResponse.json();
+                console.log("Check registration response:", checkData);
                 if (!checkData.registered) {
                     alert('Пожалуйста, напишите /start в чат с ботом для регистрации.');
                 } else {
                     await fetchAddresses();
-                    checkPin();
+                    await checkPin();
                 }
             } catch (error) {
                 console.error('Ошибка проверки регистрации:', error);
                 showError(`Ошибка проверки: ${error.message}`);
+                showScreen('mainScreen');
+                await loadInitialData();
             }
         }
 
         async function verifyPin() {
             const pin = document.getElementById('pinInput').value;
+            console.log("Verifying PIN:", pin);
             if (pin.length === 4 && /^\d+$/.test(pin)) {
-                const response = await fetch(`${API_BASE_URL}/verify_pin`, {
-                    method: 'POST',
-                    headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, pin })
-                });
-                const data = await response.json();
-                if (data.valid) {
-                    showScreen('mainScreen');
-                    await loadInitialData();
-                } else {
-                    showError('Неверный PIN-код');
+                try {
+                    const response = await fetch(`${API_BASE_URL}/verify_pin`, {
+                        method: 'POST',
+                        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, pin })
+                    });
+                    const data = await response.json();
+                    console.log("Verify PIN response:", data);
+                    if (data.valid) {
+                        showScreen('mainScreen');
+                        await loadInitialData();
+                    } else {
+                        showError('Неверный PIN-код');
+                    }
+                } catch (error) {
+                    console.error('Ошибка верификации PIN:', error);
+                    showError(`Ошибка верификации PIN: ${error.message}`);
                 }
             } else {
                 showError('Введите 4 цифры');
@@ -586,9 +607,11 @@
         }
 
         async function loadInitialData() {
+            console.log("Loading initial data...");
             await fetchBalances();
             await fetchHistory();
             await fetchAddresses();
+            console.log("Initial data loaded.");
         }
 
         async function getUsdtRubRate() {
@@ -609,6 +632,7 @@
                 });
                 if (!response.ok) throw new Error(`Fetch balances failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
+                console.log("Balances response:", data);
                 const usdtBalance = data.usdt_trc20;
                 const rubRate = await getUsdtRubRate();
                 const rubBalance = (usdtBalance * rubRate).toFixed(2);
@@ -630,6 +654,7 @@
                     headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' }
                 });
                 const data = await response.json();
+                console.log("History response:", data);
                 const transactionsDiv = document.getElementById('transactions');
                 transactionsDiv.innerHTML = '';
                 data.transactions.forEach(tx => {
@@ -855,11 +880,13 @@
         }
 
         window.onload = () => {
+            console.log("Page loaded, checking registration...");
             fetch(`${API_BASE_URL}/check_registration`, {
                 method: 'POST',
                 headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId })
             }).then(response => response.json()).then(data => {
+                console.log("Initial check registration response:", data);
                 if (data.registered) {
                     document.querySelector('.nav-bar').classList.add('active');
                     checkPin();
@@ -881,6 +908,7 @@
                 });
                 if (!response.ok) throw new Error(`Fetch address failed: ${response.status} - ${await response.text()}`);
                 const data = await response.json();
+                console.log("Addresses response:", data);
                 document.getElementById('depositAddress').innerText = data.trc20;
                 document.getElementById('trc20Address').innerText = data.trc20;
             } catch (error) {
