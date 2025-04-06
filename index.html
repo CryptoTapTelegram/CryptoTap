@@ -20,6 +20,19 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+        .beta-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 3000;
         }
         .header {
             display: flex;
@@ -75,6 +88,9 @@
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .buttons button.send-btn {
             background: transparent;
@@ -279,6 +295,8 @@
             line-height: 1.2;
             max-width: 300px;
             word-wrap: break-word;
+            margin-left: auto;
+            margin-right: auto;
         }
         #welcomeScreen p {
             font-size: 14px;
@@ -286,6 +304,8 @@
             background: none;
             margin: 0 0 30px;
             max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
         #welcomeScreen button {
             margin: 0 auto;
@@ -311,17 +331,23 @@
             height: 50px;
             border-radius: 50%;
             margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
         }
         #passwordScreen h2 {
             font-size: 24px;
             font-weight: 600;
             margin: 0 0 10px;
+            margin-left: auto;
+            margin-right: auto;
         }
         #passwordScreen p {
             font-size: 14px;
             font-weight: 400;
             background: none;
             margin: 0 0 20px;
+            margin-left: auto;
+            margin-right: auto;
         }
         #passwordScreen input {
             width: 80%;
@@ -379,10 +405,11 @@
     </style>
 </head>
 <body>
+    <div class="beta-label">Beta</div>
     <div id="welcomeScreen" class="screen active">
         <h1>Добро пожаловать<br>в CrypTon!</h1>
         <p>Храните и переводите USDT, оплачивайте покупки в магазинах и кафе через QR-код с терминалов. Первый криптокошелек с ИИ — быстро, удобно, безопасно.</p>
-        <button style="padding: 8px 16px !important; background: linear-gradient(90deg, #007aff, #005bb5) !important; color: white !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; font-family: 'Poppins', sans-serif !important; font-size: 14px !important; font-weight: 500 !important; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; width: 80px !important; height: 32px !important;" onclick="startApp()">Начать</button>
+        <button style="padding: 8px 16px !important; background: linear-gradient(90deg, #007aff, #005bb5) !important; color: white !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; font-family: 'Poppins', sans-serif !important; font-size: 14px !important; font-weight: 500 !important; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; width: 80px !important; height: 32px !important; display: flex !important; justify-content: center !important; align-items: center !important;" onclick="startApp()">Начать</button>
     </div>
 
     <div id="passwordScreen" class="screen">
@@ -390,7 +417,7 @@
         <h2>Приветствуем вас, <span id="userNamePass">User</span></h2>
         <p>Быстро. Безопасно. Удобно.</p>
         <input id="pinInput" type="password" maxlength="4" placeholder="Введите PIN (4 цифры)">
-        <button style="padding: 8px 16px !important; background: linear-gradient(90deg, #007aff, #005bb5) !important; color: white !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; font-family: 'Poppins', sans-serif !important; font-size: 14px !important; font-weight: 500 !important; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; width: 80px !important; height: 32px !important;" onclick="verifyPin()">Войти</button>
+        <button style="padding: 8px 16px !important; background: linear-gradient(90deg, #007aff, #005bb5) !important; color: white !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; font-family: 'Poppins', sans-serif !important; font-size: 14px !important; font-weight: 500 !important; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; width: 80px !important; height: 32px !important; display: flex !important; justify-content: center !important; align-items: center !important;" onclick="verifyPin()">Войти</button>
     </div>
 
     <div id="mainScreen" class="screen">
@@ -525,7 +552,6 @@
         document.getElementById("userAvatarPass").src = userAvatar;
 
         const API_BASE_URL = "https://6922-212-111-88-251.ngrok-free.app";
-        const EMPLOYEE_ADDRESS = "EMPLOYEE_TRC20_ADDRESS_HERE";
 
         let stream, qrData, hasPin = false;
         let cachedData = { balances: null, history: null, address: null };
@@ -900,8 +926,8 @@
             } catch (error) {
                 console.error('Ошибка заморозки средств:', error);
                 alert('Ошибка при оплате');
+                document.getElementById('paymentLoader').style.display = 'none';
             }
-            document.getElementById('paymentLoader').style.display = 'none';
         }
 
         async function checkPaymentStatus(paymentId) {
@@ -915,14 +941,14 @@
                         clearInterval(interval);
                         await completePayment(paymentId);
                         document.getElementById('paymentLoader').style.display = 'none';
-                        alert('Оплата прошла успешно!');
+                        alert('Ваш QR-код успешно оплачен!\nСпасибо за покупку, приходите снова!');
                         fetchBalances();
                         fetchHistory();
                         showScreen('mainScreen', true);
                     } else if (data.status === 'rejected') {
                         clearInterval(interval);
                         document.getElementById('paymentLoader').style.display = 'none';
-                        alert('Оплата не прошла. Неверный QR-код.');
+                        alert('Оплата отклонена сотрудником.');
                         showScreen('qrScreen', true);
                     }
                 } catch (error) {
@@ -936,7 +962,7 @@
                 const response = await fetch(`${API_BASE_URL}/complete_payment`, {
                     method: 'POST',
                     headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ payment_id: paymentId, employee_address: EMPLOYEE_ADDRESS })
+                    body: JSON.stringify({ payment_id: paymentId })
                 });
                 const data = await response.json();
                 if (data.status === 'completed') {
